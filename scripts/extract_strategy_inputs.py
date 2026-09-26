@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Iterable
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 from huggingface_hub import HfApi, hf_hub_download
 
 DATASET = "thetrademarkk/india-index-options-1m"
@@ -62,16 +64,57 @@ def load_index():
     df['close'] = pd.to_numeric(df['close'], errors='coerce')
     return df.dropna(subset=['timestamp','close']).sort_values('timestamp')
 
-def load_option_file(expiry, filename):
-    local = hf_hub_download(repo_id=DATASET, filename=filename, repo_type='dataset')
-    df = pd.read_parquet(local)
-    df['timestamp'] = normalize_timestamp(df['timestamp'])
-    df['strike'] = pd.to_numeric(df['strike'], errors='coerce')
-    df['close'] = pd.to_numeric(df['close'], errors='coerce')
-    df['option_type'] = df['option_type'].astype(str).str.upper()
-    df = df[df['option_type'].isin(['CE','PE'])].dropna(subset=['timestamp','strike','close']).copy()
-    df['contract_expiry'] = expiry
+def load_option_file(expiry, filename, entry_timestamps_utc=None):
+    local = hf_hub_download(repo_id=DATASET, filename=filename, repo_type="dataset")
+    if not entry_timestamps_utc:
+        df = pd.read_parquet(
+            local,
+            columns=["timestamp", "strike", "close", "option_type"],
+        )
+    else:
+        wanted = sorted(entry_timestamps_utc)
+        wanted_min = wanted[0]
+        wanted_max = wanted[-1]
+        pf = pq.ParquetFile(local)
+        timestamp_col = pf.schema_arrow.get_field_index("timestamp")
+        tables = []
+        for i in range(pf.num_row_groups):
+            stats = pf.metadata.row_group(i).column(timestamp_col).statistics
+            if stats is None or stats.min is None or stats.max is None:
+                tables.append(pf.read_row_group(i, columns=["timestamp", "strike", "close", "option_type"]))
+                continue
+            rg_min = pd.Timestamp(stats.min)
+            rg_max = pd.Timestamp(stats.max)
+            if rg_min.tzinfo is None:
+                rg_min = rg_min.tz_localize("UTC")
+            else:
+                rg_min = rg_min.tz_convert("UTC")
+            if rg_max.tzinfo is None:
+                rg_max = rg_max.tz_localize("UTC")
+            else:
+                rg_max = rg_max.tz_convert("UTC")
+            if rg_max >= wanted_min and rg_min <= wanted_max:
+                tables.append(
+                    pf.read_row_group(
+                        i,
+                        columns=["timestamp", "strike", "close", "option_type"],
+                    )
+                )
+        if not tables:
+            return pd.DataFrame(columns=["timestamp", "strike", "close", "option_type"])
+        table = pa.concat_tables(tables, promote_options=True)
+        df = table.to_pandas()
+
+    df["timestamp"] = normalize_timestamp(df["timestamp"])
+    df["strike"] = pd.to_numeric(df["strike"], errors="coerce")
+    df["close"] = pd.to_numeric(df["close"], errors="coerce")
+    df["option_type"] = df["option_type"].astype(str).str.upper()
+    df = df[df["option_type"].isin(["CE", "PE"])].dropna(
+        subset=["timestamp", "strike", "close"]
+    ).copy()
+    df["contract_expiry"] = expiry
     return df
+
 
 def exact_bar(df, entry_ts, strike, option_type):
     x = df[(df['timestamp'] == entry_ts) & (df['strike'] == strike) & (df['option_type'] == option_type)]
