@@ -1,31 +1,37 @@
 # Research status
 
 **As of:** 2026-09-26  
-**Active branch:** main bootstrap  
-**Overall phase:** 0 — Bootstrap complete
+**Active branch:** phase-1-specification  
+**Overall phase:** 1 — Strategy specification and analytical validation COMPLETE
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
 | 0 Bootstrap | COMPLETE | Governance files initialized. |
-| 1 Specification | NEXT | Create phase-1 branch and encode strategy/payoff tests. |
-| 2 Data | NOT STARTED | Select and validate historical NIFTY option dataset. |
+| 1 Specification | COMPLETE | Strategy equations, strike candidates, threshold helper, tests, and manual workflow added. |
+| 2 Data | NEXT | Select, acquire and validate historical NIFTY option data. |
 | 3 Backtest | NOT STARTED | Execute historical strategy with full cost model. |
 | 4 Validation | NOT STARTED | Out-of-sample and robustness analysis. |
 | 5 Regimes | NOT STARTED | Conditional/regime attribution. |
 | 6 Manuscript | NOT STARTED | Final research manuscript and supplements. |
 
-## Current findings
+## Phase 1 results
 
-1. The repository was empty at project start; a reproducible research structure is now being initialized.
-2. NSE's current NIFTY 50 contract specification lists four weekly expiries and Tuesday weekly expiry, subject to holiday adjustment.
-3. The strategy combines a short near-expiry synthetic forward with a long next-expiry synthetic forward. The different maturities make a one-dimensional flat payoff chart potentially misleading; the engine will evaluate the two expiries separately.
-4. Current NSE guidance shows option-sale STT at 0.15% from 2026-04-01; this must be reflected in the cost model for 2026 trades and parameterized for earlier periods.
+1. The position can be decomposed into a short near-expiry synthetic forward and a long next-expiry synthetic forward.
+2. For a common strike K, the expiry intrinsic component is S2 - S1, not zero.
+3. A one-dimensional chart that applies the same terminal spot to both expiries is flat at the initial net premium cashflow. This is a projection artifact, not evidence of flat realized P&L.
+4. The 2.5% threshold must remain parameterized because the original rule does not specify the denominator.
+5. Default deterministic research assumptions are NIFTY 50, 09:20 IST entry observation, ATM/-400/+400 common-strike candidates and one lot for reporting.
+
+## Verification
+
+Phase 1 unit tests pass locally for:
+- static flatline payoff construction
+- cross-expiry P&L directionality
+- a hidden-loss example
+- strike-candidate construction
+- strict >2.5% threshold logic
 
 ## Blockers
 
-- Historical intraday option data must be sourced, licensed/qualified, cached and validated before the full backtest.
-- The 2.5% denominator needs to remain explicit/configurable because the user's description does not define the reference capital/base.
-
-## Next step
-
-Phase 1: implement the strategy specification, payoff equations, and unit tests.
+- Historical intraday option data must be sourced, licensed/qualified, cached and validated before Phase 3.
+- The primary backtest needs exact entry fills and settlement prices for both expiries.
