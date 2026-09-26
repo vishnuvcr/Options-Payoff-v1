@@ -1,0 +1,123 @@
+name: Phase 7A - Historical SPAN Margin Cache and Exact 2.5% Selection
+
+on:
+  push:
+    branches:
+      - phase-7A-margin-reconstruction
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Completed Phase 3 run with candidate_results.parquet
+        required: true
+        default: '36262958536'
+      span_version:
+        description: NSE SPAN revision used at the 09:20 entry point
+        required: true
+        default: 'i02'
+      exposure_lower_bound_rate:
+        description: Conservative per-short index-option ELM lower bound used only for prefiltering
+        required: true
+        default: '0.01'
+      threshold_pct:
+        description: Exact margin-based Max Profit % gate
+        required: true
+        default: '2.5'
+
+concurrency:
+  group: phase-7A-historical-margin-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  historical-margin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install margin tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'marginism==0.1.1' 'pandas>=2.2' 'pyarrow>=18' 'requests>=2.31'
+
+      - name: Download Phase 3 candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/phase3_source
+          gh run download '${{ inputs.source_run_id || '36262958536' }}' \
+            --repo '${{ github.repository }}' \
+            --name phase-3-backtest-results \
+            --dir data/phase3_source
+          test -s data/phase3_source/candidate_results.parquet
+
+      - name: Prefilter candidates using conservative ELM lower bound
+        run: |
+          python scripts/prefilter_margin_candidates.py \
+            --candidates data/phase3_source/candidate_results.parquet \
+            --exposure-rate-per-short '${{ inputs.exposure_lower_bound_rate || '0.01' }}' \
+            --out results/phase7a_margin_prefilter.csv
+
+      - name: Download required NSE SPAN revisions for unique dates
+        run: |
+          mkdir -p data/margin/span_historical
+          python - <<'PY'
+          import pandas as pd
+          p='results/phase7a_margin_prefilter.csv'
+          df=pd.read_csv(p)
+          dates=sorted(pd.to_datetime(df['entry_date']).dt.strftime('%Y%m%d').unique())
+          open('/tmp/span_dates.txt','w').write('\n'.join(dates))
+          print('dates',len(dates))
+          print('\n'.join(dates))
+          PY
+          while read -r d; do
+            test -n "$d" || continue
+            url="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${d}.${{ inputs.span_version || 'i02' }}.zip"
+            echo "Downloading $url"
+            curl --fail --silent --show-error --location \
+              -H 'User-Agent: Mozilla/5.0' \
+              -H 'Accept: application/octet-stream,*/*;q=0.8' \
+              -H 'Referer: https://www.nseindia.com/' \
+              "$url" -o "/tmp/${d}.zip"
+            unzip -jo "/tmp/${d}.zip" '*.spn' -d data/margin/span_historical
+          done < /tmp/span_dates.txt
+          ls -lh data/margin/span_historical | head -n 20
+
+      - name: Reconstruct exact candidate margins
+        run: |
+          python scripts/reconstruct_candidate_margins.py \
+            --candidates results/phase7a_margin_prefilter.csv \
+            --span-dir data/margin/span_historical \
+            --span-version '${{ inputs.span_version || 'i02' }}' \
+            --out results/phase7a_margin_candidates.csv
+
+      - name: Analyze exact margin-based selection
+        run: |
+          python scripts/analyze_historical_margin_selection.py \
+            --margins results/phase7a_margin_candidates.csv \
+            --threshold-pct '${{ inputs.threshold_pct || '2.5' }}' \
+            --out-dir results/phase7a_exact_selection
+
+      - name: Validate exact selection outputs
+        run: |
+          python - <<'PY'
+          import json, pandas as pd
+          s=json.load(open('results/phase7a_exact_selection/summary.json'))
+          print(json.dumps(s,indent=2))
+          assert s['candidate_rows_reconstructed'] > 0
+          assert s['eligible_rows'] > 0
+          PY
+
+      - name: Upload Phase 7A historical margin results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-7A-historical-margin
+          path: |
+            results/phase7a_margin_prefilter.csv
+            results/phase7a_margin_candidates.csv
+            results/phase7a_exact_selection
