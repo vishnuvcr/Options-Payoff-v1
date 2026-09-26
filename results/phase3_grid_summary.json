@@ -1,0 +1,20 @@
+{
+  "phase3_run_id":"36262958536",
+  "candidate_rows":15467,
+  "eligible_entry_timestamps":891,
+  "selected_trade_rows":63,
+  "selected_entry_timestamps":52,
+  "atm_selected_trades":24,
+  "fallback_grid_selected_trades":39,
+  "selection_rate_pct":5.836139169472503,
+  "mean_net_pnl_inr":2677.237341465703,
+  "median_net_pnl_inr":6831.257956819223,
+  "win_rate_pct":60.317460317460316,
+  "total_net_pnl_inr":168665.9525123393,
+  "total_costs_inr":9439.625612661155,
+  "threshold_pct":2.5,
+  "trigger_base_mode":"buy_premium",
+  "slippage_pct":0.0025,
+  "fallback_max_shift_points":500,
+  "fallback_step_points":50
+}
