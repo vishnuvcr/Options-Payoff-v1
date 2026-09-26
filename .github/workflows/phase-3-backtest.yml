@@ -112,4 +112,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run phase-4-validation.yml --repo "${{ github.repository }}" --ref phase-4-validation -f phase3_run_id="${{ github.run_id }}" -f out_dir="results/phase4"
+          gh workflow run phase-4-validation.yml --repo "${{ github.repository }}" --ref phase-4-validation -f phase3_run_id="${{ github.run_id }}" -f phase2_run_id="$PHASE2_RUN_ID" -f out_dir="results/phase4"
