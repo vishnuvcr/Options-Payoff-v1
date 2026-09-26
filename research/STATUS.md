@@ -33,3 +33,6 @@ Regime attribution is now predeclared across realized volatility, India VIX, gap
 - Phase 3/4 historical artifacts are required before empirical regime analysis.
 - Quote-level bid/ask and IV surface history remain a separate data requirement.
 - The user's exact 2.5% denominator remains unconfirmed; supported alternatives must be reported.
+## Next executable step
+
+Run the manual Phase 2 workflow first; then pass its run ID into Phase 3. After Phase 3 completes, pass that run ID to Phase 4 and Phase 5. The current research environment does not expose a workflow-dispatch action, so this is the only external execution step currently blocking empirical results.
