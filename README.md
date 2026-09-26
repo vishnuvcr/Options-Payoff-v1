@@ -66,3 +66,29 @@ The complete manuscript is on the phase-6-manuscript branch.
 The previously reported **28 “selected trades” are provisional**. The backtest code imposed a selection gate of ATM first, then ATM-400, then ATM+400, requiring the chart metric to exceed 2.5% under the buy_premium denominator. That was an implementation choice and should not be described as a separately supplied user selection criterion.
 
 The user has now clarified that no separate selection criterion was supplied. Accordingly, the 28-trade result and all statistics derived from that conditional sample are **not final evidence for the user's strategy**. The research is paused at this specification point rather than inventing a new criterion.
+
+
+## Corrected full-grid research result (2026-09-26)
+
+The earlier ATM/-400/+400 implementation is superseded. The strategy has now been rerun using the clarified rule: ATM first; if ATM fails, evaluate every 50-point common-strike shift from -500 through +500 and trade every qualifying fallback strike.
+
+Authoritative corrected runs:
+- Phase 2: 36255238050
+- Phase 3: 36262958536
+- Phase 4: 36263760476
+- Phase 5: 36263974629
+
+Corrected baseline under the working buy-premium denominator, 0.25% slippage and ₹20/order brokerage:
+- 63 trade rows
+- 52 distinct entry timestamps
+- 24 ATM trades
+- 39 fallback-grid trades
+- ₹168,665.95 net P&L
+- ₹2,677.24 mean trade P&L
+- 60.32% win rate
+- 1.37 profit factor
+- -₹194,854.37 maximum drawdown
+
+The 2.5% denominator is still not confirmed by the user; it is an explicit working implementation assumption. The tested spot-notional denominator generated no qualifying trades from 1% through 5%.
+
+See the final corrected manuscript on branch phase-6-manuscript-grid: docs/MANUSCRIPT.md.
