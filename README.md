@@ -5,7 +5,7 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 ## Current status
 
 **Phase:** 2 — Market-data acquisition, cleaning and cache
-**Status:** IN PROGRESS; strategy-input pipeline and literature review are implemented. Manual workflow execution is the next validation step.
+**Status:** Phase 2 data build validated in GitHub Actions; 2,763 candidate rows were generated for 2021-06-01 through 2026-08-31 (2,128 `ok`, 610 shifted-strike unavailable, 25 missing-settlement). Phase 3 handoff has been repaired to use branch-local trigger files.
 **Date:** 2026-09-26
 
 The strategy under study is:
