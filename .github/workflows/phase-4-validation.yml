@@ -83,4 +83,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run phase-5-regimes.yml --repo "${{ github.repository }}" --ref phase-5-regimes -f phase3_run_id="$PHASE3_RUN_ID" -f regimes_path="" -f output_path="results/phase5_regime_summary.csv"
+          gh workflow run phase-5-regimes.yml --repo "${{ github.repository }}" --ref phase-5-regimes -f phase3_run_id="$PHASE3_RUN_ID" -f phase2_run_id="$PHASE2_RUN_ID" -f regimes_path="" -f output_path="results/phase5_regime_summary.csv"
