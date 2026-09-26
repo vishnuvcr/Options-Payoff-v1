@@ -40,14 +40,14 @@ def candidate_row_metrics(row, args, model):
         args.trigger_base_mode,
         float(row.spot_at_entry),
         lot_size,
-        raw_buy_premium * lot_size,
+        raw_buy_premium,
         args.configured_capital_per_lot,
     )
     # The user's chart trigger is based on observed entry premiums, not the
     # execution-cost shock. Slippage is applied to realized P&L only.
     chart_pnl=float(row.net_entry_cashflow_per_unit)*lot_size
     chart_return=100.0*chart_pnl/base if base>0 else None
-    gross_per_unit=float(row.net_entry_cashflow_per_unit)+float(row.next_settlement)-float(row.near_settlement)
+    gross_per_unit=float(execs['entry_cashflow_per_unit'])+float(row.next_settlement)-float(row.near_settlement)
     gross_pnl=gross_per_unit*lot_size
     long_call_intrinsic=intrinsic_value('CE',float(row.next_settlement),float(row.strike))
     long_put_intrinsic=intrinsic_value('PE',float(row.near_settlement),float(row.strike))
