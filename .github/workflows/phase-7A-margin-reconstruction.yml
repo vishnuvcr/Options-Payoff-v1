@@ -42,8 +42,9 @@ jobs:
       - name: Download all NSE SPAN intraday versions for calibration
         run: |
           mkdir -p data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+          DATE=$(echo '${{ inputs.trade_date || '2026-09-25' }}' | tr -d '-')
           for v in 5 4 3 2 1; do
-            url="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${{ inputs.trade_date || '2026-09-25' }}.i${v}.zip"
+            url="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${DATE}.i${v}.zip"
             curl --fail --silent --show-error --location \
               -H 'User-Agent: Mozilla/5.0' \
               -H 'Accept: application/octet-stream,*/*;q=0.8' \
