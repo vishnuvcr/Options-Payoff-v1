@@ -66,7 +66,7 @@ The audit shows that the positive chart trigger did not guarantee positive reali
 
 ## Reproducibility correction
 
-The authoritative 63-row result is from branch phase-3-strike-grid and run 36262958536. The later phase-6-manuscript-grid branch contains a stale run_backtest.py using the earlier ATM/±400 fallback order. That stale script must not be used to reproduce the 63-row result and is recorded as a reproducibility issue.
+The authoritative 63-row result is from branch phase-3-strike-grid and run 36262958536. The earlier stale run_backtest.py on phase-6-manuscript-grid was corrected in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4.
 
 ## Key outputs
 
