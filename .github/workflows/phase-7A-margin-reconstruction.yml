@@ -19,6 +19,9 @@ on:
         required: true
         default: '23140.50'
 
+concurrency:
+  group: phase-7A-margin-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 
