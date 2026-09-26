@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-7A-margin-reconstruction  
-**Overall status:** Phase 7A — historical margin reconstruction IN PROGRESS
+**Overall status:** Phase 7A — screenshot margin calibration COMPLETE; historical per-entry margin cache PENDING
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -129,3 +129,17 @@ See docs/PHASE7_RESULTS.md for detailed results and interpretation.
 ## Phase 7A status
 
 Calibration target: Sensibull standalone margin ₹88,076 for the screenshot-identifiable 25-Sep-2026 NIFTY 23450 four-leg position, one 65-unit lot. NSE Clearing publishes daily SPAN risk-parameter files and historical margin/volatility data; Phase 7A reconstructs this denominator before replacing the legacy percentage proxy. See `.github/workflows/phase-7A-margin-reconstruction.yml`.
+
+## Phase 7A calibration result
+
+- Sensibull screenshot standalone margin: ₹88,076.00
+- Reconstructed consolidated SPAN+exposure margin from NSE 25-Sep-2026 i05 SPAN: ₹87,812.40
+- Difference: -₹263.60 (-0.2993%)
+- i03 version: ₹87,723.22 (-0.4005%)
+- i04 version: ₹87,532.12 (-0.6175%)
+- i02 version: ₹87,437.48 (-0.7250%)
+- i01 version: ₹87,276.41 (-0.9078%)
+- The exact margin method is therefore calibrated to within 1% of the screenshot.
+- 2.5% of the observed ₹88,076 margin = ₹2,201.90; 2.5% of the closest reconstructed ₹87,812.40 = ₹2,195.31.
+
+The remaining Phase 7A task is historical margin reconstruction for all backtest entry dates/strikes. The screenshot denominator itself is now resolved.
