@@ -28,7 +28,7 @@ Regime attribution is now predeclared across realized volatility, India VIX, gap
 
 ## Blockers
 
-- GitHub Actions workflows have not been manually dispatched from this session.
+- GitHub Actions run-history audit currently reports zero workflow runs for the repository; therefore no empirical Phase 3/4 artifact exists to consume.
 - Phase 3/4 historical artifacts are required before empirical regime analysis.
 - Quote-level bid/ask and IV surface history remain a separate data requirement.
 - The user's exact 2.5% denominator remains unconfirmed; supported alternatives must be reported.
