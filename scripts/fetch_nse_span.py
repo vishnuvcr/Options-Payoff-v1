@@ -79,13 +79,16 @@ def candidate_urls(date_token: str) -> set[str]:
 
 def probe_url(url: str) -> bool:
     try:
-        r = requests.head(
+        r = requests.get(
             url,
-            timeout=8,
+            stream=True,
+            timeout=(4, 8),
             allow_redirects=True,
             headers={"User-Agent": "Options-Payoff-v1 research bot/1.0"},
         )
-        return r.status_code == 200
+        ok = r.status_code in (200, 206)
+        r.close()
+        return ok
     except Exception:
         return False
 
