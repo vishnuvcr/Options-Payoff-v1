@@ -66,6 +66,13 @@ jobs:
             --slippages '0,0.001,0.0025,0.005,0.01' \
             --thresholds '1,1.5,2,2.5,3,4,5' \
             --denominators 'buy_premium,spot_notional'
+      - name: Run Paytm Money brokerage sensitivity
+        run: |
+          python scripts/run_brokerage_sensitivity.py \
+            --trades results/phase3/selected_trades.parquet \
+            --out "$OUT_DIR/brokerage_sensitivity.csv" \
+            --baseline-brokerage 20 \
+            --rates '10,20,40'
       - name: Upload validation results
         uses: actions/upload-artifact@v4
         with:
