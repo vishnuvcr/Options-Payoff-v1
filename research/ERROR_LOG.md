@@ -12,6 +12,7 @@
 | 2026-09-26 | 3 | Container could not resolve raw.githubusercontent.com. | Exact checked-in runtime could not be executed locally. | Manual GitHub Actions remains authoritative. |
 | 2026-09-26 | 3 | Paytm Money public brokerage figures require account-level reconciliation. | Hard-coding an uncertain rate could misstate net P&L. | Keep brokerage configurable. |
 | 2026-09-26 | 5 | Regime variables can introduce look-ahead if same-day end-of-day values are joined to 09:20 entries. | Would invalidate causal timing. | Phase 5 requires point-in-time data known at or before entry and freezes regime values at entry. |
+| 2026-09-26 | 5 | Current Paytm Money public F&O FAQ states Rs.10 per unique executed order, while the research model retains a higher conservative default. | Using an unverified historical broker schedule could bias net P&L. | Record Rs.10 as the current public rate, keep brokerage configurable, and use contract-note reconciliation for historical broker-specific results. |
 | 2026-09-26 | 5 | Phase 5 empirical execution attempted without a validated trade ledger would create unsupported results. | Could produce fabricated or incomplete regime conclusions. | Added a prerequisite check and explicitly gated execution on Phase 3/4 artifacts. |
 
 ## Logging rule
