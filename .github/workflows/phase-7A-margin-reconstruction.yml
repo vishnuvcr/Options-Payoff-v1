@@ -39,11 +39,38 @@ jobs:
           python -m pip install --upgrade pip
           pip install 'marginism==0.1.1' 'requests>=2.31'
 
-      - name: Discover and download NSE SPAN file
+      - name: Download all NSE SPAN intraday versions for calibration
         run: |
-          python scripts/fetch_nse_span.py \
+          mkdir -p data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+          for v in 5 4 3 2 1; do
+            url="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${{ inputs.trade_date || '2026-09-25' }}.i${v}.zip"
+            curl --fail --silent --show-error --location \
+              -H 'User-Agent: Mozilla/5.0' \
+              -H 'Accept: application/octet-stream,*/*;q=0.8' \
+              -H 'Referer: https://www.nseindia.com/' \
+              "$url" -o "/tmp/nsccl_i${v}.zip"
+            unzip -jo "/tmp/nsccl_i${v}.zip" '*.spn' -d data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+          done
+          ls -lh data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+
+      - name: Reconstruct screenshot position margin
+        run: |
+          SPN=$(find data/margin/span/${{ inputs.trade_date || '2026-09-25' }} -type f -name '*.spn' | sort | tail -n 1)
+          test -n "$SPN"
+          python scripts/reconstruct_screenshot_margin.py \
+            --span-file "$SPN" \
             --date '${{ inputs.trade_date || '2026-09-25' }}' \
-            --out-dir data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+            --target-margin '${{ inputs.target_margin || '88076' }}' \
+            --spot '${{ inputs.spot || '23140.50' }}' \
+            --out results/margin_calibration_2026-09-25.json
+
+      - name: Compare all published intraday versions
+        run: |
+          python scripts/reconstruct_margin_versions.py \
+            --span-dir data/margin/span/${{ inputs.trade_date || '2026-09-25' }} \
+            --date '${{ inputs.trade_date || '2026-09-25' }}' \
+            --target-margin '${{ inputs.target_margin || '88076' }}' \
+            --out results/margin_calibration_versions_2026-09-25.json
 
       - name: Reconstruct screenshot position margin
         run: |
@@ -60,12 +87,15 @@ jobs:
         run: |
           python - <<'PY'
           import json
-          p='results/margin_calibration_2026-09-25.json'
-          x=json.load(open(p))
+          x=json.load(open('results/margin_calibration_2026-09-25.json'))
+          v=json.load(open('results/margin_calibration_versions_2026-09-25.json'))
           print(json.dumps(x, indent=2))
+          print(json.dumps(v, indent=2))
           assert x['screenshot_target_margin_inr'] == 88076.0
           assert x['lot_size'] == 65
           assert x['spot_notional_inr'] > 0
+          assert v['versions']
+          assert min(r['absolute_difference_inr'] for r in v['versions']) < 2000
           PY
 
       - name: Upload calibration outputs
@@ -74,4 +104,4 @@ jobs:
           name: phase-7A-margin-calibration
           path: |
             results/margin_calibration_2026-09-25.json
-            data/margin/span/2026-09-25
+            results/margin_calibration_versions_2026-09-25.json
