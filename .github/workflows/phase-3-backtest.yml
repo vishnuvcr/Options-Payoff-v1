@@ -59,14 +59,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install 'huggingface_hub>=0.34' 'pandas>=2.2' 'pyarrow>=18'
-      - name: Restore/cache Hugging Face source files
+      - name: Restore Hugging Face source cache
         if: inputs.phase2_run_id == ''
-        uses: actions/cache@v4
+        id: hf_cache_restore
+        uses: actions/cache/restore@v4
         with:
           path: ~/.cache/huggingface
           key: hf-nifty-options-v1-${{ inputs.start || '2021-06-01' }}-${{ inputs.end || '2026-08-31' }}
           restore-keys: hf-nifty-options-v1-
-          save-always: true
       - name: Download Phase 2 strategy inputs from selected run
         if: inputs.phase2_run_id != ''
         env:
@@ -77,12 +77,29 @@ jobs:
           test -s data/derived/strategy_inputs.parquet
       - name: Build Phase 2 strategy inputs when no Phase 2 run ID is supplied
         if: inputs.phase2_run_id == ''
+        id: build_phase2
         run: |
           START='${{ inputs.start }}'
           END='${{ inputs.end }}'
           [ -n "$START" ] || START='2021-06-01'
           [ -n "$END" ] || END='2026-08-31'
           python scripts/extract_strategy_inputs.py --start "$START" --end "$END" --entry-time '09:20' --out data/derived/strategy_inputs.parquet
+      - name: Save Hugging Face source cache
+        if: inputs.phase2_run_id == '' && steps.hf_cache_restore.outputs.cache-hit != 'true' && steps.build_phase2.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-nifty-options-v1-${{ inputs.start || '2021-06-01' }}-${{ inputs.end || '2026-08-31' }}
+
+      - name: Upload expanded Phase 3 inputs
+        if: steps.build_phase2.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-3-expanded-strategy-inputs
+          path: |
+            data/derived/strategy_inputs.parquet
+            data/derived/strategy_inputs.metadata.json
+
       - name: Run backtest
         run: |
           TRIGGER='${{ inputs.trigger_base }}'
