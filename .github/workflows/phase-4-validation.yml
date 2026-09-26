@@ -6,6 +6,9 @@ on:
       phase3_run_id:
         description: 'Completed Phase 3 workflow run ID containing phase-3-backtest-results'
         required: true
+      phase2_run_id:
+        description: 'Completed Phase 2 workflow run ID containing phase-2-strategy-inputs'
+        required: true
       out_dir:
         description: 'Validation output directory'
         required: true
@@ -30,10 +33,25 @@ jobs:
           mkdir -p results/phase3
           gh run download "${{ inputs.phase3_run_id }}" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
           test -s results/phase3/selected_trades.parquet
+      - name: Download Phase 2 strategy inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/derived
+          gh run download "${{ inputs.phase2_run_id }}" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
+          test -s data/derived/strategy_inputs.parquet
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
       - name: Validate selected trades
         run: python scripts/validate_results.py --trades results/phase3/selected_trades.parquet --out-dir "${{ inputs.out_dir }}"
+      - name: Run robustness and sensitivity analysis
+        run: |
+          python scripts/run_robustness.py \
+            --inputs data/derived/strategy_inputs.parquet \
+            --out-dir "${{ inputs.out_dir }}/robustness" \
+            --slippages '0,0.001,0.0025,0.005,0.01' \
+            --thresholds '1,1.5,2,2.5,3,4,5' \
+            --denominators 'buy_premium,spot_notional'
       - name: Upload validation results
         uses: actions/upload-artifact@v4
         with:
