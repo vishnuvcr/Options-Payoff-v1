@@ -98,6 +98,13 @@ def candidate_row_metrics(row, args, model):
 
     equal = estimated_equal_max_profit_loss(flatline_value_per_unit, lot_size)
 
+    margin_required = None
+    margin_profit_pct = None
+    if args.margin_column and hasattr(row, args.margin_column):
+        raw_margin = getattr(row, args.margin_column)
+        if raw_margin is not None and not pd.isna(raw_margin) and float(raw_margin) > 0:
+            margin_required = float(raw_margin)
+            margin_profit_pct = 100.0 * equal['estimated_equal_max_profit_loss_inr'] / margin_required
     gross_per_unit = (
         float(row.net_entry_cashflow_per_unit)
         + float(row.next_settlement)
@@ -131,6 +138,8 @@ def candidate_row_metrics(row, args, model):
         'estimated_all_green_flatline': equal['estimated_all_green_flatline'],
         'estimated_flatline_is_constant': equal['estimated_flatline_is_constant'],
         'estimated_max_profit_pct_of_trigger_base': chart_return,
+        'margin_required_inr': margin_required,
+        'max_profit_pct_margin': margin_profit_pct,
         'gross_pnl_inr': gross_pnl,
         'net_pnl_inr': net_pnl,
         'total_costs_inr': costs['total_costs'],
