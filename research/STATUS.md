@@ -29,3 +29,8 @@
 ## Next step
 
 Phase 1: implement the strategy specification, payoff equations, and unit tests.
+
+
+## Latest branch update — 2026-09-26
+
+Phase 5 regime-attribution protocol has been implemented on branch `phase-5-regimes`. It is intentionally gated on the validated Phase 3/4 historical trade ledger. No empirical regime result has been fabricated. See the Phase 5 branch for the protocol, source audit, script and manual workflow.
