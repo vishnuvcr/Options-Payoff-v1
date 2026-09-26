@@ -1,0 +1,12 @@
+[backtest]
+threshold_pct = 2.5
+trigger_base_mode = 'buy_premium'
+fallback_order = ['ATM_MINUS_400','ATM_PLUS_400']
+slippage_pct = 0.0025
+brokerage_per_order_inr = 20.0
+exchange_turnover_rate = 0.0003553
+sebi_turnover_rate = 0.000001
+stamp_duty_buy_rate = 0.00003
+gst_rate = 0.18
+stt_before_2026_04_01 = 0.001
+stt_from_2026_04_01 = 0.0015
