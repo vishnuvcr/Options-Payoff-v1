@@ -37,8 +37,8 @@ def parse_args():
     p.add_argument('--selection-max-shift-points', type=int, default=400)
     p.add_argument('--selection-step-points', type=int, default=50)
     p.add_argument('--min-equal-max-profit-loss-inr', type=float, default=0.0)
-    p.add_argument('--min-chart-return-pct', type=float, default=None,
-                   help='Optional legacy percentage gate. Primary Phase 7 selection does not assume the Sensibull margin denominator.')
+    p.add_argument('--min-chart-return-pct', type=float, default=2.5,
+                   help='Primary Phase 7 2.5% chart-metric gate; exact Sensibull margin denominator remains unavailable.')
     p.add_argument('--fallback-order', default='ATM_MINUS_400,ATM_PLUS_400')
     return p.parse_args()
 
