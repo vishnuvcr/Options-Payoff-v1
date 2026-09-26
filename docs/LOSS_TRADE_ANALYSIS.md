@@ -111,4 +111,4 @@ Next audit: decompose every selected trade into entry-chart edge + cross-expiry 
 
 ## Reproducibility note
 
-The authoritative 63-row result came from Phase 3 grid run 36262958536 on branch phase-3-strike-grid. The phase-6-manuscript-grid branch contains a stale copy of scripts/run_backtest.py using the old ATM/±400 fallback order; it must not be used to reproduce the 63-row result. This discrepancy is recorded for correction.
+The authoritative 63-row result came from Phase 3 grid run 36262958536 on branch phase-3-strike-grid. The stale copy of scripts/run_backtest.py on phase-6-manuscript-grid was corrected in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4. The manuscript branch is now synchronized to the full 50-point fallback-grid implementation.
