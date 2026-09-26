@@ -1,6 +1,9 @@
 name: Phase 3 - Backtest
 
 on:
+  push:
+    branches: [phase-3-backtest]
+    paths: ['.github/phase2_trigger.json']
   workflow_dispatch:
     inputs:
       phase2_run_id:
