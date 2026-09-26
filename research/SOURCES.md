@@ -27,3 +27,13 @@
 17. Wilkens (2026), Here Today, Gone Today: First Evidence on European Zero-Day Options, SSRN 7094758.
 
 Source retrieval dates and substantive-use citations are maintained in the research manuscript and phase documents.
+
+## Payoff-platform sources — Phase 7
+
+18. Sensibull Blog, “Minor Update on Sensibull Strategy Builder,” 22-Jul-2022. Documents the displayed percentage formula: Max Profit % = Max Profit / Margin needed × 100; Max Loss % = Max Loss / Margin needed × 100.
+19. Sensibull / Trading Q&A, “Multi-leg Options Strategies by Sensibull,” Jun-2018. Sensibull explains that max profit/max loss shown are expiry-day quantities and provides the standard premium/strike-width arithmetic, including a conservative STT buffer.
+20. Sensibull / Trading Q&A, “Sensibull - The Options Trading Platform,” Sep-2020. Sensibull notes that calendar-spread max profit/loss can be materially off in extreme events because the open option's IV can fluctuate; it suggests reading scenario P&L from the graph and treating the estimate cautiously.
+21. Streak current product listing (Google Play), updated 07-Sep-2026. Documents current option functionality including payoff graphs, option-chain integration, underlying/time-based option strategies, and ATM/ITM/OTM/live-premium selection.
+22. Streak Terms / disclosures. Public Streak material describes options payoff graphs as hypothetical and not guaranteed representations of actual outcomes.
+
+These Phase 7 platform sources are used to separate (a) the static payoff-chart metric, (b) the displayed max-profit/max-loss percentage, and (c) the true economic P&L of a mixed-expiry position.
