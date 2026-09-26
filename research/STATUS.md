@@ -64,3 +64,7 @@ The previous 28-trade result is superseded as the primary specification. Phase 3
 6. Exit at expiry.
 
 The expanded data extraction has already completed 19,341 candidate rows (15,701 complete; 3,498 unavailable; 142 missing settlements). Net-P&L analysis is waiting on the corrected backtest workflow to complete. The earlier 28-trade statistics remain historical/provisional only.
+
+## Corrected full-grid result
+
+Run 36262958536 is the authoritative full-grid Phase 3 rerun after the user clarified the strategy. It implements ATM first, then every 50-point shift from -500 to +500 and retains every qualifying fallback. It produced 63 selected trade rows across 52 timestamps from 891 eligible timestamps. Baseline net P&L was ₹168,665.95 with 0.25% slippage and the working buy-premium denominator.
