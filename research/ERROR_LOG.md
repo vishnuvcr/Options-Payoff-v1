@@ -15,6 +15,8 @@
 | 2026-09-26 | 5 | Current Paytm Money public F&O FAQ states Rs.10 per unique executed order, while the research model retains a higher conservative default. | Using an unverified historical broker schedule could bias net P&L. | Record Rs.10 as the current public rate, keep brokerage configurable, and use contract-note reconciliation for historical broker-specific results. |
 | 2026-09-26 | 5 | Phase 5 empirical execution attempted without a validated trade ledger would create unsupported results. | Could produce fabricated or incomplete regime conclusions. | Added a prerequisite check and explicitly gated execution on Phase 3/4 artifacts. |
 
+| 2026-09-26 | 5 | GitHub Actions API currently reports zero workflow runs for the repository. | There is no existing Phase 3/4 artifact available to consume. | Confirmed execution is genuinely pending rather than merely missing from the local session; empirical phases remain gated. |
+
 ## Logging rule
 
 Append new rows for reproducible mistakes, failed assumptions, data-quality issues or workflow failures. Do not delete historical rows.
