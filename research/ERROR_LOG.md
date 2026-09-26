@@ -17,3 +17,4 @@
 ## Logging rule
 
 Add a row whenever a reproducible mistake, failed assumption, data-quality issue or workflow failure affects the research. Do not delete historical rows; append corrections with dates.
+| 2026-09-26 | 3 | A single lot-size input across a multi-year sample would mis-scale historical P&L and can break one-for-one synthetic-forward equivalence around contract transitions. | Historical returns and costs could be materially distorted. | Derive lot size by expiry date and exclude unequal-lot near/next pairs from the core spread sample. |
