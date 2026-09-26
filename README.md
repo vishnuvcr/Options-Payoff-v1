@@ -90,3 +90,18 @@ The static chart component contributed ₹36,138.75; realized S2-S1 contributed 
 Full Phase 7 results: [docs/PHASE7_RESULTS.md](docs/PHASE7_RESULTS.md) and [results/phase7/summary.json](results/phase7/summary.json).
 
 The exact Sensibull percentage denominator remains unresolved because its public formula uses margin required, while the historical margin series is not in the cached dataset. The 2.5% gate above is therefore an explicit proxy, not a claimed exact Sensibull reconstruction.
+
+### Phase 7A margin calibration
+
+The user's Sensibull screenshot shows a standalone margin of ₹88,076 for the exact four-leg 23450 strategy. Using NSE/NSCCL SPAN data for 25-Sep-2026, the reconstructed consolidated margin is ₹87,812.40, only 0.2993% below the screenshot. The other same-day intraday SPAN versions are also within 0.91% of the screenshot.
+
+Therefore the 2.5% Max Profit % denominator is now empirically calibrated as **margin required**, not option premium:
+
+- 2.5% of screenshot margin: **₹2,201.90**
+- 2.5% of closest SPAN-reconstructed margin: **₹2,195.31**
+
+Calibration report: [docs/MARGIN_RECONSTRUCTION.md](docs/MARGIN_RECONSTRUCTION.md)
+Calibration data: [results/phase7a/margin_calibration_2026-09-25.json](results/phase7a/margin_calibration_2026-09-25.json)
+Intraday comparison: [results/phase7a/margin_calibration_versions_2026-09-25.json](results/phase7a/margin_calibration_versions_2026-09-25.json)
+
+The historical backtest still requires a per-entry-date margin cache before the proxy 2.5% gate can be replaced for all trades.
