@@ -43,7 +43,7 @@ def candidate_row_metrics(row, args, model):
     long_put_intrinsic=intrinsic_value('PE',float(row.near_settlement),float(row.strike))
     costs=transaction_costs(pd.Timestamp(row.entry_timestamp).date(),execs['premium_turnover'],execs['sell_premium_turnover'],execs['buy_premium_turnover'],long_call_intrinsic,long_put_intrinsic,lot_size,model)
     net_pnl=gross_pnl-costs['total_costs']
-    return {'chart_pnl_inr':chart_pnl,'chart_return_pct':chart_return,'gross_pnl_inr':gross_pnl,'net_pnl_inr':net_pnl,'total_costs_inr':costs['total_costs'],'premium_turnover_inr':execs['premium_turnover']*args.lot_size,**costs}
+    return {'chart_pnl_inr':chart_pnl,'chart_return_pct':chart_return,'gross_pnl_inr':gross_pnl,'net_pnl_inr':net_pnl,'total_costs_inr':costs['total_costs'],'premium_turnover_inr':execs['premium_turnover']*lot_size,**costs}
 
 def main():
     args=parse_args()
