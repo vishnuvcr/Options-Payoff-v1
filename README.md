@@ -60,3 +60,9 @@ Sources: research/SOURCES.md
 Each phase remains on its own branch and exposes a manual GitHub Actions workflow.
 
 The complete manuscript is on the phase-6-manuscript branch.
+
+### Important correction — selection terminology
+
+The previously reported **28 “selected trades” are provisional**. The backtest code imposed a selection gate of ATM first, then ATM-400, then ATM+400, requiring the chart metric to exceed 2.5% under the buy_premium denominator. That was an implementation choice and should not be described as a separately supplied user selection criterion.
+
+The user has now clarified that no separate selection criterion was supplied. Accordingly, the 28-trade result and all statistics derived from that conditional sample are **not final evidence for the user's strategy**. The research is paused at this specification point rather than inventing a new criterion.
