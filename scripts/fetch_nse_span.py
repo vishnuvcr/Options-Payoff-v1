@@ -73,6 +73,19 @@ def candidate_urls(date_token: str) -> set[str]:
     return preferred or urls
 
 
+def probe_url(url: str) -> bool:
+    try:
+        r = requests.head(
+            url,
+            timeout=8,
+            allow_redirects=True,
+            headers={"User-Agent": "Options-Payoff-v1 research bot/1.0"},
+        )
+        return r.status_code == 200
+    except Exception:
+        return False
+
+
 def download_bytes(url: str) -> bytes:
     r = requests.get(
         url,
@@ -109,8 +122,13 @@ def main() -> None:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    urls = direct_candidates(date_token)
-    urls.extend(sorted(candidate_urls(date_token)))
+    direct = direct_candidates(date_token)
+    urls = [u for u in direct if probe_url(u)]
+    if not urls:
+        try:
+            urls.extend(sorted(candidate_urls(date_token)))
+        except Exception as exc:
+            print(f"Archive discovery failed: {type(exc).__name__}: {exc}")
     if not urls:
         raise RuntimeError(
             "No SPAN-like links discovered from NSE Clearing market-report archive."
