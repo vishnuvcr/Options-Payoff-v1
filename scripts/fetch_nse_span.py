@@ -85,7 +85,16 @@ def probe_url(url: str) -> bool:
             stream=True,
             timeout=(4, 8),
             allow_redirects=True,
-            headers={"User-Agent": "Options-Payoff-v1 research bot/1.0"},
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                ),
+                "Accept": "application/octet-stream,*/*;q=0.8",
+                "Accept-Language": "en-IN,en-US;q=0.9,en;q=0.8",
+                "Referer": "https://www.nseindia.com/",
+            },
         )
         ok = r.status_code in (200, 206)
         r.close()
