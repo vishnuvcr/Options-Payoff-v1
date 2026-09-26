@@ -12,6 +12,18 @@ from huggingface_hub import HfApi, hf_hub_download
 
 DATASET = "thetrademarkk/india-index-options-1m"
 
+def nifty_lot_size(expiry):
+    """Return the NSE NIFTY 50 market lot applicable to a contract expiry date."""
+    if expiry < dt.date(2021, 8, 1):
+        return 75
+    if expiry < dt.date(2024, 5, 2):
+        return 50
+    if expiry < dt.date(2024, 11, 21):
+        return 25
+    if expiry < dt.date(2026, 1, 6):
+        return 75
+    return 65
+
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--start', required=True)
