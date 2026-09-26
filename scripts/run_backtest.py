@@ -19,7 +19,8 @@ def parse_args():
     p.add_argument('--trigger-base-mode', choices=['buy_premium','spot_notional','configured_capital'], default='buy_premium')
     p.add_argument('--configured-capital-per-lot', type=float)
     p.add_argument('--slippage-pct', type=float, default=0.0025)
-    p.add_argument('--fallback-order', default='ATM_MINUS_400,ATM_PLUS_400')
+    p.add_argument('--fallback-max-shift-points', type=int, default=500)
+    p.add_argument('--fallback-step-points', type=int, default=50)
     return p.parse_args()
 
 def candidate_row_metrics(row, args, model):
@@ -57,7 +58,7 @@ def candidate_row_metrics(row, args, model):
 def main():
     args=parse_args()
     df=pd.read_parquet(args.inputs)
-    required=['entry_timestamp','candidate_label','strike','near_call_close','near_put_close','next_call_close','next_put_close','near_settlement','next_settlement','net_entry_cashflow_per_unit','status']
+    required=['entry_timestamp','candidate_label','shift_points','strike','near_call_close','near_put_close','next_call_close','next_put_close','near_settlement','next_settlement','net_entry_cashflow_per_unit','near_lot_size','next_lot_size','status']
     missing=[c for c in required if c not in df.columns]
     if missing: raise ValueError(f'missing columns: {missing}')
     model=CostModel(slippage_pct=args.slippage_pct)
@@ -66,26 +67,42 @@ def main():
     for row in df.itertuples(index=False):
         metrics=candidate_row_metrics(row,args,model)
         if metrics is None: continue
-        candidate_records.append({'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,'candidate_label':row.candidate_label,'strike':row.strike,'near_expiry':row.near_expiry,'next_expiry':row.next_expiry,'spot_at_entry':row.spot_at_entry,'lot_size':(args.lot_size if args.lot_size else int(row.near_lot_size)),**metrics})
+        candidate_records.append({'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,'candidate_label':row.candidate_label,'shift_points':int(row.shift_points),'strike':row.strike,'near_expiry':row.near_expiry,'next_expiry':row.next_expiry,'spot_at_entry':row.spot_at_entry,'lot_size':(args.lot_size if args.lot_size else int(row.near_lot_size)),**metrics})
     candidates=pd.DataFrame(candidate_records)
     if candidates.empty: raise RuntimeError('No complete candidate rows available')
-    order=['ATM']+[x.strip() for x in args.fallback_order.split(',') if x.strip()]
+    max_shift=abs(args.fallback_max_shift_points)
+    step=abs(args.fallback_step_points)
+    if step == 0:
+        raise ValueError('fallback-step-points must be > 0')
     selected=[]
+    atm_selected=0
+    fallback_selected=0
     for ts,group in candidates.groupby('entry_timestamp',sort=True):
-        by_label={r.candidate_label:r for r in group.itertuples(index=False)}
-        chosen=None
-        for label in order:
-            r=by_label.get(label)
-            if r is not None and r.chart_return_pct is not None and r.chart_return_pct > args.threshold_pct:
-                chosen=r; break
-        if chosen is not None:
-            selected.append({**chosen._asdict(),'selected_reason':'chart_trigger'})
+        atm=group[group.shift_points.eq(0)]
+        atm_qualifies=(not atm.empty and atm.iloc[0]['chart_return_pct'] is not None and float(atm.iloc[0]['chart_return_pct']) > args.threshold_pct)
+        if atm_qualifies:
+            r=atm.iloc[0].to_dict()
+            r['selected_reason']='chart_trigger_atm'
+            selected.append(r)
+            atm_selected += 1
+            continue
+        fallbacks=group[
+            (group.shift_points.abs() <= max_shift)
+            & (group.shift_points != 0)
+            & ((group.shift_points.abs() % step) == 0)
+            & (group.chart_return_pct > args.threshold_pct)
+        ].sort_values(by=['shift_points'], key=lambda s:s.abs())
+        for _,r in fallbacks.iterrows():
+            x=r.to_dict()
+            x['selected_reason']='chart_trigger_fallback_grid'
+            selected.append(x)
+            fallback_selected += 1
     trades=pd.DataFrame(selected)
     out=Path(args.out_dir); out.mkdir(parents=True,exist_ok=True)
     candidates.to_parquet(out/'candidate_results.parquet',index=False)
     trades.to_parquet(out/'selected_trades.parquet',index=False)
     entries=int(candidates['entry_timestamp'].nunique())
-    summary={'candidate_rows':int(len(candidates)),'eligible_entry_timestamps':entries,'selected_trades':int(len(trades)),'selection_rate_pct':float(100*len(trades)/entries) if entries else 0.0,'mean_net_pnl_inr':float(trades.net_pnl_inr.mean()) if not trades.empty else None,'median_net_pnl_inr':float(trades.net_pnl_inr.median()) if not trades.empty else None,'win_rate_pct':float(100*(trades.net_pnl_inr>0).mean()) if not trades.empty else None,'total_net_pnl_inr':float(trades.net_pnl_inr.sum()) if not trades.empty else 0.0,'total_costs_inr':float(trades.total_costs_inr.sum()) if not trades.empty else 0.0,'threshold_pct':args.threshold_pct,'trigger_base_mode':args.trigger_base_mode,'slippage_pct':args.slippage_pct,'lot_size':args.lot_size}
+    summary={'candidate_rows':int(len(candidates)),'eligible_entry_timestamps':entries,'selected_trade_rows':int(len(trades)),'selected_entry_timestamps':int(trades['entry_timestamp'].nunique()) if not trades.empty else 0,'atm_selected_trades':int(atm_selected),'fallback_grid_selected_trades':int(fallback_selected),'selection_rate_pct':float(100*(trades['entry_timestamp'].nunique())/entries) if entries else 0.0,'mean_net_pnl_inr':float(trades.net_pnl_inr.mean()) if not trades.empty else None,'median_net_pnl_inr':float(trades.net_pnl_inr.median()) if not trades.empty else None,'win_rate_pct':float(100*(trades.net_pnl_inr>0).mean()) if not trades.empty else None,'total_net_pnl_inr':float(trades.net_pnl_inr.sum()) if not trades.empty else 0.0,'total_costs_inr':float(trades.total_costs_inr.sum()) if not trades.empty else 0.0,'threshold_pct':args.threshold_pct,'trigger_base_mode':args.trigger_base_mode,'slippage_pct':args.slippage_pct,'fallback_max_shift_points':max_shift,'fallback_step_points':step,'lot_size':args.lot_size}
     (out/'summary.json').write_text(json.dumps(summary,indent=2,default=str),encoding='utf-8')
     print(json.dumps(summary,indent=2,default=str))
 
