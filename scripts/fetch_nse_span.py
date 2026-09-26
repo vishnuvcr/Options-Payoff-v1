@@ -5,6 +5,7 @@ import argparse
 import io
 import re
 import zipfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import urljoin
 
@@ -41,6 +42,9 @@ def direct_candidates(date_token: str) -> list[str]:
     ]
     roots = [
         "https://www.archive.nseclearing.in/marketreports/",
+        "https://www.archive.nseclearing.in/marketreports/derivatives/",
+        "https://www.archive.nseclearing.in/marketreports/FO/",
+        "https://www.archive.nseclearing.in/marketreports/NFO/",
     ]
     return [base + name for base in roots for name in names]
 
@@ -123,7 +127,21 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
 
     direct = direct_candidates(date_token)
-    urls = [u for u in direct if probe_url(u)]
+    urls = []
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        futures = {ex.submit(probe_url, u): u for u in direct}
+        for fut in as_completed(futures):
+            u = futures[fut]
+            try:
+                if fut.result():
+                    urls.append(u)
+            except Exception:
+                pass
+    if not urls:
+        try:
+            urls.extend(sorted(candidate_urls(date_token)))
+        except Exception as exc:
+            print(f"Archive discovery failed: {type(exc).__name__}: {exc}")
     if not urls:
         try:
             urls.extend(sorted(candidate_urls(date_token)))
