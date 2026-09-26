@@ -1,8 +1,8 @@
 # Research status
 
-**As of:** 2026-09-26  
-**Active branch:** phase-6-manuscript-grid  
-**Overall status:** Phase 6 complete for the clarified full strike-grid strategy
+**As of:** 2026-09-27  
+**Active branch:** phase-6-loss-audit  
+**Overall status:** Loss-trade audit complete for the clarified full strike-grid result
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -11,8 +11,9 @@
 | 2 Data | COMPLETE | Run 36255238050 supplied the core NIFTY index/options dataset. |
 | 3 Backtest | COMPLETE | Run 36262958536 implemented ATM first, then every 50-point shift from -500 to +500; 63 trade rows, 52 entry timestamps. |
 | 4 Validation | COMPLETE | Run 36263760476 completed uncertainty, walk-forward, threshold, slippage, denominator and brokerage sensitivity. |
-| 5 Regimes | COMPLETE | Run 36263974629 completed point-in-time trend/volatility/entry-move attribution on the corrected 63-trade ledger. |
-| 6 Manuscript | COMPLETE | Corrected manuscript, result snapshots and figures added. |
+| 5 Regimes | COMPLETE | Run 36263974629 completed point-in-time trend/volatility/entry-move attribution. |
+| 6 Manuscript | COMPLETE | Corrected manuscript and figures added. |
+| 6A Loss audit | COMPLETE | Workflow 36264710663 audited all 63 selected rows directly from the Phase 3 artifact. |
 
 ## Corrected primary result
 
@@ -32,13 +33,26 @@ Results:
 - 52 distinct selected timestamps
 - 24 ATM trades
 - 39 fallback-grid trades
-- 5.84% entry-timestamp selection rate
 - total net P&L: ₹168,665.95
 - mean trade P&L: ₹2,677.24
 - median trade P&L: ₹6,831.26
 - win rate: 60.32%
 - profit factor: 1.37
 - maximum drawdown: -₹194,854.37
+
+## Loss-trade audit result
+
+- 38 winning rows
+- 25 losing rows
+- 25/25 losing rows were already negative before modeled fees
+- 0/25 losses were caused solely by fees
+- 7 losses were ATM and 18 were fallback-grid selections
+- losing rows contributed -₹454,335.44 against +₹623,001.39 from winners
+- total modeled costs on losing rows: ₹3,557.82
+- largest loss: -₹55,420.58
+- worst concentration: 2022-05-30 through 2022-06-07, -₹194,854.37
+
+The audit shows that the positive chart trigger did not guarantee positive realized cross-expiry economics. Every loser passed the trigger.
 
 ## Key validation findings
 
@@ -49,32 +63,17 @@ Results:
 - 2.5% buy-premium result remains positive through 1% slippage; net P&L falls from ₹174,021 at 0% slippage to ₹152,600 at 1%.
 - brokerage sensitivity remains positive at ₹10, ₹20 and ₹40/order.
 - tested spot-notional denominator produced no qualifying trades from 1% through 5% thresholds.
-- 50-point fallback selection materially changes the trade set: 39 of 63 trades are fallback-grid trades.
 
-## Regime attribution
+## Reproducibility correction
 
-Descriptive point-in-time results on the corrected ledger:
-
-- trend: down mean +₹6,035 (33 trades), sideways -₹7,145 (5), up +₹209 (25)
-- volatility: high -₹12,183 (12), low +₹413 (25), medium +₹11,713 (26)
-- entry move: down -₹3,350 (12), small +₹3,517 (19), up +₹4,439 (32)
-
-These are descriptive associations, not additional trading rules.
-
-## Current conclusion
-
-The clarified rule is reproducible and historically positive under one explicit implementation, but the evidence is not sufficient to treat it as robust, denominator-independent or risk-free arbitrage. The main unresolved issue is the exact denominator used by the original payoff-chart interface for the 2.5% condition.
+The authoritative 63-row result is from branch phase-3-strike-grid and run 36262958536. The later phase-6-manuscript-grid branch contains a stale run_backtest.py using the earlier ATM/±400 fallback order. That stale script must not be used to reproduce the 63-row result and is recorded as a reproducibility issue.
 
 ## Key outputs
 
 - docs/MANUSCRIPT.md
+- docs/LOSS_TRADE_ANALYSIS.md
 - results/phase3_grid_summary.json
 - results/phase4_grid_validation_summary.json
 - results/phase4_grid_robustness.csv
 - results/phase4_grid_brokerage_sensitivity.csv
 - results/phase5_grid_regime_summary.csv
-- docs/figures/grid_*.svg
-
-## Next research priorities
-
-Quote-level bid/ask validation, official settlement-price validation, exact recovery of the payoff-chart percentage definition, cross-market/FII-DII/India VIX/option-IV integration, and an untouched out-of-sample validation period.
