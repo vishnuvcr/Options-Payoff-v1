@@ -1,0 +1,25 @@
+{
+  "target_margin_inr": 88076.0,
+  "date": "2026-09-25",
+  "position": [
+    {"symbol":"NIFTY","instrument":"CE","expiry":"2026-09-29","strike":23450,"transaction_type":"SELL","quantity":65},
+    {"symbol":"NIFTY","instrument":"PE","expiry":"2026-09-29","strike":23450,"transaction_type":"BUY","quantity":65},
+    {"symbol":"NIFTY","instrument":"CE","expiry":"2026-10-06","strike":23450,"transaction_type":"BUY","quantity":65},
+    {"symbol":"NIFTY","instrument":"PE","expiry":"2026-10-06","strike":23450,"transaction_type":"SELL","quantity":65}
+  ],
+  "versions": [
+    {"file":"nsccl.20260925.i05.spn","margin_inr":87812.40,"difference_inr":-263.60,"difference_pct_of_target":0.2992869794,"span_inr":27647.10,"exposure_inr":60165.30,"option_premium_inr":529.75},
+    {"file":"nsccl.20260925.i03.spn","margin_inr":87723.22,"difference_inr":-352.78,"difference_pct_of_target":0.4005404423,"span_inr":27708.85,"exposure_inr":60014.37,"option_premium_inr":97.50},
+    {"file":"nsccl.20260925.i04.spn","margin_inr":87532.12,"difference_inr":-543.88,"difference_pct_of_target":0.6175121486,"span_inr":27567.80,"exposure_inr":59964.32,"option_premium_inr":159.25},
+    {"file":"nsccl.20260925.i02.spn","margin_inr":87437.48,"difference_inr":-638.52,"difference_pct_of_target":0.7249648031,"span_inr":27471.60,"exposure_inr":59965.88,"option_premium_inr":692.25},
+    {"file":"nsccl.20260925.i01.spn","margin_inr":87276.41,"difference_inr":-799.59,"difference_pct_of_target":0.9078409555,"span_inr":27312.35,"exposure_inr":59964.06,"option_premium_inr":887.25}
+  ],
+  "closest_file": "nsccl.20260925.i05.spn",
+  "max_profit_required_for_2_5pct": {
+    "i05": 2195.31,
+    "i03": 2193.0805,
+    "i04": 2188.303,
+    "i02": 2185.937,
+    "i01": 2181.91025
+  }
+}
