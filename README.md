@@ -5,7 +5,7 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 ## Current status
 
 **Active research phase:** Phase 5 — Regime and cross-market attribution protocol
-**Status:** FRAMEWORK IMPLEMENTED; empirical execution remains gated on Phase 3/4 historical artifacts.
+**Status:** FRAMEWORK IMPLEMENTED; workflow handoffs repaired; empirical execution remains gated on Phase 3/4 historical artifacts.
 **Date:** 2026-09-26
 
 ## Key analytical finding
@@ -53,7 +53,7 @@ Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close 
 - Phase 4: .github/workflows/phase-4-validation.yml
 - Phase 5: .github/workflows/phase-5-regimes.yml
 
-Each phase remains on its own branch and the workflow is manually runnable.
+Each phase remains on its own branch and the workflow is manually runnable. Phase 4 and Phase 5 now accept a completed Phase 3 run ID and download its artifact, so separate workflow runs no longer depend on a shared workspace.
 
 ## Current research conclusion
 
