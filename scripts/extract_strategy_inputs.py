@@ -102,7 +102,7 @@ def load_option_file(expiry, filename, entry_timestamps_utc=None):
                 )
         if not tables:
             return pd.DataFrame(columns=["timestamp", "strike", "close", "option_type"])
-        table = pa.concat_tables(tables, promote_options=True)
+        table = pa.concat_tables(tables)
         df = table.to_pandas()
 
     df["timestamp"] = normalize_timestamp(df["timestamp"])
