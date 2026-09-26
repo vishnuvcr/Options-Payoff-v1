@@ -16,3 +16,4 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 6A | Artifact-backed loss audit | Workflow 36264710663 read selected_trades.parquet from authoritative run 36262958536 and produced a 25-row loss ledger. |
 | 2026-09-27 | 6A | Loss decomposition | All 25 losers had negative gross P&L before fees; 0 were fee-only flips. Losing rows contributed -₹454,335.44 and modeled costs on them were ₹3,557.82. |
 | 2026-09-27 | 6A | Reproducibility audit | Found stale run_backtest.py on phase-6-manuscript-grid; authoritative 63-row code remains phase-3-strike-grid. |
+| 2026-09-27 | 6A | Reproducibility correction | Synchronized phase-6-manuscript-grid/scripts/run_backtest.py to the authoritative full-grid implementation in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4. |
