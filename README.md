@@ -4,8 +4,8 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Active phase:** Phase 3 — Backtest engine and transaction-cost model
-**Status:** Phase 1 analytical validation complete; Phase 2 data pipeline and Phase 3 backtest/cost engine implemented. Historical workflow execution remains pending.
+**Active phase:** Phase 4 — Statistical validation and robustness
+**Status:** Phase 1 analytical validation, Phase 2 data pipeline, Phase 3 backtest/cost engine and Phase 4 validation framework are implemented. Historical workflow execution remains pending because this session's runtime cannot resolve external data endpoints.
 **Date:** 2026-09-26
 
 ## Key finding
