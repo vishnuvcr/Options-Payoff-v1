@@ -1,6 +1,9 @@
 name: Phase 3 - Backtest
 
 on:
+  push:
+    branches: [phase-3-backtest]
+    paths: ['.github/phase2_trigger.json']
   workflow_dispatch:
     inputs:
       phase2_run_id:
@@ -35,8 +38,8 @@ on:
         default: '0.0025'
 
 permissions:
-  actions: write
-  contents: read
+  actions: read
+  contents: write
 
 jobs:
   backtest:
@@ -46,6 +49,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Resolve execution parameters
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            python - <<'PY' >> "$GITHUB_ENV"
+import json
+x=json.load(open(".github/phase2_trigger.json", encoding="utf-8"))
+for k, v in x.items():
+    print(f"{k.upper()}={v}")
+PY
+          else
+            echo "PHASE2_RUN_ID=${{ inputs.phase2_run_id }}" >> "$GITHUB_ENV"
+            echo "START_DATE=${{ inputs.start }}" >> "$GITHUB_ENV"
+            echo "END_DATE=${{ inputs.end }}" >> "$GITHUB_ENV"
+            echo "TRIGGER_BASE=${{ inputs.trigger_base }}" >> "$GITHUB_ENV"
+            echo "CONFIGURED_CAPITAL=${{ inputs.configured_capital_per_lot }}" >> "$GITHUB_ENV"
+            echo "SLIPPAGE_PCT=${{ inputs.slippage_pct }}" >> "$GITHUB_ENV"
+          fi
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -56,23 +76,31 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-nifty-options-v3-${{ inputs.start }}-${{ inputs.end }}
           restore-keys: hf-nifty-options-v3-
-      - name: Build Phase 2 strategy inputs
+      - name: Acquire Phase 2 strategy inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python scripts/extract_strategy_inputs.py \
-            --start '${{ inputs.start }}' \
-            --end '${{ inputs.end }}' \
-            --entry-time '09:20' \
-            --out data/derived/strategy_inputs.parquet
+          mkdir -p data/derived
+          if [ -n "$PHASE2_RUN_ID" ]; then
+            gh run download "$PHASE2_RUN_ID" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
+            test -s data/derived/strategy_inputs.parquet
+          else
+            python scripts/extract_strategy_inputs.py \
+              --start "$START_DATE" \
+              --end "$END_DATE" \
+              --entry-time '09:20' \
+              --out data/derived/strategy_inputs.parquet
+          fi
       - name: Run backtest
         run: |
           EXTRA=''
-          if [ '${{ inputs.trigger_base }}' = 'configured_capital' ]; then EXTRA="--configured-capital-per-lot '${{ inputs.configured_capital_per_lot }}'"; fi
+          if [ "$TRIGGER_BASE" = 'configured_capital' ]; then EXTRA="--configured-capital-per-lot '$CONFIGURED_CAPITAL'"; fi
           python scripts/run_backtest.py \
             --inputs data/derived/strategy_inputs.parquet \
             --out-dir results/phase3 \
             --threshold-pct '2.5' \
-            --trigger-base-mode '${{ inputs.trigger_base }}' \
-            --slippage-pct '${{ inputs.slippage_pct }}' $EXTRA
+            --trigger-base-mode "$TRIGGER_BASE" \
+            --slippage-pct "$SLIPPAGE_PCT" $EXTRA
       - name: Run unit tests
         run: python -m unittest tests/test_costs.py -v
       - name: Upload Phase 3 results
@@ -82,7 +110,12 @@ jobs:
           path: results/phase3
       - name: Chain to Phase 4
         if: success()
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run phase-4-validation.yml --repo "${{ github.repository }}" --ref phase-4-validation -f phase3_run_id="${{ github.run_id }}" -f out_dir="results/phase4"
+          git fetch origin phase-4-validation
+          git switch --detach origin/phase-4-validation
+          printf '{"phase3_run_id":"%s"}\n' "${GITHUB_RUN_ID}" > .github/phase3_trigger.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/phase3_trigger.json
+          git commit -m "Trigger Phase 4 from Phase 3 run ${GITHUB_RUN_ID}"
+          git push origin HEAD:phase-4-validation
