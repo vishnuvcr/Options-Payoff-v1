@@ -35,3 +35,7 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 7A | Started historical margin reconstruction | Created branch `phase-7A-margin-reconstruction` and calibration workflow for the screenshot position. |
 | 2026-09-27 | 7A | Calibration target formalized | Screenshot position: sell 29-Sep-2026 23450 CE, buy 29-Sep-2026 23450 PE, buy 06-Oct-2026 23450 CE, sell 06-Oct-2026 23450 PE; 65 units; screenshot standalone margin ₹88,076. |
 | 2026-09-27 | 7A | NSE margin methodology reviewed | NSE Clearing states that SPAN margin uses daily risk arrays over price/volatility scenarios and publishes daily SPAN risk-parameter files. |
+| 2026-09-27 | 7A | NSE SPAN source recovered | Found the direct official archive pattern `nsccl.YYYYMMDD.iN.zip` and executed it in GitHub Actions. |
+| 2026-09-27 | 7A | Screenshot margin reconstructed | Exact four-leg 23450 calendar/synthetic position calibrated at ₹87,812.40 versus Sensibull ₹88,076; discrepancy 0.2993%. |
+| 2026-09-27 | 7A | Intraday-version calibration | i05 was closest (0.2993%); i03 was 0.4005% away; all i1-i5 were within 0.91%. |
+| 2026-09-27 | 7A | Denominator resolved for screenshot | 2.5% of screenshot margin is ₹2,201.90; 2.5% of the closest reconstructed margin is ₹2,195.31. |
