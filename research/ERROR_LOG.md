@@ -14,3 +14,4 @@ Add a row whenever a reproducible mistake, failed assumption, data-quality issue
 
 | 2026-09-26 | 5 | Separate Phase 4/5 workflow runs require explicit artifact handoff. | A completed Phase 3 run would not automatically expose its files to a later workflow workspace. | Repaired on `phase-5-regimes` by downloading the Phase 3 artifact by run ID. |
 | 2026-09-26 | 3 | Configured-capital trigger mode was not passed through to the denominator function. | That sensitivity mode would fail at runtime. | Corrected on `phase-5-regimes`. |
+| 2026-09-26 | 6 | Earlier main-branch status files still described empirical execution as pending after the completed workflow chain. | Repository navigation could present stale research state. | Main README and STATUS were synchronized with the completed Phase 6 manuscript and empirical workflow IDs. |
