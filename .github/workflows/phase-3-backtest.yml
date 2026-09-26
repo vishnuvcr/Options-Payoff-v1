@@ -1,0 +1,81 @@
+name: Phase 3 - Backtest
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: Start date (YYYY-MM-DD)
+        required: true
+        default: '2025-11-01'
+      end:
+        description: End date (YYYY-MM-DD)
+        required: true
+        default: '2026-08-31'
+      lot_size:
+        description: Verified lot size for the selected date window
+        required: true
+        default: '65'
+      trigger_base:
+        description: Trigger denominator mode
+        required: true
+        default: buy_premium
+        type: choice
+        options:
+          - buy_premium
+          - spot_notional
+          - configured_capital
+      configured_capital_per_lot:
+        description: Required only for configured_capital mode
+        required: false
+        default: ''
+      slippage_pct:
+        description: Relative slippage per option premium, e.g. 0.0025
+        required: true
+        default: '0.0025'
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'huggingface_hub>=0.34' 'pandas>=2.2' 'pyarrow>=18'
+      - name: Restore/cache Hugging Face source files
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-nifty-options-v3-${{ inputs.start }}-${{ inputs.end }}
+          restore-keys: hf-nifty-options-v3-
+      - name: Build Phase 2 strategy inputs
+        run: |
+          python scripts/extract_strategy_inputs.py \
+            --start '${{ inputs.start }}' \
+            --end '${{ inputs.end }}' \
+            --entry-time '09:20' \
+            --out data/derived/strategy_inputs.parquet
+      - name: Run backtest
+        run: |
+          EXTRA=''
+          if [ '${{ inputs.trigger_base }}' = 'configured_capital' ]; then EXTRA="--configured-capital-per-lot '${{ inputs.configured_capital_per_lot }}'"; fi
+          python scripts/run_backtest.py \
+            --inputs data/derived/strategy_inputs.parquet \
+            --out-dir results/phase3 \
+            --lot-size '${{ inputs.lot_size }}' \
+            --threshold-pct '2.5' \
+            --trigger-base-mode '${{ inputs.trigger_base }}' \
+            --slippage-pct '${{ inputs.slippage_pct }}' $EXTRA
+      - name: Run unit tests
+        run: python -m unittest tests/test_costs.py -v
+      - name: Upload Phase 3 results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-3-backtest-results
+          path: results/phase3
