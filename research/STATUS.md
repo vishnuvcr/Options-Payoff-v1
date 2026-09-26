@@ -36,3 +36,7 @@ Regime attribution is now predeclared across realized volatility, India VIX, gap
 ## Next executable step
 
 Run the manual Phase 2 workflow first; then pass its run ID into Phase 3. After Phase 3 completes, pass that run ID to Phase 4 and Phase 5. The current research environment does not expose a workflow-dispatch action, so this is the only external execution step currently blocking empirical results.
+
+## Final full-grid regime attribution
+
+Run 36263974629 succeeded using the corrected 63-trade ledger. Descriptive means were +₹6,035 in prior-down trend, -₹7,145 sideways, +₹209 up; -₹12,183 high-vol, +₹413 low-vol, +₹11,713 medium-vol; -₹3,350 down-move, +₹3,517 small-move, +₹4,439 up-move. These are descriptive only.
