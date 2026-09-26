@@ -1,0 +1,30 @@
+name: Phase 4 - Statistical validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      trades_path:
+        description: Path to selected_trades.parquet from Phase 3
+        required: true
+        default: results/phase3/selected_trades.parquet
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
+      - name: Validate selected trades
+        run: python scripts/validate_results.py --trades '${{ inputs.trades_path }}' --out-dir results/phase4
+      - name: Upload validation results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-4-validation
+          path: results/phase4
