@@ -11,6 +11,7 @@
 | 2026-09-26 | 2 | Primary public dataset exposes OHLCV/OI bars rather than bid/ask quote history. | Direct bid/ask execution cannot be reconstructed from this source alone. | Label Phase 2 entries as close proxies and require Phase 3 spread/slippage sensitivity or quote-level cross-validation. |
 | 2026-09-26 | 2 | NIFTY lot size varies historically and is not present as a trusted field in the selected source. | Per-lot rupee P&L cannot be finalized without a dated lot-size calendar. | Leave lot_size unset in Phase 2 and add a verified dated lot-size table in Phase 3. |
 | 2026-09-26 | 2 | Autonomous Phase 2 produced the strategy-input artifact but `gh workflow run phase-3-backtest.yml --ref phase-3-backtest` returned HTTP 404 because the target workflow is not on the default branch. | Phase chaining stopped after valid Phase 2 data were built. | Replaced workflow-dispatch chaining with cross-branch trigger files plus `push` path triggers; future phase handoffs now operate from their own phase branches. |
+| 2026-09-26 | 2 | A branch-local `push` handoff cannot reliably chain from GitHub Actions using `GITHUB_TOKEN`, because GITHUB_TOKEN-triggered push events do not start downstream workflows. | The intermediate trigger-file design was unsuitable for autonomous phase chaining. | Added the phase workflow files to `main` as dispatch anchors and reverted autonomous chaining to `workflow_dispatch` on each phase branch; this event is explicitly allowed when initiated by GITHUB_TOKEN. |
 
 ## Logging rule
 
