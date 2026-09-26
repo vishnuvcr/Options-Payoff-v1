@@ -1,0 +1,51 @@
+{
+  "calibration_date": "2026-09-25",
+  "source": "user_provided_sensibull_screenshot",
+  "screenshot_identifiers": {
+    "nifty_spot": 23140.5,
+    "standalone_margin_inr": 88076,
+    "target_day_futures": {
+      "2026-09-29": 23190,
+      "2026-10-06": 23197
+    }
+  },
+  "position": [
+    {
+      "expiry": "2026-09-29",
+      "strike": 23450,
+      "instrument": "CE",
+      "side": "SELL",
+      "quantity": 65
+    },
+    {
+      "expiry": "2026-09-29",
+      "strike": 23450,
+      "instrument": "PE",
+      "side": "BUY",
+      "quantity": 65
+    },
+    {
+      "expiry": "2026-10-06",
+      "strike": 23450,
+      "instrument": "CE",
+      "side": "BUY",
+      "quantity": 65
+    },
+    {
+      "expiry": "2026-10-06",
+      "strike": 23450,
+      "instrument": "PE",
+      "side": "SELL",
+      "quantity": 65
+    }
+  ],
+  "derived": {
+    "lot_size": 65,
+    "spot_notional_inr": 1504132.5,
+    "observed_margin_pct_of_spot_notional": 5.855601152159135,
+    "max_profit_required_for_2_5pct_inr": 2201.9,
+    "illustrative_two_short_legs_exposure_at_2pct_inr": 60165.3,
+    "residual_to_observed_margin_after_that_illustrative_exposure_inr": 27910.7
+  },
+  "caveat": "The 2% short-index-option exposure calculation is only an illustrative decomposition. The exact standalone margin requires the daily SPAN risk arrays, calendar-spread treatment and broker/platform rules."
+}
