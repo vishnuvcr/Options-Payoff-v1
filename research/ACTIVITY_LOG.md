@@ -19,3 +19,9 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 6A | Reproducibility correction | Synchronized phase-6-manuscript-grid/scripts/run_backtest.py to the authoritative full-grid implementation in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4. |
 
 | 2026-09-27 | 6A | Payoff formula audit | Verified static chart = C1-P1-C2+P2 under the same-terminal-spot convention and actual gross cross-expiry P&L = C1-P1-C2+P2+S2-S1. |
+| 2026-09-27 | 7 | Strategy change initiated | Created `phase-7-max-equal-selection` because the user replaced ATM-first/fallback ordering with exhaustive ATM-400..ATM+400 maximum-flatline selection. |
+| 2026-09-27 | 7 | Platform research | Reviewed current public Streak and Sensibull material. Sensibull documents max-profit/max-loss percentage as max profit or max loss divided by margin required; Streak public material reviewed here does not publish a comparable percentage formula. |
+| 2026-09-27 | 7 | Platform semantics documented | Added `docs/PAYOFF_PLATFORM_REVIEW.md`, distinguishing software chart metrics from the true two-expiry economic P&L. |
+| 2026-09-27 | 7 | Strategy engine updated | Added exhaustive strike-grid helper, chart flatline estimator and maximum equal-max-profit=max-loss selection mode. |
+| 2026-09-27 | 7 | Data extraction updated | Future cached strategy-input builds now generate ATM-400..ATM+400 in 50-point increments; current Phase 3 artifact remains usable for the rerun because it contains the wider grid. |
+| 2026-09-27 | 7 | Tests/workflow added | Added unit coverage and manual GitHub Actions workflow `.github/workflows/phase-7-max-equal-selection.yml`. |
