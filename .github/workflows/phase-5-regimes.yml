@@ -1,9 +1,6 @@
 name: Phase 5 - Regime Attribution
 
 on:
-  push:
-    branches: [phase-5-regimes]
-    paths: ['.github/phase3_trigger.json']
   workflow_dispatch:
     inputs:
       phase3_run_id:
@@ -30,23 +27,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Resolve execution parameters
-        run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "PHASE3_RUN_ID=$(python -c 'import json; print(json.load(open(".github/phase3_trigger.json"))["phase3_run_id"])')" >> "$GITHUB_ENV"
-            echo "REGIMES_PATH=" >> "$GITHUB_ENV"
-            echo "OUTPUT_PATH=results/phase5_regime_summary.csv" >> "$GITHUB_ENV"
-          else
-            echo "PHASE3_RUN_ID=${{ inputs.phase3_run_id }}" >> "$GITHUB_ENV"
-            echo "REGIMES_PATH=${{ inputs.regimes_path }}" >> "$GITHUB_ENV"
-            echo "OUTPUT_PATH=${{ inputs.output_path }}" >> "$GITHUB_ENV"
-          fi
       - name: Download Phase 3 results from the selected run
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p results/phase3
-          gh run download "$PHASE3_RUN_ID" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
+          gh run download "${{ inputs.phase3_run_id }}" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
       - name: Check prerequisite ledger
         run: |
           test -s results/phase3/selected_trades.parquet || {
@@ -57,14 +43,14 @@ jobs:
         run: python -m pip install pandas pyarrow
       - name: Run regime attribution
         run: |
-          if [ -n "$REGIMES_PATH" ]; then
-            test -f "$REGIMES_PATH"
-            python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --regimes "$REGIMES_PATH" --out "$OUTPUT_PATH"
+          if [ -n "${{ inputs.regimes_path }}" ]; then
+            test -f "${{ inputs.regimes_path }}"
+            python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --regimes "${{ inputs.regimes_path }}" --out "${{ inputs.output_path }}"
           else
-            python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --out "$OUTPUT_PATH"
+            python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --out "${{ inputs.output_path }}"
           fi
       - name: Upload Phase 5 result
         uses: actions/upload-artifact@v4
         with:
           name: phase-5-regime-summary
-          path: "$OUTPUT_PATH"
+          path: "${{ inputs.output_path }}"
