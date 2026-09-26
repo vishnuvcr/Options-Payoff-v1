@@ -9,3 +9,5 @@
 ## Logging rule
 
 Add a row whenever a reproducible mistake, failed assumption, data-quality issue or workflow failure affects the research. Do not delete historical rows; append corrections with dates.
+
+| 2026-09-26 | 5 | Phase 5 could be incorrectly interpreted as empirical evidence before the Phase 3/4 ledger exists. | Would create unsupported regime conclusions. | Branch explicitly requires a validated ledger before execution and labels current work as protocol/scaffold only. |
