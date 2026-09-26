@@ -75,20 +75,7 @@ jobs:
           print('dates',len(dates))
           print('\n'.join(dates))
           PY
-          while read -r d; do
-            test -n "$d" || continue
-            url="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${d}.${{ inputs.span_version || 'i02' }}.zip"
-            echo "Downloading $url"
-            curl --fail --silent --show-error --location \
-              -H 'User-Agent: Mozilla/5.0' \
-              -H 'Accept: application/octet-stream,*/*;q=0.8' \
-              -H 'Referer: https://www.nseindia.com/' \
-              "$url" -o "/tmp/${d}.zip"
-            unzip -jo "/tmp/${d}.zip" '*.spn' -d data/margin/span_historical
-          done < /tmp/span_dates.txt
-          ls -lh data/margin/span_historical | head -n 20
-
-      - name: Reconstruct exact candidate margins
+          : > /tmp/span_missing.txt,          while read -r d; do,            test -n "$d" || continue,            found=0,            for stem in "${d}.i02" "${d}.i01" "${d}.i1" "${d}.s"; do,              zipurl="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${stem}.zip",              outfile="/tmp/${d}_${stem}.zip",              if curl --fail --silent --show-error --location --max-time 20 \,                -H 'User-Agent: Mozilla/5.0' \,                -H 'Accept: application/octet-stream,*/*;q=0.8' \,                -H 'Referer: https://www.nseindia.com/' \,                "$zipurl" -o "$outfile"; then,                unzip -jo "$outfile" '*.spn' -d data/margin/span_historical || true,                found=1,                break,              fi,            done,            if [ "$found" -eq 0 ]; then,              spnurl="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${d}.s.spn",              if curl --fail --silent --show-error --location --max-time 20 \,                -H 'User-Agent: Mozilla/5.0' \,                -H 'Accept: application/octet-stream,*/*;q=0.8' \,                -H 'Referer: https://www.nseindia.com/' \,                "$spnurl" -o "data/margin/span_historical/nsccl.${d}.s.spn"; then,                found=1,              fi,            fi,            if [ "$found" -eq 0 ]; then echo "$d" >> /tmp/span_missing.txt; fi,          done < /tmp/span_dates.txt,          echo 'missing_dates:',          cat /tmp/span_missing.txt || true,          echo 'available_spn_files:',          find data/margin/span_historical -type f -name '*.spn' | sort | head -n 100,      - name: Reconstruct exact candidate margins
         run: |
           python scripts/reconstruct_candidate_margins.py \
             --candidates results/phase7a_margin_prefilter.csv \
