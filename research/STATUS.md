@@ -64,3 +64,7 @@ The previous 28-trade result is superseded as the primary specification. Phase 3
 6. Exit at expiry.
 
 The expanded data extraction has already completed 19,341 candidate rows (15,701 complete; 3,498 unavailable; 142 missing settlements). Net-P&L analysis is waiting on the corrected backtest workflow to complete. The earlier 28-trade statistics remain historical/provisional only.
+
+## Final full-grid validation
+
+Run 36263760476 succeeded using Phase 3 run 36262958536. Baseline: 63 trades, ₹168,665.95 net P&L, mean ₹2,677.24, median ₹6,831.26, win rate 60.32%, profit factor 1.37, max drawdown -₹194,854.37. IID and block-bootstrap mean intervals both include zero. Chronological train was -₹50,828; test was +₹219,494.
