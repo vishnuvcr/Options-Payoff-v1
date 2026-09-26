@@ -34,7 +34,16 @@ def candidate_row_metrics(row, args, model):
     if any(pd.isna(x) for x in premiums) or pd.isna(row.near_settlement) or pd.isna(row.next_settlement):
         return None
     execs=four_leg_entry_cashflow(*premiums, slippage_pct=model.slippage_pct)
-    base=trigger_base(args.trigger_base_mode,float(row.spot_at_entry),lot_size,execs['buy_premium_turnover'])
+    raw_buy_premium = float(row.near_put_close) + float(row.next_call_close)
+    base=trigger_base(
+        args.trigger_base_mode,
+        float(row.spot_at_entry),
+        lot_size,
+        raw_buy_premium * lot_size,
+        args.configured_capital_per_lot,
+    )
+    # The user's chart trigger is based on observed entry premiums, not the
+    # execution-cost shock. Slippage is applied to realized P&L only.
     chart_pnl=float(row.net_entry_cashflow_per_unit)*lot_size
     chart_return=100.0*chart_pnl/base if base>0 else None
     gross_per_unit=float(row.net_entry_cashflow_per_unit)+float(row.next_settlement)-float(row.near_settlement)
