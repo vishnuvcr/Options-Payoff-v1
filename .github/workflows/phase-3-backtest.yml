@@ -57,7 +57,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          key: hf-nifty-options-v3-${{ inputs.start }}-${{ inputs.end }}
+          key: hf-nifty-options-v3-${{ inputs.start || '2021-06-01' }}-${{ inputs.end || '2026-08-31' }}
           restore-keys: hf-nifty-options-v3-
       - name: Download Phase 2 strategy inputs from selected run
         if: inputs.phase2_run_id != ''
@@ -70,14 +70,22 @@ jobs:
       - name: Build Phase 2 strategy inputs when no Phase 2 run ID is supplied
         if: inputs.phase2_run_id == ''
         run: |
-          python scripts/extract_strategy_inputs.py --start '${{ inputs.start }}' --end '${{ inputs.end }}' --entry-time '09:20' --out data/derived/strategy_inputs.parquet
+          START='${{ inputs.start }}'
+          END='${{ inputs.end }}'
+          [ -n "$START" ] || START='2021-06-01'
+          [ -n "$END" ] || END='2026-08-31'
+          python scripts/extract_strategy_inputs.py --start "$START" --end "$END" --entry-time '09:20' --out data/derived/strategy_inputs.parquet
       - name: Run backtest
         run: |
+          TRIGGER='${{ inputs.trigger_base }}'
+          SLIP='${{ inputs.slippage_pct }}'
+          [ -n "$TRIGGER" ] || TRIGGER='buy_premium'
+          [ -n "$SLIP" ] || SLIP='0.0025'
           EXTRA=''
-          if [ '${{ inputs.trigger_base }}' = 'configured_capital' ]; then
+          if [ "$TRIGGER" = 'configured_capital' ]; then
             EXTRA="--configured-capital-per-lot '${{ inputs.configured_capital_per_lot }}'"
           fi
-          python scripts/run_backtest.py --inputs data/derived/strategy_inputs.parquet --out-dir results/phase3 --threshold-pct '2.5' --trigger-base-mode '${{ inputs.trigger_base }}' --slippage-pct '${{ inputs.slippage_pct }}' $EXTRA
+          python scripts/run_backtest.py --inputs data/derived/strategy_inputs.parquet --out-dir results/phase3 --threshold-pct '2.5' --trigger-base-mode "$TRIGGER" --slippage-pct "$SLIP" --fallback-max-shift-points '500' --fallback-step-points '50' $EXTRA
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
       - name: Upload Phase 3 results
