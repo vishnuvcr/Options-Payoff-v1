@@ -4,43 +4,59 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current research status
 
-**Latest protocol branch:** `phase-5-regimes`
-**Latest phase:** Phase 5 — regime and cross-market attribution framework
-**Empirical status:** Phase 3/4 historical execution artifacts are still required; no historical performance result is claimed. The latest Phase 5 branch also repaired cross-workflow artifact handoffs and a configured-capital trigger bug.
-**Last updated:** 2026-09-26
+**Active phase:** Phase 6 — empirical manuscript and reproducibility package  
+**Status:** COMPLETE  
+**Date:** 2026-09-26
 
-## Key analytical finding
+### Primary result
 
-The four-leg position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. The economically relevant expiry component is the difference between the two expiry settlement levels, not a single common terminal spot. A chart that uses one terminal spot for both expiries can therefore display a flat line even though the held position has cross-expiry settlement risk.
+The corrected historical backtest selected 28 trades from 891 eligible entry timestamps under the buy-premium interpretation of the 2.5% trigger, with 0.25% slippage and ₹20/order baseline brokerage.
 
-## Phase map
+Net P&L was ₹166,240.97; mean trade P&L ₹5,937.18; median ₹9,431.27; win rate 67.86%; profit factor 2.33; maximum drawdown -₹48,161.45.
 
-- Phase 0 — governance: complete.
-- Phase 1 — strategy/payoff specification: complete.
-- Phase 2 — data engineering: implemented; runtime validation pending.
-- Phase 3 — backtest and costs: implemented; historical execution pending.
-- Phase 4 — statistical validation: implemented; execution pending Phase 3 artifacts.
-- Phase 5 — regime attribution: protocol/scaffold implemented on `phase-5-regimes`; execution gated on validated trade ledger.
-- Phase 6 — manuscript: not started; begins only after empirical Phases 3–5 are complete.
+The iid bootstrap CI for mean trade P&L spans approximately -₹434 to ₹11,735, and the weekly block bootstrap CI spans approximately -₹1,689 to ₹12,745. The chronological 70/30 split remains positive in the 9-trade test segment.
 
-## Latest Phase 5 work
+### Important interpretation
 
-The regime protocol is point-in-time and covers realized volatility, India VIX, gap, trend, liquidity, option IV/term structure, FII/DII activity, USD/INR, gold, global equity benchmarks and auditable event windows. Same-day end-of-day information is prohibited for a 09:20 entry unless it was genuinely available before entry.
+The flatline payoff chart is not the realized economic payoff of the cross-expiry position. The correct expiry component is S(next expiry) - S(near expiry), plus the entry premium edge and costs.
 
-Official NSE sources expose historical derivatives reports, contract-wise option data, participant reports, FII derivatives statistics and India VIX history. The current Paytm Money F&O FAQ states Rs.10 brokerage per unique executed order; the research model remains configurable and retains a conservative higher-brokerage sensitivity for historical/account-specific uncertainty.
+The 2.5% denominator remains a material specification ambiguity. The buy-premium denominator generated trades; the tested spot-notional denominator generated none across 1%–5% thresholds.
 
-## Repository governance
+The selected sample is sparse and concentrated: 28 trades, all from 2021-08-05 through 2024-01-17, with approximately 89.3% of total selected-trade P&L coming from May and October 2022.
 
-- Baseline plan: `research/RESEARCH_PLAN.md`
-- Instructions: `research/RESEARCH_INSTRUCTIONS.md`
-- Status: `research/STATUS.md`
-- Error log: `research/ERROR_LOG.md`
-- Activity log: `research/ACTIVITY_LOG.md`
-- Phase 5 protocol: `docs/PHASE_5_REGIME_ANALYSIS.md`
-- Phase 5 source audit: `docs/PHASE_5_SOURCE_AUDIT.md`
+### Research outputs
 
-Latest phase branch: https://github.com/vishnuvcr/Options-Payoff-v1/tree/phase-5-regimes
+- docs/MANUSCRIPT.md — complete research manuscript
+- results/phase3_summary.json
+- results/phase4_validation_summary.json
+- results/phase4_brokerage_sensitivity.csv
+- results/phase4_monthly_pnl.csv
+- results/phase5_regime_summary.csv
+- docs/figures/*.svg
 
-## Execution dependency
+### Phase status
 
-The current research branch has repaired Phase 2 → Phase 3 → Phase 4/5 artifact handoffs. Because the connected GitHub interface in this research session does not expose workflow dispatch, the first empirical run still requires the repository's manual workflow buttons. No performance result is claimed until those artifacts exist.
+- Phase 0 — governance: COMPLETE
+- Phase 1 — strategy/payoff specification: COMPLETE
+- Phase 2 — market-data engineering: COMPLETE
+- Phase 3 — cost-aware backtest: COMPLETE
+- Phase 4 — statistical validation and robustness: COMPLETE
+- Phase 5 — point-in-time spot-derived regime attribution: COMPLETE
+- Phase 6 — manuscript and reproducibility package: COMPLETE
+
+### Remaining research opportunities
+
+Quote-level bid/ask validation, official settlement-price validation, India VIX, FII/DII, option-IV/term-structure, USD/INR, gold, global equity and event-window data remain future extensions. They are intentionally not presented as completed results.
+
+### Governance
+
+Research plan: research/RESEARCH_PLAN.md  
+Instructions: research/RESEARCH_INSTRUCTIONS.md  
+Status: research/STATUS.md  
+Error log: research/ERROR_LOG.md  
+Activity log: research/ACTIVITY_LOG.md  
+Sources: research/SOURCES.md
+
+Each phase remains on its own branch and exposes a manual GitHub Actions workflow.
+
+The complete manuscript is on the phase-6-manuscript branch.
