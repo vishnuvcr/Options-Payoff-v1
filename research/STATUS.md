@@ -1,39 +1,34 @@
 # Research status
 
 **As of:** 2026-09-26
-**Active branch:** phase-4-validation
-**Overall phase:** 4 — Statistical validation framework IMPLEMENTED; empirical execution pending
+**Active branch:** phase-5-regimes
+**Overall phase:** 5 — Regime attribution framework IMPLEMENTED; empirical execution gated on Phase 3/4 artifacts
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
 | 0 Bootstrap | COMPLETE | Governance files initialized. |
 | 1 Specification | COMPLETE | Strategy equations, payoff tests and manual workflow added. |
-| 2 Data | IMPLEMENTED; VALIDATION PENDING | Data manifest, extractor and manual workflow exist. Runtime execution requires GitHub Actions/network access. |
-| 3 Backtest | IMPLEMENTED; VALIDATION PENDING | Gross P&L, selection rule, transaction costs, exercise STT and unit tests added. Historical run has not been executed in this session. |
-| 4 Validation | IMPLEMENTED; EXECUTION PENDING | Bootstrap, monthly aggregation, walk-forward and robustness framework added. |
-| 5 Regimes | NOT STARTED | Conditional/regime attribution. |
-| 6 Manuscript | NOT STARTED | Final research manuscript and supplements. |
+| 2 Data | IMPLEMENTED; VALIDATION PENDING | Extractor, source manifest and cache workflow exist; runtime artifact still required. |
+| 3 Backtest | IMPLEMENTED; VALIDATION PENDING | Cost-aware ledger exists in code; historical run has not been executed in this session. |
+| 4 Validation | IMPLEMENTED; EXECUTION PENDING | Statistical/robustness framework exists; requires Phase 3 results. |
+| 5 Regimes | FRAMEWORK COMPLETE; EXECUTION BLOCKED | Point-in-time regime protocol, script and manual workflow added; requires validated trade ledger. |
+| 6 Manuscript | NOT STARTED | Starts after empirical Phases 3–5 are complete. |
 
-## Phase 3 results so far
+## Current analytical findings
 
-1. The backtest separates the static chart trigger from the realized cross-expiry P&L.
-2. The selection rule is deterministic: ATM first, then configurable -400/+400 fallback order.
-3. Three explicit chart-trigger denominators are supported: buy-premium, spot-notional and configured-capital.
-4. The cost engine includes four order brokerages, exchange premium-turnover charges, SEBI fee, buyer stamp duty, GST, entry-sale STT, and expiry-exercise STT on intrinsic value of long options.
-5. Slippage is configurable because the Phase 2 dataset does not contain bid/ask quotes.
-6. Lot size is a required explicit input; it is not silently inferred across historical contract changes.
+1. The static flatline chart is not the realized payoff of the cross-expiry position.
+2. The economically relevant expiry component is S2 - S1, plus the entry premium edge and transaction costs.
+3. The 2.5% denominator is unspecified and must remain an explicit sensitivity dimension.
+4. Historical NIFTY lot-size changes require expiry-specific treatment; unequal-lot pairs are excluded from the one-for-one spread sample.
+5. Primary public data lack bid/ask history, so close-based execution is only a proxy.
 
-## Current research conclusion
+## Phase 5 protocol result
 
-The static flatline chart is not the realized payoff of the cross-expiry position. A selected trade can pass the chart trigger and still lose money because the realized expiry component is S2 - S1 and because costs can consume a small entry-price edge.
+Regime attribution is now predeclared across realized volatility, India VIX, gap, trend, liquidity, IV level/term structure, FII/DII activity, USD/INR, gold, global equity benchmarks and event windows where point-in-time data are available. The protocol prohibits using future or same-day end-of-day information that was not known at the 09:20 entry.
 
 ## Blockers
 
-- The GitHub Actions workflow has not been manually dispatched from this session.
-- A dated NIFTY lot-size calendar is still required for a multi-year rupee P&L series.
-- Quote-level bid/ask data are not in the primary Phase 2 source; Phase 3 therefore uses explicit slippage sensitivity until a quote-level source is validated.
-- The percentage denominator in the user's 2.5% rule remains unconfirmed; all supported denominator modes must be reported before treating any signal result as final.
-
-## New validation result
-
-Historical NIFTY lot-size changes are now encoded by expiry date rather than a single fixed lot. Transition weeks with unequal near/next lots are excluded from the one-for-one spread sample. This prevents artificial P&L scaling and synthetic-forward notional mismatch.
+- GitHub Actions workflows have not been manually dispatched from this session.
+- Phase 3/4 historical artifacts are required before empirical regime analysis.
+- Quote-level bid/ask and IV surface history remain a separate data requirement.
+- The user's exact 2.5% denominator remains unconfirmed; supported alternatives must be reported.
