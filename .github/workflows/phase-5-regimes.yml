@@ -46,6 +46,8 @@ jobs:
             echo "REGIMES_PATH=${{ inputs.regimes_path }}" >> "$GITHUB_ENV"
             echo "OUTPUT_PATH=${{ inputs.output_path }}" >> "$GITHUB_ENV"
           fi
+      - name: Install dependencies
+        run: python -m pip install pandas pyarrow
       - name: Download Phase 3 results from the selected run
         env:
           GH_TOKEN: ${{ github.token }}
@@ -68,8 +70,6 @@ jobs:
             echo 'Phase 5 requires a completed Phase 3 trade ledger.'
             exit 2
           }
-      - name: Install dependencies
-        run: python -m pip install pandas pyarrow
       - name: Run regime attribution
         run: |
           if [ -n "$REGIMES_PATH" ]; then
