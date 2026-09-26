@@ -36,3 +36,5 @@ Append new rows for reproducible mistakes, failed assumptions, data-quality issu
 
 | 2026-09-26 | 3 | Expanded strike-grid extraction omitted the shift_points field in its parquet rows. | The corrected backtest rejected the 19,341-row input before calculating P&L. | Added shift_points to both unavailable and complete candidate rows and added a schema assertion path; rerun triggered. |
 | 2026-09-26 | 3 | Multiple push-triggered strike-grid workflows ran concurrently during debugging. | Wasted runner time and duplicated long Hugging Face extraction. | Added a concurrency group with cancel-in-progress and enabled cache save even when a run fails. |
+
+| 2026-09-26 | 3 | Optimized strike-grid extraction used pyarrow concat_tables with a boolean promote_options argument, but the installed PyArrow version expects a string and raised a TypeError. | Extraction stopped before backtest despite authenticated Hugging Face access working. | Removed the optional promotion argument because the selected row-group schemas are identical; rerun triggered. |
