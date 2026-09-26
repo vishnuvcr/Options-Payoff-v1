@@ -58,7 +58,7 @@ Full audit: docs/LOSS_TRADE_ANALYSIS.md
 
 The 63-row result is authoritative from branch phase-3-strike-grid and run 36262958536.
 
-A later phase-6-manuscript-grid branch contains a stale copy of scripts/run_backtest.py using the old ATM/±400 fallback order. That stale script must not be used to reproduce the 63-row result. The discrepancy is recorded in the phase-6-loss-audit error log and status.
+The phase-6-manuscript-grid branch was found to contain a stale copy of scripts/run_backtest.py using the old ATM/±400 fallback order; it was corrected in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4.
 
 ### Research outputs
 
