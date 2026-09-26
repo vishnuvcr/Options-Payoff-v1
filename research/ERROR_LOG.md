@@ -25,3 +25,5 @@ Append new rows for reproducible mistakes, failed assumptions, data-quality issu
 | 2026-09-26 | 3 | The chart trigger numerator used observed premiums while its buy-premium denominator used slippage-adjusted execution premiums. | Trigger percentage changed with the execution shock, mixing signal definition with cost stress. | Chart trigger now uses observed entry premiums; slippage is applied only to realized execution/P&L. |
 
 | 2026-09-26 | 3 | Phase 3 originally rebuilt the Phase 2 input table instead of consuming a prior validated Phase 2 artifact. | Could waste bandwidth and weaken the intended cached-data workflow. | Phase 3 now accepts an optional Phase 2 run ID and downloads the phase-2-strategy-inputs artifact; rebuilding remains the explicit fallback. |
+
+| 2026-09-26 | 5 | Manual dispatch remained the last execution blocker. | Empirical research could not start autonomously. | Added bounded Actions chaining with explicit run-ID artifact handoffs; no workflow chains beyond Phase 5. |
