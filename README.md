@@ -2,71 +2,59 @@
 
 Research repository for testing a cross-expiry NIFTY index-options strategy.
 
-## Current status
+## Current research status
 
-**Active research phase:** Phase 5 — Regime and cross-market attribution protocol
-**Status:** FRAMEWORK IMPLEMENTED; workflow handoffs repaired; empirical execution remains gated on Phase 3/4 historical artifacts.
+**Active phase:** Phase 6 — empirical manuscript and reproducibility package  
+**Status:** COMPLETE  
 **Date:** 2026-09-26
 
-## Key analytical finding
+### Primary result
 
-The position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, its economically correct expiry component is S(next expiry) - S(near expiry). A chart that applies one identical terminal spot to both expiries will look flat because the intrinsic terms cancel. That flatline is not the realized held-to-expiry payoff.
+The corrected historical backtest selected 28 trades from 891 eligible entry timestamps under the buy-premium interpretation of the 2.5% trigger, with 0.25% slippage and ₹20/order baseline brokerage.
 
-## Current implementation
+Net P&L was ₹166,240.97; mean trade P&L ₹5,937.18; median ₹9,431.27; win rate 67.86%; profit factor 2.33; maximum drawdown -₹48,161.45.
 
-- Phase 1: analytical payoff model and unit tests.
-- Phase 2: reproducible NIFTY option/index data extraction with cached public source files.
-- Phase 3: chart-trigger selection, gross cross-expiry P&L, historical lot handling, slippage and transaction-cost model.
-- Phase 4: statistical validation and robustness framework.
-- Phase 5: point-in-time regime/cross-market attribution protocol and manual workflow.
+The iid bootstrap CI for mean trade P&L spans approximately -₹434 to ₹11,735, and the weekly block bootstrap CI spans approximately -₹1,689 to ₹12,745. The chronological 70/30 split remains positive in the 9-trade test segment.
 
-## Critical open inputs
+### Important interpretation
 
-The 2.5% chart denominator is not specified in the original rule, so the backtest exposes multiple denominator modes rather than silently selecting one.
+The flatline payoff chart is not the realized economic payoff of the cross-expiry position. The correct expiry component is S(next expiry) - S(near expiry), plus the entry premium edge and costs.
 
-Historical NIFTY lot-size transitions are handled by expiry date; unequal-lot near/next pairs are excluded from the one-for-one synthetic-forward sample.
+The 2.5% denominator remains a material specification ambiguity. The buy-premium denominator generated trades; the tested spot-notional denominator generated none across 1%–5% thresholds.
 
-Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close is a proxy. Quote-level execution analysis requires a separately validated source.
+The selected sample is sparse and concentrated: 28 trades, all from 2021-08-05 through 2024-01-17, with approximately 89.3% of total selected-trade P&L coming from May and October 2022.
 
-## Research files
+### Research outputs
 
-- research/RESEARCH_PLAN.md
-- research/RESEARCH_INSTRUCTIONS.md
-- research/STATUS.md
-- research/ERROR_LOG.md
-- research/ACTIVITY_LOG.md
-- research/SOURCES.md
-- docs/PHASE_1_SPECIFICATION.md
-- docs/PHASE_2_DATA_PLAN.md
-- docs/LITERATURE_REVIEW.md
-- docs/PHASE_3_BACKTEST.md
-- docs/PHASE_4_VALIDATION.md
-- docs/PHASE_5_REGIME_ANALYSIS.md
-- docs/PHASE_5_SOURCE_AUDIT.md
-- scripts/analyze_regimes.py
+- docs/MANUSCRIPT.md — complete research manuscript
+- results/phase3_summary.json
+- results/phase4_validation_summary.json
+- results/phase4_brokerage_sensitivity.csv
+- results/phase4_monthly_pnl.csv
+- results/phase5_regime_summary.csv
+- docs/figures/*.svg
 
-## Manual workflows
+### Phase status
 
-- Phase 1: .github/workflows/phase-1-specification.yml
-- Phase 2: .github/workflows/phase-2-data.yml
-- Phase 3: .github/workflows/phase-3-backtest.yml
-- Phase 4: .github/workflows/phase-4-validation.yml
-- Phase 5: .github/workflows/phase-5-regimes.yml
+- Phase 0 — governance: COMPLETE
+- Phase 1 — strategy/payoff specification: COMPLETE
+- Phase 2 — market-data engineering: COMPLETE
+- Phase 3 — cost-aware backtest: COMPLETE
+- Phase 4 — statistical validation and robustness: COMPLETE
+- Phase 5 — point-in-time spot-derived regime attribution: COMPLETE
+- Phase 6 — manuscript and reproducibility package: COMPLETE
 
-Each phase remains on its own branch and the workflow is manually runnable. Phase 4 and Phase 5 now accept a completed Phase 3 run ID and download its artifact, so separate workflow runs no longer depend on a shared workspace.
+### Remaining research opportunities
 
-### Current manual execution sequence
+Quote-level bid/ask validation, official settlement-price validation, India VIX, FII/DII, option-IV/term-structure, USD/INR, gold, global equity and event-window data remain future extensions. They are intentionally not presented as completed results.
 
-1. Run `Phase 2 - Data acquisition and validation` on `phase-2-data` and record the workflow run ID.
-2. Run `Phase 3 - Backtest` on `phase-3-backtest` and pass the Phase 2 run ID when available. The workflow can fall back to rebuilding the inputs.
-3. Run `Phase 4 - Statistical validation` on `phase-4-validation` and pass the Phase 3 run ID.
-4. Run `Phase 5 - Regime Attribution` on `phase-5-regimes` and pass the same Phase 3 run ID; add a point-in-time regime table when available.
-5. Only after those artifacts exist should Phase 6 manuscript work begin.
+### Governance
 
-## Current research conclusion
+Research plan: research/RESEARCH_PLAN.md  
+Instructions: research/RESEARCH_INSTRUCTIONS.md  
+Status: research/STATUS.md  
+Error log: research/ERROR_LOG.md  
+Activity log: research/ACTIVITY_LOG.md  
+Sources: research/SOURCES.md
 
-The flatline chart remains a signal candidate, not evidence of a risk-free payoff. No historical performance conclusion has been fabricated while the required GitHub Actions artifacts are unavailable.
-
-## Reproducibility
-
-Source revisions, assumptions, data-quality flags, research status and errors are recorded. Public source data should be cached in GitHub Actions rather than downloaded blindly on every run.
+Each phase remains on its own branch and exposes a manual GitHub Actions workflow.
