@@ -6,7 +6,7 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 **Latest protocol branch:** `phase-5-regimes`
 **Latest phase:** Phase 5 — regime and cross-market attribution framework
-**Empirical status:** Phase 3/4 historical execution artifacts are still required; no historical performance result is claimed.
+**Empirical status:** Phase 3/4 historical execution artifacts are still required; no historical performance result is claimed. The latest Phase 5 branch also repaired cross-workflow artifact handoffs and a configured-capital trigger bug.
 **Last updated:** 2026-09-26
 
 ## Key analytical finding
