@@ -55,7 +55,7 @@ See docs/LOSS_TRADE_ANALYSIS.md for the complete 25-trade ledger, concentration 
 
 ## Reproducibility correction
 
-The authoritative 63-row result comes from branch phase-3-strike-grid and run 36262958536. The later phase-6-manuscript-grid branch retains an older run_backtest.py using ATM/-400/+400. That stale script must not be used to reproduce the full-grid result; the discrepancy is logged for correction.
+The authoritative 63-row result comes from branch phase-3-strike-grid and run 36262958536. The manuscript-branch copy of run_backtest.py was synchronized to the same full-grid implementation in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4.
 
 ## Important specification limitation
 
