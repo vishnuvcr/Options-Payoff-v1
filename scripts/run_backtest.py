@@ -101,8 +101,37 @@ def main():
     out=Path(args.out_dir); out.mkdir(parents=True,exist_ok=True)
     candidates.to_parquet(out/'candidate_results.parquet',index=False)
     trades.to_parquet(out/'selected_trades.parquet',index=False)
+
+    eligible_mask = candidates['chart_return_pct'].notna() & (candidates['chart_return_pct'] > args.threshold_pct)
+    atm_mask = eligible_mask & candidates['shift_points'].eq(0)
+    fallback_mask = eligible_mask & candidates['shift_points'].ne(0)
     entries=int(candidates['entry_timestamp'].nunique())
-    summary={'candidate_rows':int(len(candidates)),'eligible_entry_timestamps':entries,'selected_trade_rows':int(len(trades)),'selected_entry_timestamps':int(trades['entry_timestamp'].nunique()) if not trades.empty else 0,'atm_selected_trades':int(atm_selected),'fallback_grid_selected_trades':int(fallback_selected),'selection_rate_pct':float(100*(trades['entry_timestamp'].nunique())/entries) if entries else 0.0,'mean_net_pnl_inr':float(trades.net_pnl_inr.mean()) if not trades.empty else None,'median_net_pnl_inr':float(trades.net_pnl_inr.median()) if not trades.empty else None,'win_rate_pct':float(100*(trades.net_pnl_inr>0).mean()) if not trades.empty else None,'total_net_pnl_inr':float(trades.net_pnl_inr.sum()) if not trades.empty else 0.0,'total_costs_inr':float(trades.total_costs_inr.sum()) if not trades.empty else 0.0,'threshold_pct':args.threshold_pct,'trigger_base_mode':args.trigger_base_mode,'slippage_pct':args.slippage_pct,'fallback_max_shift_points':max_shift,'fallback_step_points':step,'lot_size':args.lot_size}
+    selected_entries=int(trades['entry_timestamp'].nunique()) if not trades.empty else 0
+    summary={
+        'candidate_rows':int(len(candidates)),
+        'eligible_entry_timestamps':entries,
+        'selected_trade_rows':int(len(trades)),
+        'selected_entry_timestamps':selected_entries,
+        'atm_selected_trades':int(atm_selected),
+        'fallback_grid_selected_trades':int(fallback_selected),
+        'selection_rate_pct':float(100*selected_entries/entries) if entries else 0.0,
+        'candidate_rows_above_threshold':int(eligible_mask.sum()),
+        'atm_candidate_rows_above_threshold':int(atm_mask.sum()),
+        'fallback_candidate_rows_above_threshold':int(fallback_mask.sum()),
+        'max_chart_return_pct':float(candidates['chart_return_pct'].max()) if candidates['chart_return_pct'].notna().any() else None,
+        'p95_chart_return_pct':float(candidates['chart_return_pct'].dropna().quantile(0.95)) if candidates['chart_return_pct'].notna().any() else None,
+        'mean_net_pnl_inr':float(trades.net_pnl_inr.mean()) if not trades.empty else None,
+        'median_net_pnl_inr':float(trades.net_pnl_inr.median()) if not trades.empty else None,
+        'win_rate_pct':float(100*(trades.net_pnl_inr>0).mean()) if not trades.empty else None,
+        'total_net_pnl_inr':float(trades.net_pnl_inr.sum()) if not trades.empty else 0.0,
+        'total_costs_inr':float(trades.total_costs_inr.sum()) if not trades.empty else 0.0,
+        'threshold_pct':args.threshold_pct,
+        'trigger_base_mode':args.trigger_base_mode,
+        'slippage_pct':args.slippage_pct,
+        'fallback_max_shift_points':max_shift,
+        'fallback_step_points':step,
+        'lot_size':args.lot_size,
+    }
     (out/'summary.json').write_text(json.dumps(summary,indent=2,default=str),encoding='utf-8')
     print(json.dumps(summary,indent=2,default=str))
 
