@@ -1,6 +1,9 @@
 name: Phase 4 - Statistical validation
 
 on:
+  push:
+    branches: [phase-4-validation]
+    paths: ['.github/phase4_trigger.json']
   workflow_dispatch:
     inputs:
       phase3_run_id:
@@ -26,29 +29,40 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Resolve execution parameters
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "PHASE3_RUN_ID=$(python -c 'import json; print(json.load(open(".github/phase4_trigger.json"))["phase3_run_id"])')" >> "$GITHUB_ENV"
+            echo "PHASE2_RUN_ID=$(python -c 'import json; print(json.load(open(".github/phase4_trigger.json"))["phase2_run_id"])')" >> "$GITHUB_ENV"
+            echo "OUT_DIR=results/phase4" >> "$GITHUB_ENV"
+          else
+            echo "PHASE3_RUN_ID=${{ inputs.phase3_run_id }}" >> "$GITHUB_ENV"
+            echo "PHASE2_RUN_ID=${{ inputs.phase2_run_id }}" >> "$GITHUB_ENV"
+            echo "OUT_DIR=${{ inputs.out_dir }}" >> "$GITHUB_ENV"
+          fi
       - name: Download Phase 3 results
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p results/phase3
-          gh run download "${{ inputs.phase3_run_id }}" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
+          gh run download "$PHASE3_RUN_ID" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
           test -s results/phase3/selected_trades.parquet
       - name: Download Phase 2 strategy inputs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p data/derived
-          gh run download "${{ inputs.phase2_run_id }}" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
+          gh run download "$PHASE2_RUN_ID" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
           test -s data/derived/strategy_inputs.parquet
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
       - name: Validate selected trades
-        run: python scripts/validate_results.py --trades results/phase3/selected_trades.parquet --out-dir "${{ inputs.out_dir }}"
+        run: python scripts/validate_results.py --trades results/phase3/selected_trades.parquet --out-dir "$OUT_DIR"
       - name: Run robustness and sensitivity analysis
         run: |
           python scripts/run_robustness.py \
             --inputs data/derived/strategy_inputs.parquet \
-            --out-dir "${{ inputs.out_dir }}/robustness" \
+            --out-dir "$OUT_DIR/robustness" \
             --slippages '0,0.001,0.0025,0.005,0.01' \
             --thresholds '1,1.5,2,2.5,3,4,5' \
             --denominators 'buy_premium,spot_notional'
@@ -56,10 +70,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phase-4-validation
-          path: "${{ inputs.out_dir }}"
+          path: "$OUT_DIR"
       - name: Chain to Phase 5
         if: success()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh workflow run phase-5-regimes.yml --repo "${{ github.repository }}" --ref phase-5-regimes -f phase3_run_id="${{ inputs.phase3_run_id }}" -f regimes_path="" -f output_path="results/phase5_regime_summary.csv"
+          gh workflow run phase-5-regimes.yml --repo "${{ github.repository }}" --ref phase-5-regimes -f phase3_run_id="$PHASE3_RUN_ID" -f regimes_path="" -f output_path="results/phase5_regime_summary.csv"
