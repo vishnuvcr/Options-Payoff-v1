@@ -1,40 +1,39 @@
 # Research status
 
-**As of:** 2026-09-26  
-**Active branch:** main bootstrap  
-**Overall phase:** 0 — Bootstrap complete
+**As of:** 2026-09-26
+**Active branch:** phase-5-regimes
+**Overall phase:** 5 — Regime attribution framework implemented; empirical execution still gated on historical workflow artifacts
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
 | 0 Bootstrap | COMPLETE | Governance files initialized. |
-| 1 Specification | NEXT | Create phase-1 branch and encode strategy/payoff tests. |
-| 2 Data | NOT STARTED | Select and validate historical NIFTY option dataset. |
-| 3 Backtest | NOT STARTED | Execute historical strategy with full cost model. |
-| 4 Validation | NOT STARTED | Out-of-sample and robustness analysis. |
-| 5 Regimes | NOT STARTED | Conditional/regime attribution. |
-| 6 Manuscript | NOT STARTED | Final research manuscript and supplements. |
+| 1 Specification | COMPLETE | Strategy equations, payoff tests and manual workflow added. |
+| 2 Data | IMPLEMENTED; VALIDATION PENDING | Extractor, source manifest and cache workflow exist; runtime artifact still required. |
+| 3 Backtest | IMPLEMENTED; VALIDATION PENDING | Cost-aware ledger exists in code; historical run has not been executed. |
+| 4 Validation | IMPLEMENTED; EXECUTION PENDING | Bootstrap/monthly/walk-forward/sensitivity framework exists; requires Phase 3 results. |
+| 5 Regimes | FRAMEWORK COMPLETE; EXECUTION BLOCKED | Point-in-time protocol, source audit, script and manual workflow added; requires a validated trade ledger. |
+| 6 Manuscript | NOT STARTED | Starts after empirical Phases 3–5 are complete. |
 
-## Current findings
+## Current analytical findings
 
-1. The repository was empty at project start; a reproducible research structure is now being initialized.
-2. NSE's current NIFTY 50 contract specification lists four weekly expiries and Tuesday weekly expiry, subject to holiday adjustment.
-3. The strategy combines a short near-expiry synthetic forward with a long next-expiry synthetic forward. The different maturities make a one-dimensional flat payoff chart potentially misleading; the engine will evaluate the two expiries separately.
-4. Current NSE guidance shows option-sale STT at 0.15% from 2026-04-01; this must be reflected in the cost model for 2026 trades and parameterized for earlier periods.
+1. The static flatline chart is not the realized payoff of the cross-expiry position.
+2. The economically relevant expiry component is S2 - S1, plus the entry premium edge and transaction costs.
+3. The 2.5% denominator is unspecified and must remain an explicit sensitivity dimension.
+4. Historical NIFTY lot-size changes require expiry-specific treatment; unequal-lot pairs are excluded from the one-for-one synthetic-forward sample.
+5. Primary public data lack bid/ask history, so close-based execution is only a proxy.
+
+## Current protocol status
+
+Phase 5 regime attribution is predeclared across realized volatility, India VIX, gap, trend, liquidity, IV level/term structure, FII/DII activity, USD/INR, gold, global equity benchmarks and event windows where point-in-time data are available. Same-day end-of-day information that was not known at the 09:20 entry is prohibited.
 
 ## Blockers
 
-- Historical intraday option data must be sourced, licensed/qualified, cached and validated before the full backtest.
-- The 2.5% denominator needs to remain explicit/configurable because the user's description does not define the reference capital/base.
+- No completed Phase 3/4 historical workflow artifact is currently available to consume.
+- The current research environment does not expose workflow dispatch; the first empirical execution therefore requires the repository's manual workflow buttons.
+- Phase 4/5 workflow handoffs have been repaired so later runs can download a selected Phase 3 artifact by run ID.
+- Quote-level bid/ask and IV-surface history remain separate data requirements.
+- The user's exact 2.5% denominator remains unconfirmed; supported alternatives must be reported.
 
-## Next step
+## Next executable step
 
-Phase 1: implement the strategy specification, payoff equations, and unit tests.
-
-
-## Latest branch update — 2026-09-26
-
-Phase 5 regime-attribution protocol has been implemented on branch `phase-5-regimes`. It is intentionally gated on the validated Phase 3/4 historical trade ledger. No empirical regime result has been fabricated. See the Phase 5 branch for the protocol, source audit, script and manual workflow.
-
-## Latest continuation audit — 2026-09-26
-
-The Phase 5 branch was audited before further execution. Separate Phase 4/5 workflow runs were found to require explicit Phase 3 artifact handoff; those workflows are now repaired on `phase-5-regimes`. A configured-capital trigger path was also corrected. Empirical results remain gated because no completed Phase 3/4 workflow artifact is currently available.
+Run Phase 2 manually, record its run ID, pass that run ID into Phase 3, then pass the Phase 3 run ID into Phase 4 and Phase 5. Do not start Phase 6 until empirical outputs are available and validated.
