@@ -80,7 +80,8 @@ jobs:
             --selection-score equal_max_profit_loss_inr \
             --selection-max-shift-points 400 \
             --selection-step-points 50 \
-            --min-equal-max-profit-loss-inr 0
+            --min-equal-max-profit-loss-inr 0 \
+            --min-chart-return-pct 2.5
 
       - name: Run Phase 7 sensitivity - maximum value with legacy 2.5 percent gate
         run: |
