@@ -55,15 +55,12 @@ and uses S2 - S1 in the expiry payoff.
 
 ## Strike-selection rule
 
-The default candidates are:
+The candidates are defined on a 50-point grid around the entry ATM strike.
 
-1. ATM strike = nearest listed strike to spot at entry.
-2. ATM - 400 points.
-3. ATM + 400 points.
-
-The research engine tests the user's preference order: ATM first, then the +/-400 alternatives only when the ATM candidate fails the trigger.
-
-The 400-point adjustment is applied to the common strike, not independently to each leg.
+1. ATM strike = nearest listed common strike to spot at entry.
+2. If ATM fails the chart trigger, evaluate shifts of -500, -450, -400, ..., -50, +50, ..., +450, +500.
+3. The shift is applied to the common strike used by all four legs.
+4. Every fallback strike whose payoff chart exceeds the trigger is a qualifying trade candidate; no additional ranking rule is invented.
 
 ## Trigger
 
