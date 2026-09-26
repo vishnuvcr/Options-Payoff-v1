@@ -1,0 +1,74 @@
+name: Phase 7A - Historical Margin Reconstruction
+
+on:
+  push:
+    branches:
+      - phase-7A-margin-reconstruction
+  workflow_dispatch:
+    inputs:
+      trade_date:
+        description: Historical trade date used for calibration
+        required: true
+        default: '2026-09-25'
+      target_margin:
+        description: Sensibull standalone margin shown in the user screenshot
+        required: true
+        default: '88076'
+      spot:
+        description: NIFTY spot shown in the screenshot
+        required: true
+        default: '23140.50'
+
+permissions:
+  contents: read
+
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install margin tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'marginism==0.1.1' 'requests>=2.31'
+
+      - name: Discover and download NSE SPAN file
+        run: |
+          python scripts/fetch_nse_span.py \
+            --date '${{ inputs.trade_date || '2026-09-25' }}' \
+            --out-dir data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+
+      - name: Reconstruct screenshot position margin
+        run: |
+          SPN=$(find data/margin/span -type f -name '*.spn' | head -n 1)
+          test -n "$SPN"
+          python scripts/reconstruct_screenshot_margin.py \
+            --span-file "$SPN" \
+            --date '${{ inputs.trade_date || '2026-09-25' }}' \
+            --target-margin '${{ inputs.target_margin || '88076' }}' \
+            --spot '${{ inputs.spot || '23140.50' }}' \
+            --out results/margin_calibration_2026-09-25.json
+
+      - name: Validate calibration report
+        run: |
+          python - <<'PY'
+          import json
+          p='results/margin_calibration_2026-09-25.json'
+          x=json.load(open(p))
+          print(json.dumps(x, indent=2))
+          assert x['screenshot_target_margin_inr'] == 88076.0
+          assert x['lot_size'] == 65
+          assert x['spot_notional_inr'] > 0
+          PY
+
+      - name: Upload calibration outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-7A-margin-calibration
+          path: |
+            results/margin_calibration_2026-09-25.json
+            data/margin/span/2026-09-25
