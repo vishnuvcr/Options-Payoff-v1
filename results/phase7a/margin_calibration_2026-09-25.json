@@ -1,0 +1,65 @@
+{
+  "calibration_date": "2026-09-25",
+  "source_run_id": 36269071472,
+  "source_archive": "nsccl.20260925.i05.spn",
+  "source_archive_sha256": "b1d00132a6397e5b8d5b13524f89142605fefc8901cecabe370ff73509ba0f3f",
+  "source_url": "https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.20260925.i5.zip",
+  "position": [
+    {
+      "symbol": "NIFTY",
+      "instrument": "CE",
+      "expiry": "2026-09-29",
+      "strike": 23450,
+      "transaction_type": "SELL",
+      "quantity": 65
+    },
+    {
+      "symbol": "NIFTY",
+      "instrument": "PE",
+      "expiry": "2026-09-29",
+      "strike": 23450,
+      "transaction_type": "BUY",
+      "quantity": 65
+    },
+    {
+      "symbol": "NIFTY",
+      "instrument": "CE",
+      "expiry": "2026-10-06",
+      "strike": 23450,
+      "transaction_type": "BUY",
+      "quantity": 65
+    },
+    {
+      "symbol": "NIFTY",
+      "instrument": "PE",
+      "expiry": "2026-10-06",
+      "strike": 23450,
+      "transaction_type": "SELL",
+      "quantity": 65
+    }
+  ],
+  "screenshot": {
+    "spot": 23140.5,
+    "standalone_margin_inr": 88076,
+    "target_day_futures": {
+      "2026-09-29": 23190,
+      "2026-10-06": 23197
+    }
+  },
+  "reconstructed": {
+    "span_inr": 27647.1,
+    "exposure_inr": 60165.3,
+    "consolidated_margin_inr": 87812.4,
+    "option_premium_reported_inr": 529.75
+  },
+  "difference": {
+    "inr": -263.6,
+    "pct_of_screenshot": 0.299299627879263,
+    "within_1pct": true
+  },
+  "max_profit_2_5pct": {
+    "on_screenshot_margin_inr": 2201.9,
+    "on_reconstructed_margin_inr": 2195.31
+  },
+  "methodology": "NSE/NSCCL SPAN risk array reconstruction using marginism 0.1.1; one-lot 65 NIFTY, exact four-leg portfolio."
+}
