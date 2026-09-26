@@ -39,6 +39,21 @@ def list_nifty_expiry_files(start, end):
             out.append((expiry, name))
     return sorted(out)
 
+
+def nifty_lot_size(expiry):
+    # Historical weekly NIFTY contract lots, based on NSE revision notices.
+    # These dates are keyed to expiry dates, so existing contracts retain
+    # their old lot until their own expiry.
+    if expiry < dt.date(2021, 8, 1):
+        return 75
+    if expiry < dt.date(2024, 5, 2):
+        return 50
+    if expiry < dt.date(2024, 11, 21):
+        return 25
+    if expiry < dt.date(2026, 1, 6):
+        return 75
+    return 65
+
 def load_index():
     local = hf_hub_download(repo_id=DATASET, filename='index/NIFTY.parquet', repo_type='dataset')
     df = pd.read_parquet(local)
@@ -125,7 +140,7 @@ def main():
         for label, shift in [('ATM',0.0),('ATM_MINUS_400',-400.0),('ATM_PLUS_400',400.0)]:
             strike = atm + shift
             if strike not in common:
-                rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'candidate_label':label,'strike':strike,'status':'candidate_strike_unavailable'})
+                rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'near_lot_size':nifty_lot_size(near_expiry),'next_lot_size':nifty_lot_size(next_expiry),'candidate_label':label,'strike':strike,'status':'candidate_strike_unavailable'})
                 continue
             vals = [exact_bar(near,entry_ts,strike,'CE'), exact_bar(near,entry_ts,strike,'PE'), exact_bar(nxt,entry_ts,strike,'CE'), exact_bar(nxt,entry_ts,strike,'PE')]
             near_call, near_put, next_call, next_put = vals
