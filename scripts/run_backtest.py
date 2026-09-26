@@ -31,14 +31,18 @@ def parse_args():
                    choices=['max_equal_flatline', 'legacy_order'],
                    default='max_equal_flatline')
     p.add_argument('--selection-score',
-                   choices=['equal_max_profit_loss_inr', 'chart_return_pct'],
+                   choices=['equal_max_profit_loss_inr', 'chart_return_pct', 'max_profit_pct_margin'],
                    default='equal_max_profit_loss_inr',
                    help='Primary score for max_equal_flatline. chart_return_pct uses the configured trigger denominator and is not a proprietary Sensibull-margin replication.')
     p.add_argument('--selection-max-shift-points', type=int, default=400)
     p.add_argument('--selection-step-points', type=int, default=50)
     p.add_argument('--min-equal-max-profit-loss-inr', type=float, default=0.0)
     p.add_argument('--min-chart-return-pct', type=float, default=2.5,
-                   help='Primary Phase 7 2.5% chart-metric gate; exact Sensibull margin denominator remains unavailable.')
+                   help='Legacy 2.5% proxy gate when margin data are unavailable.')
+    p.add_argument('--margin-column', default=None,
+                   help='Optional candidate column containing reconstructed margin required in INR.')
+    p.add_argument('--min-margin-profit-pct', type=float, default=2.5,
+                   help='Margin-based max-profit percentage gate when margin-column is supplied.')
     p.add_argument('--fallback-order', default='ATM_MINUS_400,ATM_PLUS_400')
     return p.parse_args()
 
