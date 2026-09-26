@@ -57,8 +57,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          key: hf-nifty-options-v3-${{ inputs.start || '2021-06-01' }}-${{ inputs.end || '2026-08-31' }}
-          restore-keys: hf-nifty-options-v3-
+          key: hf-nifty-options-v1-${{ inputs.start || '2021-06-01' }}-${{ inputs.end || '2026-08-31' }}
+          restore-keys: hf-nifty-options-v1-
       - name: Download Phase 2 strategy inputs from selected run
         if: inputs.phase2_run_id != ''
         env:
