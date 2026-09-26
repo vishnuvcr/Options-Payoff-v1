@@ -25,3 +25,5 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 3 | Verified historical NIFTY lot-size transitions | Encoded expiry-date lot sizes and excluded unequal-lot transition pairs from the one-for-one spread sample. |
 
 | 2026-09-26 | 4 | Added validation framework | Added bootstrap CI, monthly aggregation, profit factor, drawdown and validation-gate workflow; execution awaits Phase 3 output artifact. |
+
+| 2026-09-26 | 4 | Implemented full robustness grid, chronological holdout, block bootstrap and selection-by-strike analysis. | Phase 4 now operationalizes the predeclared sensitivity plan using the Phase 2 strategy-input artifact. |
