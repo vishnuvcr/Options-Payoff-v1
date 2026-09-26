@@ -4,27 +4,29 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Active research phase:** Phase 3 — Backtest engine and transaction-cost model
-**Status:** IMPLEMENTED; historical execution is pending manual GitHub Actions run.
+**Active research phase:** Phase 5 — Regime and cross-market attribution protocol
+**Status:** FRAMEWORK IMPLEMENTED; empirical execution remains gated on Phase 3/4 historical artifacts.
 **Date:** 2026-09-26
 
 ## Key analytical finding
 
-The position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, its expiry payoff is S(next expiry) - S(near expiry). A chart that applies one identical terminal spot to both expiries will look flat because the intrinsic terms cancel. That flatline is not the realized held-to-expiry payoff.
+The position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, its economically correct expiry component is S(next expiry) - S(near expiry). A chart that applies one identical terminal spot to both expiries will look flat because the intrinsic terms cancel. That flatline is not the realized held-to-expiry payoff.
 
 ## Current implementation
 
 - Phase 1: analytical payoff model and unit tests.
-- Phase 2: reproducible NIFTY option/index data extraction with cached Hugging Face source files.
-- Phase 3: chart-trigger selection, gross cross-expiry P&L, slippage, brokerage, exchange fees, SEBI fee, stamp duty, GST, entry-sale STT and expiry-exercise STT.
+- Phase 2: reproducible NIFTY option/index data extraction with cached public source files.
+- Phase 3: chart-trigger selection, gross cross-expiry P&L, historical lot handling, slippage and transaction-cost model.
+- Phase 4: statistical validation and robustness framework.
+- Phase 5: point-in-time regime/cross-market attribution protocol and manual workflow.
 
 ## Critical open inputs
 
-The 2.5% chart denominator is not specified in the original rule, so the backtest exposes three denominator modes rather than silently selecting one.
+The 2.5% chart denominator is not specified in the original rule, so the backtest exposes multiple denominator modes rather than silently selecting one.
 
-A historical NIFTY lot-size calendar is required for multi-year rupee P&L; the Phase 3 workflow requires an explicit verified lot size for the date window.
+Historical NIFTY lot-size transitions are handled by expiry date; unequal-lot near/next pairs are excluded from the one-for-one synthetic-forward sample.
 
-Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close is only a proxy. The base research run uses configurable slippage and later validation must compare against quote-level data when available.
+Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close is a proxy. Quote-level execution analysis requires a separately validated source.
 
 ## Research files
 
@@ -38,21 +40,24 @@ Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close 
 - docs/PHASE_2_DATA_PLAN.md
 - docs/LITERATURE_REVIEW.md
 - docs/PHASE_3_BACKTEST.md
-- src/options_payoff.py
-- src/costs.py
-- tests/test_options_payoff.py
-- tests/test_costs.py
-- scripts/extract_strategy_inputs.py
-- scripts/run_backtest.py
+- docs/PHASE_4_VALIDATION.md
+- docs/PHASE_5_REGIME_ANALYSIS.md
+- scripts/analyze_regimes.py
 
 ## Manual workflows
 
 - Phase 1: .github/workflows/phase-1-specification.yml
 - Phase 2: .github/workflows/phase-2-data.yml
 - Phase 3: .github/workflows/phase-3-backtest.yml
+- Phase 4: .github/workflows/phase-4-validation.yml
+- Phase 5: .github/workflows/phase-5-regimes.yml
 
 Each phase remains on its own branch and the workflow is manually runnable.
 
+## Current research conclusion
+
+The flatline chart remains a signal candidate, not evidence of a risk-free payoff. No historical performance conclusion has been fabricated while the required GitHub Actions artifacts are unavailable.
+
 ## Reproducibility
 
-Source revisions, assumptions, data-quality flags, research status and errors are recorded. Raw public source data are cached in GitHub Actions instead of being downloaded blindly on every run.
+Source revisions, assumptions, data-quality flags, research status and errors are recorded. Public source data should be cached in GitHub Actions rather than downloaded blindly on every run.
