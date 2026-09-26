@@ -50,8 +50,9 @@ def main() -> None:
         trades = pd.merge_asof(trades, regimes, on='entry_timestamp', direction='backward', allow_exact_matches=True)
     summaries = []
     if args.regimes is not None:
-        for col in regimes.columns:
-            if col == 'entry_timestamp' or col not in trades.columns:
+        regime_columns = [col for col in regimes.columns if col.endswith('_regime')]
+        for col in regime_columns:
+            if col not in trades.columns:
                 continue
             summaries.append(summarize(trades.dropna(subset=[col]), col).assign(variable=col))
     if summaries:
