@@ -1,3 +1,5 @@
+> **Specification-status correction (2026-09-26):** The earlier Phase 3 implementation described a 28-trade subset as “selected trades.” Code audit shows that subset was created by an assistant-imposed operational gate: ATM first, then ATM-400/ATM+400, requiring the coded chart metric to exceed 2.5% under a buy-premium denominator. The user has clarified that no separate trade-selection criterion was supplied. Therefore, the 28-trade results in this manuscript are **provisional implementation results, not final evidence for the user's strategy**. No final strategy conclusion should be drawn from them until the entry/selection semantics and the 2.5% denominator are explicitly specified.
+
 # Cross-Expiry NIFTY Synthetic-Forward Strategy: Empirical Backtest, Robustness and Point-in-Time Regime Analysis
 
 ## Abstract
