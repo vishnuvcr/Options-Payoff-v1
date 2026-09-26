@@ -30,3 +30,4 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 3 | Improved phase-to-phase data handoff | Phase 3 can now consume the cached Phase 2 strategy-input artifact by run ID, avoiding unnecessary reconstruction when that artifact exists; it retains an explicit fallback build path. |
 
 | 2026-09-26 | 5 | Enabled autonomous empirical chain | Phase 2 now triggers Phase 3 after successful data validation; Phase 3 passes its artifact run ID to Phase 4; Phase 4 passes the Phase 3 run ID to terminal Phase 5. |
+| 2026-09-26 | 5 | Added point-in-time spot-derived regime builder | Uses only pre-entry 09:20 NIFTY spot history to classify prior 20-observation trend, prior 20-observation annualized volatility, and prior-entry move. No same-day end-of-day information is used. |
