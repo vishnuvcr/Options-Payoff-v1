@@ -1,0 +1,23 @@
+{
+  "workflow_run_id": 36257292327,
+  "n_trades": 28,
+  "date_start": "2021-08-05",
+  "date_end": "2024-01-17",
+  "total_net_pnl_inr": 166240.9699090372,
+  "mean_net_pnl_inr": 5937.177496751328,
+  "median_net_pnl_inr": 9431.274121702349,
+  "win_rate_pct": 67.85714285714286,
+  "profit_factor": 2.326936965083724,
+  "max_drawdown_inr": -48161.44911376963,
+  "bootstrap_mean_ci_95_inr": [-434.147239402814, 11734.85167663406],
+  "block_bootstrap_mean_ci_95_inr": [-1688.8550951454206, 12745.225309985306],
+  "trades_per_year": 11.426815642458102,
+  "monthly_positive_rate_pct": 66.66666666666666,
+  "largest_loss_inr": -38217.71345081468,
+  "largest_win_inr": 33479.60371462422,
+  "walkforward_split": "2022-07-07",
+  "walkforward_train_trades": 19,
+  "walkforward_train_total_net_pnl_inr": 92252.7812399867,
+  "walkforward_test_trades": 9,
+  "walkforward_test_total_net_pnl_inr": 73988.18866905052
+}
