@@ -55,6 +55,14 @@ Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close 
 
 Each phase remains on its own branch and the workflow is manually runnable. Phase 4 and Phase 5 now accept a completed Phase 3 run ID and download its artifact, so separate workflow runs no longer depend on a shared workspace.
 
+### Current manual execution sequence
+
+1. Run `Phase 2 - Data acquisition and validation` on `phase-2-data` and record the workflow run ID.
+2. Run `Phase 3 - Backtest` on `phase-3-backtest` and pass the Phase 2 run ID when available. The workflow can fall back to rebuilding the inputs.
+3. Run `Phase 4 - Statistical validation` on `phase-4-validation` and pass the Phase 3 run ID.
+4. Run `Phase 5 - Regime Attribution` on `phase-5-regimes` and pass the same Phase 3 run ID; add a point-in-time regime table when available.
+5. Only after those artifacts exist should Phase 6 manuscript work begin.
+
 ## Current research conclusion
 
 The flatline chart remains a signal candidate, not evidence of a risk-free payoff. No historical performance conclusion has been fabricated while the required GitHub Actions artifacts are unavailable.
