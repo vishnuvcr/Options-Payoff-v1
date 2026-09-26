@@ -127,6 +127,74 @@ def strike_candidates(
     return tuple(atm + shift for shift in shifts)
 
 
+def strike_grid(
+    spot: float,
+    atm_step: float = 50.0,
+    max_shift_points: int = 400,
+    step_points: int = 50,
+) -> tuple[float, ...]:
+    """Return every common-strike candidate from -max_shift to +max_shift."""
+    if atm_step <= 0:
+        raise ValueError("atm_step must be positive")
+    if max_shift_points < 0:
+        raise ValueError("max_shift_points must be >= 0")
+    if step_points <= 0:
+        raise ValueError("step_points must be positive")
+    if max_shift_points % step_points != 0:
+        raise ValueError("max_shift_points must be divisible by step_points")
+    atm = round(spot / atm_step) * atm_step
+    return tuple(
+        atm + shift
+        for shift in range(-max_shift_points, max_shift_points + 1, step_points)
+    )
+
+
+def static_flatline_value(
+    common_strike: float,
+    near_expiry: str,
+    next_expiry: str,
+    near_call: float,
+    near_put: float,
+    next_call: float,
+    next_put: float,
+) -> float:
+    """Return the constant P&L of the one-dimensional same-spot payoff chart.
+
+    For this four-leg structure the terminal intrinsic terms cancel when the
+    *same hypothetical spot* is applied to both expiries. The result is the
+    entry premium cashflow C1-P1-C2+P2, per unit of underlying.
+    """
+    legs = strategy_legs(common_strike, near_expiry, next_expiry)
+    prices = {
+        (near_expiry, "CE"): float(near_call),
+        (near_expiry, "PE"): float(near_put),
+        (next_expiry, "CE"): float(next_call),
+        (next_expiry, "PE"): float(next_put),
+    }
+    return float(static_chart_payoff(common_strike, legs, prices))
+
+
+def estimated_equal_max_profit_loss(
+    flatline_value_per_unit: float,
+    lot_size: int,
+) -> dict[str, float | bool]:
+    """Summarize the chart's estimated max-profit=max-loss flatline.
+
+    This is deliberately labeled an *estimated chart metric*, not the
+    economically correct max loss of the held cross-expiry position. For a
+    positive flatline, the chart's maximum and minimum P&L are equal to the
+    same positive value.
+    """
+    value = float(flatline_value_per_unit) * int(lot_size)
+    return {
+        "estimated_max_profit_inr": value,
+        "estimated_min_pnl_inr": value,
+        "estimated_equal_max_profit_loss_inr": value,
+        "estimated_all_green_flatline": bool(value > 0.0),
+        "estimated_flatline_is_constant": True,
+    }
+
+
 def threshold_met(pnl: float, base_value: float, threshold_pct: float = 2.5) -> bool:
     if base_value <= 0:
         raise ValueError("base_value must be positive")
