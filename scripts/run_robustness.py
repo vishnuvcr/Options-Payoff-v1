@@ -122,7 +122,7 @@ def build_candidate_table(raw: pd.DataFrame, slippage: float, mode: str, configu
         )
         chart_pnl = float(row.net_entry_cashflow_per_unit) * near_lot
         chart_return = 100.0 * chart_pnl / base if base > 0 else None
-        gross_per_unit = float(row.net_entry_cashflow_per_unit) + float(row.next_settlement) - float(row.near_settlement)
+        gross_per_unit = float(execs['entry_cashflow_per_unit']) + float(row.next_settlement) - float(row.near_settlement)
         gross_pnl = gross_per_unit * near_lot
         long_call_intrinsic = intrinsic_value("CE", float(row.next_settlement), float(row.strike))
         long_put_intrinsic = intrinsic_value("PE", float(row.near_settlement), float(row.strike))
