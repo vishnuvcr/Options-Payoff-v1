@@ -1,0 +1,49 @@
+name: Phase 6 - Loss Trade Audit
+
+on:
+  push:
+    branches:
+      - phase-6-loss-audit
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Completed Phase 3 grid run containing phase-3-backtest-results
+        required: true
+        default: '36262958536'
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_RUN_ID: ${{ inputs.source_run_id || '36262958536' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install analysis dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'pandas>=2.2' 'pyarrow>=18'
+      - name: Download authoritative Phase 3 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/audit
+          gh run download "$SOURCE_RUN_ID" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir data/audit
+          test -s data/audit/selected_trades.parquet
+      - name: Run loss audit
+        run: |
+          python scripts/audit_selected_losses.py \
+            --selected-trades data/audit/selected_trades.parquet \
+            --out-dir results/loss_audit \
+            --expected-trades 63
+      - name: Upload loss audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-6-loss-audit
+          path: results/loss_audit
