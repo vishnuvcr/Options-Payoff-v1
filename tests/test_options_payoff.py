@@ -2,9 +2,12 @@ import unittest
 
 from src.options_payoff import (
     cross_expiry_terminal_pnl,
+    estimated_equal_max_profit_loss,
     static_chart_payoff,
+    static_flatline_value,
     strategy_legs,
     strike_candidates,
+    strike_grid,
     threshold_met,
 )
 
@@ -68,6 +71,32 @@ class StrategyPayoffTests(unittest.TestCase):
 
     def test_candidate_strikes(self) -> None:
         self.assertEqual(strike_candidates(24175.0, 50.0), (24200.0, 23800.0, 24600.0))
+
+
+    def test_phase7_strike_grid_is_exhaustive(self) -> None:
+        grid = strike_grid(24175.0, 50.0, 400, 50)
+        self.assertEqual(len(grid), 17)
+        self.assertEqual(grid[0], 23775.0)
+        self.assertEqual(grid[-1], 24575.0)
+        self.assertIn(24175.0, grid)
+
+    def test_equal_max_profit_loss_metric_for_green_flatline(self) -> None:
+        legs = strategy_legs(100.0, "near", "next")
+        prices = {
+            ("near", "CE"): 8.0,
+            ("near", "PE"): 5.0,
+            ("next", "CE"): 7.0,
+            ("next", "PE"): 10.0,
+        }
+        value = static_chart_payoff(100.0, legs, prices)
+        value_direct = static_flatline_value(100.0, "near", "next", 8.0, 5.0, 7.0, 10.0)
+        self.assertAlmostEqual(value, 6.0)
+        self.assertAlmostEqual(value_direct, 6.0)
+        summary = estimated_equal_max_profit_loss(value, 50)
+        self.assertAlmostEqual(summary["estimated_max_profit_inr"], 300.0)
+        self.assertAlmostEqual(summary["estimated_min_pnl_inr"], 300.0)
+        self.assertTrue(summary["estimated_all_green_flatline"])
+        self.assertTrue(summary["estimated_flatline_is_constant"])
 
     def test_threshold_is_strictly_greater_than(self) -> None:
         self.assertTrue(threshold_met(2.51, 100.0, 2.5))
