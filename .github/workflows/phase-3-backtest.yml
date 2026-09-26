@@ -11,10 +11,6 @@ on:
         description: End date (YYYY-MM-DD)
         required: true
         default: '2026-08-31'
-      lot_size:
-        description: Verified lot size for the selected date window
-        required: true
-        default: ''
       trigger_base:
         description: Trigger denominator mode
         required: true
@@ -68,7 +64,6 @@ jobs:
           python scripts/run_backtest.py \
             --inputs data/derived/strategy_inputs.parquet \
             --out-dir results/phase3 \
-            --lot-size '${{ inputs.lot_size }}' \
             --threshold-pct '2.5' \
             --trigger-base-mode '${{ inputs.trigger_base }}' \
             --slippage-pct '${{ inputs.slippage_pct }}' $EXTRA
