@@ -4,54 +4,54 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Phase:** 0 — Research bootstrap  
-**Status:** Initialized; Phase 1 specification is next.  
+**Active research phase:** Phase 2 — Market-data acquisition, cleaning and cache
+**Status:** Phase 1 complete; Phase 2 pipeline implemented and awaiting manual GitHub Actions execution/validation.
 **Date:** 2026-09-26
 
-The strategy under study is:
+### Live research branches
 
-1. Sell an ATM call and buy an ATM put in the near weekly expiry.
-2. Buy an ATM call and sell an ATM put in the next weekly expiry.
-3. Reproduce the user's payoff-chart trigger, including the >2.5% threshold.
-4. When ATM does not qualify, test a common strike shifted by -400 and +400 points.
-5. Hold to expiry/settlement according to the strategy rules.
-6. Include bid/ask execution assumptions, slippage, brokerage, statutory charges and other transaction costs.
+- phase-1-specification — strategy equations, payoff tests and Phase 1 workflow
+- phase-2-data — data manifest, extractor, literature review and Phase 2 workflow
 
-### Important modeling note
+The agreed six-phase research plan is unchanged.
 
-The near-week and next-week synthetic-forward legs have different expiries. Therefore, a single one-dimensional payoff chart that assigns the same terminal spot price to both expiries can show a misleading flat line. The research engine will separately model the underlying settlement at the two expiries and will retain the original chart rule only as a signal to be tested.
+## Key analytical finding so far
+
+The position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, its expiry payoff is S(next expiry) - S(near expiry). A chart that applies one identical terminal spot to both expiries will look flat because the intrinsic terms cancel. Therefore the flatline chart cannot be treated as the strategy's realized held-to-expiry payoff.
 
 ## Research files
 
 - research/RESEARCH_PLAN.md
+- research/RESEARCH_INSTRUCTIONS.md
 - research/STATUS.md
 - research/ERROR_LOG.md
 - research/ACTIVITY_LOG.md
 - research/SOURCES.md
-- research/RESEARCH_INSTRUCTIONS.md
+- docs/PHASE_1_SPECIFICATION.md
+- docs/PHASE_2_DATA_PLAN.md
+- docs/LITERATURE_REVIEW.md
+- src/options_payoff.py
+- tests/test_options_payoff.py
+- scripts/extract_strategy_inputs.py
 
-## Phases
+## Phase structure
 
-- Phase 0 — Bootstrap and research governance
-- Phase 1 — Strategy specification and analytical validation
-- Phase 2 — Market-data acquisition, cleaning and cache
-- Phase 3 — Backtest engine and transaction-cost model
-- Phase 4 — Statistical validation and robustness
-- Phase 5 — Regime/cross-market attribution
-- Phase 6 — Manuscript, conclusion and future research
+0. Bootstrap and governance
+1. Strategy specification and analytical validation
+2. Market-data acquisition, cleaning and cache
+3. Backtest engine and transaction-cost model
+4. Statistical validation and robustness
+5. Regime and cross-market attribution
+6. Manuscript and final conclusion
 
-Each research phase will live on its own Git branch and expose a manual GitHub Actions workflow.
+Each phase is implemented on its own branch and has a manual GitHub Actions workflow.
 
-## Scope
+## Data and execution safeguards
 
-Default test market: NIFTY 50 weekly index options, because NSE currently lists four weekly NIFTY 50 option expiries and the weekly expiry is Tuesday (or the preceding trading day when Tuesday is a holiday). This is a documented default, not a claim that the strategy is suitable for trading.
+The Phase 2 source is the public thetrademarkk/india-index-options-1m dataset on Hugging Face. Its OHLCV/OI bars are sufficient to construct a historical research input table but do not provide bid/ask quotes, so Phase 2 marks prices as 09:20 close proxies. Phase 3 must therefore apply conservative spread/slippage assumptions and verify dated broker/exchange charges before net profitability is assessed.
 
-The backtest will remain parameterized so another eligible underlying can be substituted later.
-
-## Costs
-
-The model will use dated, configurable cost inputs rather than silently assuming zero friction. In particular, NSE states that from 1 April 2026 the STT rate on sale of an option is 0.15% of option premium; broker brokerage and other charges are modeled separately.
+Historical NIFTY expiry handling is data-driven and preserves the 2025 Thursday-to-Tuesday expiry transition.
 
 ## Reproducibility
 
-Data sources, dataset hashes/versions, assumptions, code versions, and backtest outputs will be recorded so results can be regenerated without repeatedly downloading the same data.
+Important source metadata, checksums/revisions, transformations, data-quality flags and research status are recorded in the repository. Raw public data are cached in GitHub Actions rather than blindly re-downloaded on every run.
