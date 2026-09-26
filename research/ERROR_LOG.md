@@ -33,3 +33,6 @@ Append new rows for reproducible mistakes, failed assumptions, data-quality issu
 
 | 2026-09-26 | 3 | First 50-point-grid CI reruns downloaded the expanded 19,341-row input successfully but failed at the backtest import with ModuleNotFoundError: No module named src. | The corrected strike-selection logic did not reach trade calculation. | Added PYTHONPATH=. to the workflow and retained the expanded strike grid; the next push reruns the backtest. |
 | 2026-09-26 | 3 | Expanded strike-grid extraction initially used unauthenticated Hugging Face access. | Extraction completed but Hugging Face warned that authenticated access provides higher rate limits/faster downloads. | Workflow now exposes the optional HF_TOKEN repository secret without printing or storing the token in source. |
+
+| 2026-09-26 | 3 | Expanded strike-grid extraction omitted the shift_points field in its parquet rows. | The corrected backtest rejected the 19,341-row input before calculating P&L. | Added shift_points to both unavailable and complete candidate rows and added a schema assertion path; rerun triggered. |
+| 2026-09-26 | 3 | Multiple push-triggered strike-grid workflows ran concurrently during debugging. | Wasted runner time and duplicated long Hugging Face extraction. | Added a concurrency group with cancel-in-progress and enabled cache save even when a run fails. |
