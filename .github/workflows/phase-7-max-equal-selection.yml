@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - phase-7-max-equal-selection
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       source_run_id:
