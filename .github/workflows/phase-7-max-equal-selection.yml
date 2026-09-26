@@ -17,10 +17,14 @@ on:
         description: Premium slippage per option leg
         required: true
         default: '0.0025'
+      phase2_run_id:
+        description: Completed Phase 2 workflow run containing phase-2-strategy-inputs
+        required: true
+        default: '36255238050'
 
 permissions:
   actions: read
-  contents: read
+  contents: write
 
 jobs:
   max-equal-selection:
@@ -28,6 +32,7 @@ jobs:
     env:
       SOURCE_RUN_ID: ${{ inputs.source_run_id || '36262958536' }}
       SLIPPAGE_PCT: ${{ inputs.slippage_pct || '0.0025' }}
+      PHASE2_RUN_ID: ${{ inputs.phase2_run_id || '36255238050' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -55,6 +60,16 @@ jobs:
             --dir data/phase3_source
           test -s data/phase3_source/candidate_results.parquet
 
+      - name: Download Phase 2 point-in-time spot inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/phase2_source
+          gh run download "$PHASE2_RUN_ID" \
+            --repo "${{ github.repository }}" \
+            --name phase-2-strategy-inputs \
+            --dir data/phase2_source
+          test -s data/phase2_source/strategy_inputs.parquet
       - name: Run Phase 7 primary selection - maximum equal flatline value
         run: |
           python scripts/run_backtest.py \
@@ -80,6 +95,39 @@ jobs:
             --min-equal-max-profit-loss-inr 0 \
             --min-chart-return-pct 2.5
 
+      - name: Run Phase 7 robustness summary
+        run: |
+          python scripts/validate_results.py \
+            --trades results/phase7_primary/selected_trades.parquet \
+            --out-dir results/phase7_primary_validation
+          python scripts/phase7_validation.py \
+            --trades results/phase7_primary/selected_trades.parquet \
+            --out results/phase7_primary_validation/phase7_robustness.json
+
+      - name: Build point-in-time regimes and attribute Phase 7
+        run: |
+          python scripts/build_spot_regimes.py \
+            --inputs data/phase2_source/strategy_inputs.parquet \
+            --out data/phase2_source/spot_regimes.csv
+          python scripts/analyze_regimes.py \
+            --trades results/phase7_primary/selected_trades.parquet \
+            --regimes data/phase2_source/spot_regimes.csv \
+            --out results/phase7_primary_validation/phase7_regime_summary.csv
+
+      - name: Run slippage sensitivity
+        run: |
+          for s in 0.0 0.0025 0.005 0.01; do
+            tag=$(echo "$s" | tr '.' 'p')
+            python scripts/run_backtest.py \
+              --inputs data/phase3_source/candidate_results.parquet \
+              --out-dir "results/phase7_slippage_${tag}" \
+              --slippage-pct "$s" \
+              --selection-mode max_equal_flatline \
+              --selection-score equal_max_profit_loss_inr \
+              --selection-max-shift-points 400 \
+              --selection-step-points 50 \
+              --min-equal-max-profit-loss-inr 0
+          done
       - name: Compare Phase 7 variants
         run: |
           python - <<'PY'
@@ -108,6 +156,36 @@ jobs:
           out.write_text(json.dumps(rows, indent=2, default=str))
           print(out.read_text())
           PY
+
+      - name: Publish Phase 7 results to dedicated results branch
+        run: |
+          rm -rf /tmp/phase7_publish
+          mkdir -p /tmp/phase7_publish/results
+          cp -R results/phase7_primary /tmp/phase7_publish/results/
+          cp -R results/phase7_legacy_25pct_gate /tmp/phase7_publish/results/
+          cp -R results/phase7_primary_validation /tmp/phase7_publish/results/
+          cp -R results/phase7_slippage_* /tmp/phase7_publish/results/
+          cp results/phase7_comparison.json /tmp/phase7_publish/results/
+          cp data/phase2_source/spot_regimes.csv /tmp/phase7_publish/results/spot_regimes.csv
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin phase-7-results || true
+          if git show-ref --verify --quiet refs/remotes/origin/phase-7-results; then
+            git switch -C phase-7-results origin/phase-7-results
+            git rm -rf . >/dev/null 2>&1 || true
+          else
+            git switch --orphan phase-7-results
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          cp -R /tmp/phase7_publish/results .
+          git add results
+          if git diff --cached --quiet; then
+            echo "No Phase 7 result changes to publish."
+          else
+            git commit -m "Phase 7 empirical results"
+            git push origin HEAD:phase-7-results
+          fi
 
       - name: Upload Phase 7 results
         uses: actions/upload-artifact@v4
