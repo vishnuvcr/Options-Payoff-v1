@@ -259,3 +259,30 @@ The research must not declare a strategy successful based on a single backtest o
 - Holding: settlement/expiry as specified, with near and next expiry tracked separately.
 - Threshold: 2.5%, configurable denominator.
 - Position size: 1 lot by default for reporting; scale tests later.
+
+## Phase 7A — Historical margin reconstruction and platform-percentage calibration
+
+**Branch:** phase-7A-margin-reconstruction
+
+Objective:
+- Replace the legacy buy-premium proxy for the 2.5% max-profit/max-loss percentage with a reproducible margin-required denominator wherever historical margin data can be reconstructed.
+
+Calibration target:
+- User screenshot: NIFTY 23140.50; 1-lot 29-Sep-2026/06-Oct-2026 four-leg position at 23450 strike; Sensibull standalone margin ₹88,076.
+- The screenshot is date-identified as 25-Sep-2026 using the exact NIFTY 23140.50 close and contemporaneous Sep futures quote.
+
+Method:
+1. Obtain the daily NSE Clearing SPAN risk-parameter file for 25-Sep-2026 and, where available, the appropriate intraday file nearest the screenshot time.
+2. Reconstruct the four-leg portfolio using 65 NIFTY units.
+3. Calculate SPAN scan risk, calendar-spread charge and exposure/ELM components using the published SPAN inputs.
+4. Report multiple margin definitions (SPAN, SPAN+exposure, and premium-inclusive variants) and compare them with ₹88,076.
+5. Record the closest reproducible definition and the residual mismatch, if any; do not force a match.
+6. Build a compact historical-margin cache containing only the NIFTY contracts/17 strike candidates needed by this research rather than committing raw multi-GB SPAN archives.
+7. Rerun the full 17-strike selection using exact/reconstructed margin-required percentage where coverage permits.
+8. Compare maximum percentage selection versus maximum ₹ flatline-value selection.
+
+Exit criteria:
+- screenshot-date calibration report completed;
+- reproducible margin calculation code and manual workflow committed;
+- exact historical margin denominator used for any rerun is documented;
+- downstream performance results are either rerun with the calibrated denominator or explicitly marked as proxy results.
