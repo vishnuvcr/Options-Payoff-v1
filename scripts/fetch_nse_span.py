@@ -41,6 +41,7 @@ def direct_candidates(date_token: str) -> list[str]:
         f"nsccl.{date_token}.i05.spn",
     ]
     roots = [
+        "https://nsearchives.nseindia.com/archives/nsccl/span/",
         "https://www.archive.nseclearing.in/marketreports/",
         "https://www.archive.nseclearing.in/marketreports/derivatives/",
         "https://www.archive.nseclearing.in/marketreports/FO/",
