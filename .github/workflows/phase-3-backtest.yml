@@ -52,12 +52,12 @@ jobs:
       - name: Resolve execution parameters
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            python - <<'PY' >> "$GITHUB_ENV"
-import json
-x=json.load(open(".github/phase2_trigger.json", encoding="utf-8"))
-for k, v in x.items():
-    print(f"{k.upper()}={v}")
-PY
+            echo "PHASE2_RUN_ID=$(python -c 'import json; print(json.load(open(".github/phase2_trigger.json"))["phase2_run_id"])')" >> "$GITHUB_ENV"
+            echo "START_DATE=$(python -c 'import json; print(json.load(open(".github/phase2_trigger.json"))["start_date"])')" >> "$GITHUB_ENV"
+            echo "END_DATE=$(python -c 'import json; print(json.load(open(".github/phase2_trigger.json"))["end_date"])')" >> "$GITHUB_ENV"
+            echo "TRIGGER_BASE=$(python -c 'import json; print(json.load(open(".github/phase2_trigger.json"))["trigger_base"])')" >> "$GITHUB_ENV"
+            echo "CONFIGURED_CAPITAL=$(python -c 'import json; print(json.load(open(".github/phase2_trigger.json"))["configured_capital"])')" >> "$GITHUB_ENV"
+            echo "SLIPPAGE_PCT=$(python -c 'import json; print(json.load(open(".github/phase2_trigger.json"))["slippage_pct"])')" >> "$GITHUB_ENV"
           else
             echo "PHASE2_RUN_ID=${{ inputs.phase2_run_id }}" >> "$GITHUB_ENV"
             echo "START_DATE=${{ inputs.start }}" >> "$GITHUB_ENV"
@@ -74,7 +74,7 @@ PY
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          key: hf-nifty-options-v3-${{ inputs.start }}-${{ inputs.end }}
+          key: hf-nifty-options-v3
           restore-keys: hf-nifty-options-v3-
       - name: Acquire Phase 2 strategy inputs
         env:
