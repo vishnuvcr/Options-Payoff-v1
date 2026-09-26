@@ -14,6 +14,7 @@ import pandas as pd
 
 from src.costs import CostModel, four_leg_entry_cashflow, transaction_costs, trigger_base
 from src.options_payoff import intrinsic_value
+from scripts.extract_strategy_inputs import nifty_lot_size
 
 def parse_args():
     p=argparse.ArgumentParser()
@@ -28,13 +29,17 @@ def parse_args():
     return p.parse_args()
 
 def candidate_row_metrics(row, args, model):
-    if hasattr(row, 'near_lot_size') and hasattr(row, 'next_lot_size'):
-        near_lot=int(row.near_lot_size); next_lot=int(row.next_lot_size)
+    if args.lot_size:
+        near_lot = next_lot = int(args.lot_size)
+    elif hasattr(row, 'near_lot_size') and hasattr(row, 'next_lot_size') and pd.notna(row.near_lot_size) and pd.notna(row.next_lot_size):
+        near_lot = int(row.near_lot_size)
+        next_lot = int(row.next_lot_size)
     else:
-        near_lot=next_lot=args.lot_size
+        near_lot = nifty_lot_size(pd.Timestamp(row.near_expiry).date())
+        next_lot = nifty_lot_size(pd.Timestamp(row.next_expiry).date())
     if near_lot != next_lot:
         return None
-    lot_size=args.lot_size if args.lot_size else near_lot
+    lot_size = near_lot
     premiums=[row.near_call_close,row.near_put_close,row.next_call_close,row.next_put_close]
     if any(pd.isna(x) for x in premiums) or pd.isna(row.near_settlement) or pd.isna(row.next_settlement):
         return None
@@ -62,7 +67,7 @@ def main():
     for row in df.itertuples(index=False):
         metrics=candidate_row_metrics(row,args,model)
         if metrics is None: continue
-        candidate_records.append({'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,'candidate_label':row.candidate_label,'strike':row.strike,'near_expiry':row.near_expiry,'next_expiry':row.next_expiry,'spot_at_entry':row.spot_at_entry,'lot_size':(args.lot_size if args.lot_size else int(row.near_lot_size)),**metrics})
+        candidate_records.append({'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,'candidate_label':row.candidate_label,'strike':row.strike,'near_expiry':row.near_expiry,'next_expiry':row.next_expiry,'spot_at_entry':row.spot_at_entry,'lot_size':int(args.lot_size if args.lot_size else nifty_lot_size(pd.Timestamp(row.near_expiry).date())),**metrics})
     candidates=pd.DataFrame(candidate_records)
     if candidates.empty: raise RuntimeError('No complete candidate rows available')
     order=['ATM']+[x.strip() for x in args.fallback_order.split(',') if x.strip()]
