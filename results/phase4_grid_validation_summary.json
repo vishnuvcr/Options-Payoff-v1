@@ -1,0 +1,23 @@
+{
+  "phase4_run_id":"36263760476",
+  "n_trades":63,
+  "date_start":"2021-07-13",
+  "date_end":"2024-01-17",
+  "total_net_pnl_inr":168665.9525123393,
+  "mean_net_pnl_inr":2677.237341465703,
+  "median_net_pnl_inr":6831.257956819223,
+  "win_rate_pct":60.317460317460316,
+  "profit_factor":1.3712366186630907,
+  "max_drawdown_inr":-194854.37191178356,
+  "bootstrap_mean_ci_95_pct":[-2750.350767241569,7902.998875648362],
+  "block_bootstrap_mean_ci_95_pct":[-5627.9523203384415,9957.88102992586],
+  "block_bootstrap_blocks":34,
+  "trades_per_year":25.066176470588236,
+  "monthly_positive_rate_pct":41.17647058823529,
+  "largest_loss_inr":-55420.57880713203,
+  "largest_win_inr":35233.55102532894,
+  "walkforward_train_net_pnl_inr":-50828.468322945024,
+  "walkforward_test_net_pnl_inr":219494.4208352843,
+  "walkforward_train_trades":45,
+  "walkforward_test_trades":18
+}
