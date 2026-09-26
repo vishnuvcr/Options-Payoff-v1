@@ -25,3 +25,10 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 7 | Strategy engine updated | Added exhaustive strike-grid helper, chart flatline estimator and maximum equal-max-profit=max-loss selection mode. |
 | 2026-09-27 | 7 | Data extraction updated | Future cached strategy-input builds now generate ATM-400..ATM+400 in 50-point increments; current Phase 3 artifact remains usable for the rerun because it contains the wider grid. |
 | 2026-09-27 | 7 | Tests/workflow added | Added unit coverage and manual GitHub Actions workflow `.github/workflows/phase-7-max-equal-selection.yml`. |
+
+| 2026-09-27 | 7 | Exact empirical rerun from cached Phase 3 expanded inputs | Reproduced the prior 63-trade result exactly with a local raw Parquet decoder, then evaluated the new ATM-400..ATM+400 rule without new market-data downloads. |
+| 2026-09-27 | 7 | Primary selection completed | 905 timestamps had complete candidates in the requested grid; 48 passed the 2.5% legacy proxy gate; maximum estimated equal-flatline value selected one trade per qualifying timestamp. |
+| 2026-09-27 | 7 | Primary result | 48 trades, ₹166,866.51 net P&L, 60.42% win rate, PF 1.56, max drawdown -₹124,060.72 at 0.25% slippage and ₹20/order brokerage. |
+| 2026-09-27 | 7 | Economic decomposition | Static chart value contributed ₹36,138.75 versus ₹142,545.00 from realized S2-S1 before entry slippage and fees. |
+| 2026-09-27 | 7 | Robustness/loss audit | 95% bootstrap intervals include zero; 19/19 losing trades were negative before fees; loss-side S2-S1 contribution was -₹309,305.00. |
+| 2026-09-27 | 7 | Sensitivity | Net P&L remained positive at 0%, 0.25%, 0.50% and 1.00% slippage; no-gate maximum-flatline selection produced materially worse drawdown than the 2.5%-gated rule. |
