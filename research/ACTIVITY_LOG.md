@@ -17,6 +17,8 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 2 | Added strategy-input extractor | Builds per-entry ATM/-400/+400 candidate rows from the NIFTY index and per-expiry option files. |
 | 2026-09-26 | 2 | Added manual GitHub Actions workflow | Workflow caches Hugging Face files and uploads the derived strategy-input table as an artifact. |
 | 2026-09-26 | 2 | Added initial literature review | Research references on put-call parity, synthetic forwards and transaction-cost frictions recorded. |
+| 2026-09-26 | 3 | Phase 3 runtime audit | Workflow reached the backtest engine and failed because the historical Phase 2 artifact does not carry a trusted lot-size field. |
+| 2026-09-26 | 3 | Repaired lot-size handling | Phase 3 now derives NIFTY lot size from the near/next expiry dates and excludes unequal-lot pairs from the one-for-one synthetic-forward sample. |
 | 2026-09-26 | 3 | Added transaction-cost model | Added brokerage, exchange, SEBI, stamp duty, GST, entry STT and expiry-exercise STT components. |
 | 2026-09-26 | 3 | Added backtest engine | Added deterministic ATM then fallback selection, configurable 2.5% trigger denominator and selected-trade/candidate outputs. |
 | 2026-09-26 | 3 | Added manual Phase 3 workflow | Workflow rebuilds Phase 2 inputs, runs the backtest and uploads results. |
