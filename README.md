@@ -4,54 +4,35 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Active research phase:** Phase 2 — Market-data acquisition, cleaning and cache
-**Status:** Phase 1 complete; Phase 2 pipeline implemented and awaiting manual GitHub Actions execution/validation.
+**Active phase:** Phase 3 — Backtest engine and transaction-cost model
+**Status:** Phase 1 analytical validation complete; Phase 2 data pipeline and Phase 3 backtest/cost engine implemented. Historical workflow execution remains pending.
 **Date:** 2026-09-26
 
-### Live research branches
+## Key finding
 
-- phase-1-specification — strategy equations, payoff tests and Phase 1 workflow
-- phase-2-data — data manifest, extractor, literature review and Phase 2 workflow
+The four-leg position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, the actual expiry component is S2 - S1. A payoff chart that applies one identical terminal spot to both expiries will show a flat line because the two intrinsic terms cancel. The flatline therefore cannot be interpreted as a flat realized held-to-expiry payoff.
 
-The agreed six-phase research plan is unchanged.
+## Research branches
 
-## Key analytical finding so far
+- `phase-1-specification` — strategy equations, analytical payoff functions and unit tests
+- `phase-2-data` — historical data source, cache/extraction pipeline and literature review
+- `phase-3-backtest` — trigger selection, cost model and backtest workflow
 
-The position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, its expiry payoff is S(next expiry) - S(near expiry). A chart that applies one identical terminal spot to both expiries will look flat because the intrinsic terms cancel. Therefore the flatline chart cannot be treated as the strategy's realized held-to-expiry payoff.
+## Main research files
 
-## Research files
+- `research/RESEARCH_PLAN.md` — fixed six-phase protocol
+- `research/STATUS.md` — live phase/status
+- `research/ERROR_LOG.md` — mistakes and corrections
+- `research/ACTIVITY_LOG.md` — observable research/repository activity
+- `research/SOURCES.md` — official and research sources
+- `docs/PHASE_3_BACKTEST.md` — current backtest methodology
 
-- research/RESEARCH_PLAN.md
-- research/RESEARCH_INSTRUCTIONS.md
-- research/STATUS.md
-- research/ERROR_LOG.md
-- research/ACTIVITY_LOG.md
-- research/SOURCES.md
-- docs/PHASE_1_SPECIFICATION.md
-- docs/PHASE_2_DATA_PLAN.md
-- docs/LITERATURE_REVIEW.md
-- src/options_payoff.py
-- tests/test_options_payoff.py
-- scripts/extract_strategy_inputs.py
+## Important safeguards
 
-## Phase structure
+The 2.5% denominator in the original rule is not specified, so the engine tests explicit denominator modes rather than silently inventing one.
 
-0. Bootstrap and governance
-1. Strategy specification and analytical validation
-2. Market-data acquisition, cleaning and cache
-3. Backtest engine and transaction-cost model
-4. Statistical validation and robustness
-5. Regime and cross-market attribution
-6. Manuscript and final conclusion
+Phase 2 source bars are OHLCV/OI rather than bid/ask, so entry prices are 09:20 close proxies and Phase 3 applies configurable slippage.
 
-Each phase is implemented on its own branch and has a manual GitHub Actions workflow.
+A verified historical NIFTY lot-size calendar and broker-specific charges are required before final multi-year rupee P&L. Paytm Money's public pages currently show inconsistent F&O brokerage figures, so the broker rate is intentionally configurable.
 
-## Data and execution safeguards
-
-The Phase 2 source is the public thetrademarkk/india-index-options-1m dataset on Hugging Face. Its OHLCV/OI bars are sufficient to construct a historical research input table but do not provide bid/ask quotes, so Phase 2 marks prices as 09:20 close proxies. Phase 3 must therefore apply conservative spread/slippage assumptions and verify dated broker/exchange charges before net profitability is assessed.
-
-Historical NIFTY expiry handling is data-driven and preserves the 2025 Thursday-to-Tuesday expiry transition.
-
-## Reproducibility
-
-Important source metadata, checksums/revisions, transformations, data-quality flags and research status are recorded in the repository. Raw public data are cached in GitHub Actions rather than blindly re-downloaded on every run.
+Raw public market data are cached in GitHub Actions rather than blindly downloaded on every run. Each phase has a manual workflow.
