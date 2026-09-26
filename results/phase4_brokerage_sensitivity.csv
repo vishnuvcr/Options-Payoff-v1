@@ -1,0 +1,4 @@
+brokerage_per_order_inr,n_trades,total_net_pnl_inr,mean_net_pnl_inr,delta_vs_20_inr,note
+10.0,28,167360.9699090372,5977.177496751328,1120.0,Adjustment uses the fixed four-entry-order cost structure in the Phase 3 model.
+20.0,28,166240.9699090372,5937.177496751328,0.0,Adjustment uses the fixed four-entry-order cost structure in the Phase 3 model.
+40.0,28,164000.9699090372,5857.177496751328,-2240.0,Adjustment uses the fixed four-entry-order cost structure in the Phase 3 model.
