@@ -54,12 +54,7 @@ jobs:
             data/derived/strategy_inputs.metadata.json
       - name: Chain to Phase 3
         if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git fetch origin phase-3-backtest
-          git switch --detach origin/phase-3-backtest
-          printf '{"phase2_run_id":"%s","start_date":"2021-06-01","end_date":"2026-08-31","trigger_base":"buy_premium","configured_capital":"","slippage_pct":"0.0025"}\n' "${GITHUB_RUN_ID}" > .github/phase2_trigger.json
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/phase2_trigger.json
-          git commit -m "Trigger Phase 3 from Phase 2 run ${GITHUB_RUN_ID}"
-          git push origin HEAD:phase-3-backtest
+          gh workflow run phase-3-backtest.yml --repo "${{ github.repository }}" --ref phase-3-backtest -f phase2_run_id="${{ github.run_id }}" -f start='2021-06-01' -f end='2026-08-31' -f trigger_base='buy_premium' -f configured_capital_per_lot='' -f slippage_pct='0.0025'
