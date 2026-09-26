@@ -82,4 +82,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phase-5-regime-summary
-          path: "$OUTPUT_PATH"
+          path: results/phase5_regime_summary.csv
