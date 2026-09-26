@@ -74,3 +74,9 @@ jobs:
         with:
           name: phase-3-backtest-results
           path: results/phase3
+      - name: Chain to Phase 4
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run phase-4-validation.yml --repo "${{ github.repository }}" --ref phase-4-validation -f phase3_run_id="${{ github.run_id }}" -f out_dir="results/phase4"
