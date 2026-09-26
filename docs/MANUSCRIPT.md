@@ -471,3 +471,57 @@ The fallback candidate shifts are:
 -500, -450, -400, -350, -300, -250, -200, -150, -100, -50, +50, +100, +150, +200, +250, +300, +350, +400, +450, +500.
 
 ATM is tested first. Fallbacks are evaluated only when ATM fails. Every fallback satisfying the trigger is retained.
+
+## Phase 7 addendum — payoff-platform semantics and exhaustive maximum-value selection
+
+### Strategy specification change
+
+Phase 7 replaced the superseded ordered ATM/fallback rule with an exhaustive candidate search. For every 09:20 IST entry timestamp, all common strikes from ATM-400 through ATM+400 in 50-point increments are evaluated. The candidate is first required to exceed the 2.5% chart-percentage gate. Among eligible candidates, the primary selector is the maximum estimated equal max-profit=max-loss flatline value in INR. A separate maximum-percentage selector is retained as a sensitivity.
+
+The displayed percentage itself is not claimed to be an exact Sensibull reconstruction. Sensibull's public documentation defines the percentage denominator as margin required, whereas the historical cached dataset does not contain the historical margin requirement for each position. The repository therefore uses its legacy buy-premium denominator only as an explicit proxy for the 2.5% gate.
+
+### Phase 7 data and execution
+
+The empirical rerun used the cached Phase 3 expanded strategy-input artifact rather than downloading new market data. The analysis was independently checked with a raw Parquet reader because the local environment did not expose a usable Parquet engine. The reader reproduced the prior authoritative 63-trade result exactly before evaluating the new selector.
+
+Execution assumptions remained 0.25% premium slippage per leg, ₹20 brokerage per executed order, dated statutory charges from the repository cost model, historical lot sizes, 09:20 option close as the execution proxy, and expiry settlement.
+
+### Phase 7 results
+
+The requested exhaustive grid contained 13,824 complete candidate rows across 905 timestamps. Forty-eight timestamps had at least one candidate above the 2.5% proxy gate, and one candidate was selected at each such timestamp.
+
+At 0.25% slippage:
+
+- 48 selected trades;
+- total net P&L ₹166,866.51;
+- mean trade P&L ₹3,476.39;
+- median trade P&L ₹6,242.51;
+- win rate 60.42%;
+- profit factor 1.56;
+- maximum drawdown -₹124,060.72;
+- largest loss -₹55,321.89;
+- largest win ₹35,233.55.
+
+### Economic decomposition
+
+The static same-terminal-spot chart component contributed ₹36,138.75 across the selected trades. The realized cross-expiry settlement component `(S2-S1)` contributed ₹142,545.00 before entry slippage and fees. This decomposition is consistent with the independent payoff identity:
+
+`economic P&L = static chart value + (S2-S1) - execution/cost adjustments`.
+
+Among the 19 losing trades, the static chart component contributed +₹13,681.25 in aggregate, while the `S2-S1` component contributed -₹309,305.00. All 19 losses were already negative before modeled fees, and no loss was caused solely by fees.
+
+### Robustness
+
+The iid 95% bootstrap confidence interval for mean trade P&L was -₹1,943.61 to ₹8,927.91; the weekly block-bootstrap interval was -₹3,672.56 to ₹9,932.60. The chronological 70/30 split produced +₹18,711.33 in training and +₹148,155.17 in the later test segment. These results remain sensitive to chronology and do not independently establish a stable edge.
+
+Net P&L under 0%, 0.25%, 0.50% and 1.00% premium slippage was ₹171,346.72, ₹166,866.51, ₹162,386.29 and ₹153,425.87 respectively.
+
+### Regime observations
+
+Descriptively, medium-volatility observations produced the strongest subgroup results (21 trades; mean net P&L ₹11,658.63; profit factor 4.27), while high-volatility observations were negative on average (9 trades; mean -₹7,806.15; profit factor 0.48). Down-trend observations were also positive on average (25 trades; mean ₹7,760.37). These are exploratory subgroup findings and were not used to select trades.
+
+### Phase 7 inference
+
+The new selection rule has a positive historical point estimate under the stated proxy and execution assumptions, but the payoff graph itself is not the economic source of the result. The dominant realized contribution is the movement between the two expiries. The statistical uncertainty intervals include zero, and the result is concentrated in particular periods and regimes.
+
+The unresolved item is the exact historical margin-required denominator used by the user's chart. Until that denominator is reconstructed or the original platform can be replicated directly, the 2.5% gate should be treated as a proxy rather than an exact reproduction of the displayed percentage.
