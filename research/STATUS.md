@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-26
 **Active branch:** phase-5-regimes
-**Overall phase:** 5 — Regime attribution framework IMPLEMENTED; empirical execution gated on Phase 3/4 artifacts
+**Overall phase:** 5 — Regime attribution framework IMPLEMENTED; workflow handoffs repaired; empirical execution still gated on Phase 3/4 artifacts
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
@@ -28,7 +28,8 @@ Regime attribution is now predeclared across realized volatility, India VIX, gap
 
 ## Blockers
 
-- GitHub Actions run-history audit currently reports zero workflow runs for the repository; therefore no empirical Phase 3/4 artifact exists to consume.
+- GitHub Actions run-history audit previously reported zero workflow runs for the repository; no empirical Phase 3/4 artifact is currently available to consume.
+- Phase 4/5 workflow handoffs have been repaired so future manual runs can pull the Phase 3 artifact by run ID.
 - Phase 3/4 historical artifacts are required before empirical regime analysis.
 - Quote-level bid/ask and IV surface history remain a separate data requirement.
 - The user's exact 2.5% denominator remains unconfirmed; supported alternatives must be reported.
