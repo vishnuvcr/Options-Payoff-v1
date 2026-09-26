@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-26
-**Active branch:** phase-3-backtest
-**Overall phase:** 3 — Backtest engine and transaction-cost model IMPLEMENTED; execution pending
+**Active branch:** phase-4-validation
+**Overall phase:** 4 — Statistical validation framework IMPLEMENTED; empirical execution pending
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
@@ -10,7 +10,7 @@
 | 1 Specification | COMPLETE | Strategy equations, payoff tests and manual workflow added. |
 | 2 Data | IMPLEMENTED; VALIDATION PENDING | Data manifest, extractor and manual workflow exist. Runtime execution requires GitHub Actions/network access. |
 | 3 Backtest | IMPLEMENTED; VALIDATION PENDING | Gross P&L, selection rule, transaction costs, exercise STT and unit tests added. Historical run has not been executed in this session. |
-| 4 Validation | NOT STARTED | Walk-forward, bootstrap and robustness analyses. |
+| 4 Validation | IMPLEMENTED; EXECUTION PENDING | Bootstrap, monthly aggregation, walk-forward and robustness framework added. |
 | 5 Regimes | NOT STARTED | Conditional/regime attribution. |
 | 6 Manuscript | NOT STARTED | Final research manuscript and supplements. |
 
