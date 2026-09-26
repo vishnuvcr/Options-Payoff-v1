@@ -3,6 +3,11 @@ name: Phase 3 - Backtest
 on:
   workflow_dispatch:
     inputs:
+      phase2_run_id:
+        description: 'Completed Phase 2 workflow run ID containing phase-2-strategy-inputs'
+        required: false
+        default: ''
+
       start:
         description: Start date (YYYY-MM-DD)
         required: true
@@ -30,6 +35,7 @@ on:
         default: '0.0025'
 
 permissions:
+  actions: write
   contents: read
 
 jobs:
