@@ -2,13 +2,13 @@
 
 **As of:** 2026-09-26
 **Active branch:** phase-2-data
-**Overall phase:** 2 — Market-data acquisition, cleaning and cache IN PROGRESS
+**Overall phase:** 2 — Market-data acquisition, cleaning and cache COMPLETE
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
 | 0 Bootstrap | COMPLETE | Governance files initialized. |
 | 1 Specification | COMPLETE | Strategy equations, strike candidates, threshold helper, tests, and manual workflow added. |
-| 2 Data | IN PROGRESS | Source manifest, data plan, extractor and manual GitHub Actions workflow added. Execute and validate the historical input table next. |
+| 2 Data | COMPLETE | Full-range Phase 2 artifact validated in GitHub Actions; handoff to Phase 3 repaired and re-triggerable. |
 | 3 Backtest | NOT STARTED | Requires validated Phase 2 inputs and dated cost model. |
 | 4 Validation | NOT STARTED | Out-of-sample and robustness analysis. |
 | 5 Regimes | NOT STARTED | Conditional/regime attribution. |
@@ -25,6 +25,6 @@
 
 ## Blockers
 
-- The manual Phase 2 workflow has not yet been executed through GitHub Actions in this session.
+- The full-range autonomous Phase 2 workflow has now executed successfully; a separate handoff mechanism is used because GitHub CLI workflow dispatch requires the workflow to be present on the default branch.
 - Bid/ask quote history is not present in the primary dataset; Phase 3 must either source quote-level data for a subset or use conservative slippage/spread sensitivity bands.
 - Dated NIFTY lot sizes and the full Paytm Money/NSE charge stack must be verified before net P&L is treated as final.
