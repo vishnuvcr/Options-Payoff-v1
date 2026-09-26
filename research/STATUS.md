@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-7-max-equal-selection  
-**Overall status:** Phase 7 empirical analysis COMPLETE; exact platform margin denominator remains unresolved
+**Active branch:** phase-7A-margin-reconstruction  
+**Overall status:** Phase 7A — historical margin reconstruction IN PROGRESS
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -14,7 +14,7 @@
 | 5 Regimes | COMPLETE | Run 36263974629 completed point-in-time trend/volatility/entry-move attribution. |
 | 6 Manuscript | COMPLETE | Corrected manuscript and figures added. |
 | 6A Loss audit | COMPLETE | Workflow 36264710663 audited all 63 selected rows directly from the Phase 3 artifact. |
-| 7 Payoff semantics + maximum-flatline selection | COMPLETE | 48-trade primary ledger evaluated; robustness, loss decomposition, slippage sensitivity and regime attribution completed. Exact historical Sensibull margin denominator remains unresolved. |
+| 7 Payoff semantics + maximum-flatline selection | COMPLETE | 48-trade primary ledger evaluated; robustness, loss decomposition, slippage sensitivity and regime attribution completed. |
 
 ## Historical comparator — superseded selection rule
 
@@ -126,3 +126,6 @@ The previous 63-trade result is preserved as historical evidence for the superse
 - 0 fee-only losses
 
 See docs/PHASE7_RESULTS.md for detailed results and interpretation.
+## Phase 7A status
+
+Calibration target: Sensibull standalone margin ₹88,076 for the screenshot-identifiable 25-Sep-2026 NIFTY 23450 four-leg position, one 65-unit lot. NSE Clearing publishes daily SPAN risk-parameter files and historical margin/volatility data; Phase 7A reconstructs this denominator before replacing the legacy percentage proxy. See `.github/workflows/phase-7A-margin-reconstruction.yml`.
