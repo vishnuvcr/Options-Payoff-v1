@@ -4,8 +4,8 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Phase:** 0 — Research bootstrap  
-**Status:** Initialized; Phase 1 specification is next.  
+**Phase:** 1 — Strategy specification and analytical validation  
+**Status:** COMPLETE; Phase 2 data work is next.  
 **Date:** 2026-09-26
 
 The strategy under study is:
@@ -17,9 +17,15 @@ The strategy under study is:
 5. Hold to expiry/settlement according to the strategy rules.
 6. Include bid/ask execution assumptions, slippage, brokerage, statutory charges and other transaction costs.
 
-### Important modeling note
+### Phase 1 finding
 
-The near-week and next-week synthetic-forward legs have different expiries. Therefore, a single one-dimensional payoff chart that assigns the same terminal spot price to both expiries can show a misleading flat line. The research engine will separately model the underlying settlement at the two expiries and will retain the original chart rule only as a signal to be tested.
+The four legs are a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With a common strike K, the intrinsic expiry component is:
+
+S(next expiry) - S(near expiry)
+
+A one-dimensional chart that applies the same hypothetical terminal spot to both expiries will cancel the intrinsic terms and show a flat line. That flatline is therefore not a valid representation of the held-to-expiry risk.
+
+The Phase 1 unit tests reproduce the flatline construction and independently prove that the economically correct two-expiry P&L varies with the two settlement prices.
 
 ## Research files
 
@@ -29,12 +35,16 @@ The near-week and next-week synthetic-forward legs have different expiries. Ther
 - research/ACTIVITY_LOG.md
 - research/SOURCES.md
 - research/RESEARCH_INSTRUCTIONS.md
+- docs/PHASE_1_SPECIFICATION.md
+- src/options_payoff.py
+- tests/test_options_payoff.py
+- config/strategy_phase1.toml
 
 ## Phases
 
-- Phase 0 — Bootstrap and research governance
-- Phase 1 — Strategy specification and analytical validation
-- Phase 2 — Market-data acquisition, cleaning and cache
+- Phase 0 — Bootstrap and research governance — COMPLETE
+- Phase 1 — Strategy specification and analytical validation — COMPLETE
+- Phase 2 — Market-data acquisition, cleaning and cache — NEXT
 - Phase 3 — Backtest engine and transaction-cost model
 - Phase 4 — Statistical validation and robustness
 - Phase 5 — Regime/cross-market attribution
@@ -46,12 +56,10 @@ Each research phase will live on its own Git branch and expose a manual GitHub A
 
 Default test market: NIFTY 50 weekly index options, because NSE currently lists four weekly NIFTY 50 option expiries and the weekly expiry is Tuesday (or the preceding trading day when Tuesday is a holiday). This is a documented default, not a claim that the strategy is suitable for trading.
 
-The backtest will remain parameterized so another eligible underlying can be substituted later.
-
 ## Costs
 
-The model will use dated, configurable cost inputs rather than silently assuming zero friction. In particular, NSE states that from 1 April 2026 the STT rate on sale of an option is 0.15% of option premium; broker brokerage and other charges are modeled separately.
+The model uses dated, configurable cost inputs rather than silently assuming zero friction. NSE states that from 1 April 2026 the STT rate on sale of an option is 0.15% of option premium; broker brokerage and other charges are modeled separately.
 
 ## Reproducibility
 
-Data sources, dataset hashes/versions, assumptions, code versions, and backtest outputs will be recorded so results can be regenerated without repeatedly downloading the same data.
+Data sources, dataset versions/checksums, assumptions, code versions, and backtest outputs will be recorded so results can be regenerated without repeatedly downloading the same data.
