@@ -33,3 +33,7 @@ The static flatline chart is not the realized payoff of the cross-expiry positio
 - A dated NIFTY lot-size calendar is still required for a multi-year rupee P&L series.
 - Quote-level bid/ask data are not in the primary Phase 2 source; Phase 3 therefore uses explicit slippage sensitivity until a quote-level source is validated.
 - The percentage denominator in the user's 2.5% rule remains unconfirmed; all supported denominator modes must be reported before treating any signal result as final.
+
+## New validation result
+
+Historical NIFTY lot-size changes are now encoded by expiry date rather than a single fixed lot. Transition weeks with unequal near/next lots are excluded from the one-for-one spread sample. This prevents artificial P&L scaling and synthetic-forward notional mismatch.
