@@ -1,71 +1,68 @@
 # Research status
 
-**As of:** 2026-09-26
-**Active branch:** phase-6-manuscript
-**Overall phase:** 6 — Empirical manuscript and reproducibility package COMPLETE
+**As of:** 2026-09-27  
+**Active branch:** phase-6-loss-audit  
+**Overall phase:** 6A — Loss-trade audit COMPLETE
 
 | Phase | Status | Evidence |
 |---|---|---|
-| 0 Bootstrap | COMPLETE | Governance, plan, sources, status and logs initialized. |
+| 0 Bootstrap | COMPLETE | Governance, plan, sources, status and logs maintained. |
 | 1 Specification | COMPLETE | Strategy equations, payoff model, strike candidates and tests validated. |
-| 2 Data | COMPLETE | Run 36255238050 generated 2,763 candidate rows: 2,128 ok, 610 shifted-strike-unavailable, 25 missing-settlement. |
-| 3 Backtest | COMPLETE | Corrected run 36256634939 generated the 28-trade cost-aware selected ledger. |
-| 4 Validation | COMPLETE | Corrected run 36257292327 completed descriptive, walk-forward, block-bootstrap, threshold/slippage/denominator and brokerage sensitivity. |
-| 5 Regimes | COMPLETE | Corrected run 36257664922 completed point-in-time NIFTY spot-derived categorical regime attribution. |
-| 6 Manuscript | COMPLETE | Full manuscript, figures, result snapshots and reproducibility appendix committed on phase-6-manuscript. |
+| 2 Data | COMPLETE | Run 36255238050 generated the corrected strategy input cache. |
+| 3 Backtest | COMPLETE | Run 36262958536 generated the authoritative 63-row full-grid selected ledger. |
+| 4 Validation | COMPLETE | Run 36263760476 completed uncertainty, walk-forward, threshold/slippage/denominator and brokerage sensitivity. |
+| 5 Regimes | COMPLETE | Run 36263974629 completed point-in-time regime attribution. |
+| 6 Manuscript | COMPLETE | Corrected full-grid manuscript and figures committed. |
+| 6A Loss audit | COMPLETE | Run 36264710663 audited all 63 selected rows directly from the Phase 3 artifact. |
 
-## Primary result
+## Corrected primary result
 
-Under the buy-premium interpretation of the user's 2.5% trigger, 0.25% premium slippage and ₹20/order baseline brokerage:
+Under the working buy-premium interpretation of the 2.5% trigger, 0.25% premium slippage and ₹20/order baseline brokerage:
 
-- selected trades: 28 of 891 eligible timestamps
-- total net P&L: ₹166,240.97
-- mean trade P&L: ₹5,937.18
-- median trade P&L: ₹9,431.27
-- win rate: 67.86%
-- profit factor: 2.33
-- maximum drawdown: -₹48,161.45
+- selected trade rows: 63
+- distinct entry timestamps: 52
+- ATM trades: 24
+- fallback-grid trades: 39
+- total net P&L: ₹168,665.95
+- mean trade P&L: ₹2,677.24
+- median trade P&L: ₹6,831.26
+- win rate: 60.32%
+- profit factor: 1.37
+- maximum drawdown: -₹194,854.37
 
-The iid bootstrap 95% interval for mean trade P&L was approximately -₹434 to ₹11,735; the weekly block-bootstrap interval was approximately -₹1,689 to ₹12,745.
+The iid and weekly block-bootstrap intervals for mean trade P&L both include zero. The chronological training segment was negative while the test segment was positive.
 
-## Key robustness findings
+## Loss-trade audit
 
-The result remained positive across the tested 0%–1% slippage range and ₹10–₹40 brokerage sensitivity. The chronological 70/30 split was also positive in the nine-trade test segment.
+The authoritative 63-row selected ledger contains:
 
-The result is sparse and concentrated: all 28 selected trades occurred from 2021-08-05 through 2024-01-17, and May 2022 plus October 2022 contributed about 89.3% of total selected-trade P&L.
+- 38 winners
+- 25 losers
+- losing contribution: -₹454,335.44
+- winning contribution: +₹623,001.39
+- largest loss: -₹55,420.58
+- mean loss: -₹18,173.42
+- median loss: -₹9,563.35
+- 25/25 losers negative before modeled fees
+- 0/25 fee-only losses
+- 7 ATM losses
+- 18 fallback losses
+- modeled costs on losing rows: ₹3,557.82
 
-The denominator is a major specification issue: the buy-premium denominator generated trades, while the tested spot-notional denominator generated none across the 1%–5% threshold grid. Configured-capital sensitivity was not invented because no capital amount was supplied.
+The audit found that the 25 losing trades all passed the positive >2.5% entry-chart trigger. The realized cross-expiry economic component, not brokerage, is the dominant loss mechanism.
 
-## Phase 5 interpretation
+See docs/LOSS_TRADE_ANALYSIS.md for the complete 25-trade ledger, concentration analysis, shift analysis and cost anatomy.
 
-Point-in-time attribution used only prior 20-observation trend, prior 20-observation annualized volatility and prior 09:20 entry move. The descriptive sample showed the largest mean P&L in down-trend and medium-volatility buckets. These are not new trading rules and are not causal claims.
+## Reproducibility correction
 
-India VIX, FII/DII, option-IV/term-structure, USD/INR, gold, global-equity and event-window ingestion remain future data extensions rather than fabricated completed results.
+The authoritative 63-row result comes from branch phase-3-strike-grid and run 36262958536. The later phase-6-manuscript-grid branch retains an older run_backtest.py using ATM/-400/+400. That stale script must not be used to reproduce the full-grid result; the discrepancy is logged for correction.
+
+## Important specification limitation
+
+The 2.5% percentage denominator remains unconfirmed. The buy-premium denominator is a working research assumption. The tested spot-notional denominator generated no qualifying trades from 1% through 5%.
 
 ## Final conclusion
 
-The specified rule is reproducible and historically positive in the tested cost-aware sample, but the evidence is not strong enough to treat it as a robust, denominator-independent or risk-free arbitrage. The original flatline chart is not the correct economic payoff representation because the two synthetic forwards settle at different dates.
+The clarified rule is reproducible and had a positive historical point estimate under one explicit implementation, but the evidence is not sufficient to treat it as robust, denominator-independent or risk-free arbitrage.
 
-Principal limitations are the unresolved denominator, sparse sample, P&L concentration, confidence intervals spanning zero, close-based execution proxy, settlement proxy, incomplete cross-market attribution and account-specific historical brokerage uncertainty.
-
-## Final manuscript
-
-docs/MANUSCRIPT.md on the phase-6-manuscript branch is the complete research manuscript, including methods, tables, figures, discussion, strengths, limitations, conclusion, future research and reproducibility appendix.
-
-## Specification clarification hold
-
-The previously reported **28 “selected trades” are provisional**. Code inspection confirms that Phase 3 selected one candidate per timestamp only when the programmed chart trigger passed: ATM first, then -400, then +400, with a >2.5% threshold and the buy_premium denominator. The repository wording had incorrectly described this as the user's selection rule.
-
-The user has now clarified that no separate trade-selection criterion was provided. Therefore, the 28-trade performance result must **not** be treated as the final performance of the user's strategy. The research is held at the interpretation boundary until the selection/trigger semantics and percentage denominator are explicitly specified. No new selection rule should be invented.
-
-
-## Corrected full-grid rerun
-
-The previous 28-trade ATM/-400/+400 result is superseded. The final clarified rule uses the full 50-point grid from -500 to +500 after ATM fails.
-
-Authoritative results:
-- Phase 3 run 36262958536: 63 trades, 52 timestamps, ₹168,665.95 net P&L.
-- Phase 4 run 36263760476: 60.32% win rate, PF 1.37, max drawdown -₹194,854.
-- Phase 5 run 36263974629: corrected point-in-time regime attribution.
-
-Final research branch: phase-6-manuscript-grid.
+The loss audit explains why: a positive static payoff-chart trigger can coexist with a strongly negative realized cross-expiry settlement outcome.
