@@ -187,7 +187,14 @@ def select_trades(candidates: pd.DataFrame, args) -> pd.DataFrame:
             grid['estimated_equal_max_profit_loss_inr'] >
             float(args.min_equal_max_profit_loss_inr)
         ]
-        if args.min_chart_return_pct is not None:
+        if args.margin_column:
+            if args.margin_column not in grid.columns:
+                raise ValueError(f'margin column not found: {args.margin_column}')
+            grid = grid[
+                grid['max_profit_pct_margin'].notna()
+                & (grid['max_profit_pct_margin'] > float(args.min_margin_profit_pct))
+            ]
+        elif args.min_chart_return_pct is not None:
             grid = grid[
                 grid['chart_return_pct'].notna()
                 & (grid['chart_return_pct'] > float(args.min_chart_return_pct))
@@ -201,6 +208,9 @@ def select_trades(candidates: pd.DataFrame, args) -> pd.DataFrame:
         elif args.selection_score == 'chart_return_pct':
             ranked = grid[grid['chart_return_pct'].notna()].copy()
             ranked['_score'] = ranked['chart_return_pct']
+        elif args.selection_score == 'max_profit_pct_margin':
+            ranked = grid[grid['max_profit_pct_margin'].notna()].copy()
+            ranked['_score'] = ranked['max_profit_pct_margin']
         else:
             raise ValueError(f'Unsupported selection score: {args.selection_score}')
 
@@ -314,6 +324,8 @@ def main():
         'min_equal_max_profit_loss_inr': args.min_equal_max_profit_loss_inr,
         'legacy_threshold_pct': args.threshold_pct,
         'optional_min_chart_return_pct': args.min_chart_return_pct,
+        'margin_column': args.margin_column,
+        'min_margin_profit_pct': args.min_margin_profit_pct,
         'trigger_base_mode': args.trigger_base_mode,
         'slippage_pct': args.slippage_pct,
         'lot_size': args.lot_size,
