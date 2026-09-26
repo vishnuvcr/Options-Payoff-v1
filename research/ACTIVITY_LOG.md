@@ -40,3 +40,6 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 3 | Corrected strike-selection specification | Replaced the earlier ATM/-400/+400 implementation with ATM first, then all 50-point shifts from -500 through +500 when ATM fails; every fallback strike exceeding the trigger is retained, with no extra ranking rule. |
 | 2026-09-26 | 3 | Expanded Phase 3 input extraction | New extraction produced 19,341 rows: 15,701 complete, 3,498 unavailable candidate strikes, 142 missing settlements. |
 | 2026-09-26 | 3 | Repaired strike-grid workflow runtime | Three reruns reached data extraction but failed at the src import. Added workflow PYTHONPATH=. and optional HF token wiring; a new rerun is in progress. |
+
+| 2026-09-26 | 3 | Strike-grid schema repair | Added the missing shift_points field to expanded Phase 3 inputs, persisted the full candidate-shift metadata, and triggered a clean rerun. |
+| 2026-09-26 | 3 | Workflow efficiency repair | Added concurrency cancellation and cache save-always so debugging cannot leave multiple long data-extraction runs consuming runners. |
