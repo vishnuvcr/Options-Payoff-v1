@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-7-max-equal-selection  
-**Overall status:** Phase 7 implementation complete; empirical rerun pending/completing
+**Overall status:** Phase 7 empirical analysis COMPLETE; exact platform margin denominator remains unresolved
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -14,7 +14,7 @@
 | 5 Regimes | COMPLETE | Run 36263974629 completed point-in-time trend/volatility/entry-move attribution. |
 | 6 Manuscript | COMPLETE | Corrected manuscript and figures added. |
 | 6A Loss audit | COMPLETE | Workflow 36264710663 audited all 63 selected rows directly from the Phase 3 artifact. |
-| 7 Payoff semantics + maximum-flatline selection | IMPLEMENTED | Exhaustive ATM-400..ATM+400 selection code, platform review, unit tests and manual workflow added; empirical run pending/completing. |
+| 7 Payoff semantics + maximum-flatline selection | COMPLETE | 48-trade primary ledger evaluated; robustness, loss decomposition, slippage sensitivity and regime attribution completed. Exact historical Sensibull margin denominator remains unresolved. |
 
 ## Historical comparator — superseded selection rule
 
@@ -91,3 +91,38 @@ Primary rule:
 - 2.5% legacy percentage gate: sensitivity only, because the exact platform margin denominator has not yet been reconstructed.
 
 The previous 63-trade result is preserved as historical evidence for the superseded ATM-first/full-grid fallback rule and must not be reported as the Phase 7 result.
+
+
+## Phase 7 primary result
+
+- grid timestamps: 905
+- eligible timestamps after legacy 2.5% proxy gate: 48
+- selected trades: 48
+- net P&L: ₹166,866.51
+- mean trade P&L: ₹3,476.39
+- median trade P&L: ₹6,242.51
+- win rate: 60.42%
+- profit factor: 1.56
+- maximum drawdown: -₹124,060.72
+- largest loss: -₹55,321.89
+- largest win: ₹35,233.55
+- modeled costs: ₹7,334.77
+
+## Phase 7 robustness
+
+- iid bootstrap 95% CI for mean: -₹1,943.61 to ₹8,927.91
+- weekly block bootstrap 95% CI: -₹3,672.56 to ₹9,932.60
+- chronological 70/30: train ₹18,711.33; test ₹148,155.17
+- net P&L at 0%, 0.25%, 0.50%, 1.00% slippage: ₹171,346.72; ₹166,866.51; ₹162,386.29; ₹153,425.87
+
+## Phase 7 economic decomposition
+
+- total static flatline P&L: ₹36,138.75
+- total realized S2-S1 contribution: ₹142,545.00
+- losses: 19
+- losing contribution: -₹299,970.18
+- loss-side S2-S1 contribution: -₹309,305.00
+- 19/19 losses negative before fees
+- 0 fee-only losses
+
+See docs/PHASE7_RESULTS.md for detailed results and interpretation.
