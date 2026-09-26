@@ -2,37 +2,41 @@
 
 Research repository for testing a cross-expiry NIFTY index-options strategy.
 
-## Current status
+## Current research status
 
-**Active phase:** Phase 4 — Statistical validation and robustness
-**Status:** Phase 1 analytical validation, Phase 2 data pipeline, Phase 3 backtest/cost engine and Phase 4 validation framework are implemented. Historical workflow execution remains pending because this session's runtime cannot resolve external data endpoints.
-**Date:** 2026-09-26
+**Latest protocol branch:** `phase-5-regimes`
+**Latest phase:** Phase 5 — regime and cross-market attribution framework
+**Empirical status:** Phase 3/4 historical execution artifacts are still required; no historical performance result is claimed.
+**Last updated:** 2026-09-26
 
-## Key finding
+## Key analytical finding
 
-The four-leg position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, the actual expiry component is S2 - S1. A payoff chart that applies one identical terminal spot to both expiries will show a flat line because the two intrinsic terms cancel. The flatline therefore cannot be interpreted as a flat realized held-to-expiry payoff.
+The four-leg position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. The economically relevant expiry component is the difference between the two expiry settlement levels, not a single common terminal spot. A chart that uses one terminal spot for both expiries can therefore display a flat line even though the held position has cross-expiry settlement risk.
 
-## Research branches
+## Phase map
 
-- `phase-1-specification` — strategy equations, analytical payoff functions and unit tests
-- `phase-2-data` — historical data source, cache/extraction pipeline and literature review
-- `phase-3-backtest` — trigger selection, cost model and backtest workflow
+- Phase 0 — governance: complete.
+- Phase 1 — strategy/payoff specification: complete.
+- Phase 2 — data engineering: implemented; runtime validation pending.
+- Phase 3 — backtest and costs: implemented; historical execution pending.
+- Phase 4 — statistical validation: implemented; execution pending Phase 3 artifacts.
+- Phase 5 — regime attribution: protocol/scaffold implemented on `phase-5-regimes`; execution gated on validated trade ledger.
+- Phase 6 — manuscript: not started; begins only after empirical Phases 3–5 are complete.
 
-## Main research files
+## Latest Phase 5 work
 
-- `research/RESEARCH_PLAN.md` — fixed six-phase protocol
-- `research/STATUS.md` — live phase/status
-- `research/ERROR_LOG.md` — mistakes and corrections
-- `research/ACTIVITY_LOG.md` — observable research/repository activity
-- `research/SOURCES.md` — official and research sources
-- `docs/PHASE_3_BACKTEST.md` — current backtest methodology
+The regime protocol is point-in-time and covers realized volatility, India VIX, gap, trend, liquidity, option IV/term structure, FII/DII activity, USD/INR, gold, global equity benchmarks and auditable event windows. Same-day end-of-day information is prohibited for a 09:20 entry unless it was genuinely available before entry.
 
-## Important safeguards
+Official NSE sources expose historical derivatives reports, contract-wise option data, participant reports, FII derivatives statistics and India VIX history. The current Paytm Money F&O FAQ states Rs.10 brokerage per unique executed order; the research model remains configurable and retains a conservative higher-brokerage sensitivity for historical/account-specific uncertainty.
 
-The 2.5% denominator in the original rule is not specified, so the engine tests explicit denominator modes rather than silently inventing one.
+## Repository governance
 
-Phase 2 source bars are OHLCV/OI rather than bid/ask, so entry prices are 09:20 close proxies and Phase 3 applies configurable slippage.
+- Baseline plan: `research/RESEARCH_PLAN.md`
+- Instructions: `research/RESEARCH_INSTRUCTIONS.md`
+- Status: `research/STATUS.md`
+- Error log: `research/ERROR_LOG.md`
+- Activity log: `research/ACTIVITY_LOG.md`
+- Phase 5 protocol: `docs/PHASE_5_REGIME_ANALYSIS.md`
+- Phase 5 source audit: `docs/PHASE_5_SOURCE_AUDIT.md`
 
-A verified historical NIFTY lot-size calendar and broker-specific charges are required before final multi-year rupee P&L. Paytm Money's public pages currently show inconsistent F&O brokerage figures, so the broker rate is intentionally configurable.
-
-Raw public market data are cached in GitHub Actions rather than blindly downloaded on every run. Each phase has a manual workflow.
+Latest phase branch: https://github.com/vishnuvcr/Options-Payoff-v1/tree/phase-5-regimes
