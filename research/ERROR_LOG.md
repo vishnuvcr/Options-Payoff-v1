@@ -12,6 +12,7 @@
 | 2026-09-26 | 2 | NIFTY lot size varies historically and is not present as a trusted field in the selected source. | Per-lot rupee P&L cannot be finalized without a dated lot-size calendar. | Leave lot_size unset in Phase 2 and require explicit verified lot size in Phase 3. |
 | 2026-09-26 | 3 | Initial Phase 3 cost model omitted STT on long options that reach expiry and are exercised. | Net P&L could have been slightly overstated, especially for ITM long legs. | Added separate expiry-exercise STT using the NSE rate schedule and intrinsic value of the long call/put. |
 | 2026-09-26 | 3 | Attempted exact runtime validation from the container failed because DNS/network access to raw.githubusercontent.com is unavailable. | Could not honestly execute the checked-in Phase 3 code locally in this environment. | Recorded the limitation; the manual GitHub Actions workflow remains the authoritative execution path. |
+| 2026-09-26 | 3 | Paytm Money public pages show inconsistent F&O brokerage figures. | Hard-coding one retail brokerage rate could misstate net P&L for the user's account. | Brokerage remains a configurable input and must be reconciled to the user's current contract note before broker-specific conclusions. |
 
 ## Logging rule
 
