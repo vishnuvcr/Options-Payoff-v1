@@ -51,3 +51,9 @@ Principal limitations are the unresolved denominator, sparse sample, P&L concent
 ## Final manuscript
 
 docs/MANUSCRIPT.md on the phase-6-manuscript branch is the complete research manuscript, including methods, tables, figures, discussion, strengths, limitations, conclusion, future research and reproducibility appendix.
+
+## Specification clarification hold
+
+The previously reported **28 “selected trades” are provisional**. Code inspection confirms that Phase 3 selected one candidate per timestamp only when the programmed chart trigger passed: ATM first, then -400, then +400, with a >2.5% threshold and the buy_premium denominator. The repository wording had incorrectly described this as the user's selection rule.
+
+The user has now clarified that no separate trade-selection criterion was provided. Therefore, the 28-trade performance result must **not** be treated as the final performance of the user's strategy. The research is held at the interpretation boundary until the selection/trigger semantics and percentage denominator are explicitly specified. No new selection rule should be invented.
