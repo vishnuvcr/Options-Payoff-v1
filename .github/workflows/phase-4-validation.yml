@@ -3,12 +3,16 @@ name: Phase 4 - Statistical validation
 on:
   workflow_dispatch:
     inputs:
-      trades_path:
-        description: Path to selected_trades.parquet from Phase 3
+      phase3_run_id:
+        description: 'Completed Phase 3 workflow run ID containing phase-3-backtest-results'
         required: true
-        default: results/phase3/selected_trades.parquet
+      out_dir:
+        description: 'Validation output directory'
+        required: true
+        default: results/phase4
 
 permissions:
+  actions: write
   contents: read
 
 jobs:
@@ -19,12 +23,25 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Download Phase 3 results
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p results/phase3
+          gh run download "${{ inputs.phase3_run_id }}" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
+          test -s results/phase3/selected_trades.parquet
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
       - name: Validate selected trades
-        run: python scripts/validate_results.py --trades '${{ inputs.trades_path }}' --out-dir results/phase4
+        run: python scripts/validate_results.py --trades results/phase3/selected_trades.parquet --out-dir "${{ inputs.out_dir }}"
       - name: Upload validation results
         uses: actions/upload-artifact@v4
         with:
           name: phase-4-validation
-          path: results/phase4
+          path: "${{ inputs.out_dir }}"
+      - name: Chain to Phase 5
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run phase-5-regimes.yml --repo "${{ github.repository }}" --ref phase-5-regimes -f phase3_run_id="${{ inputs.phase3_run_id }}" -f regimes_path="" -f output_path="results/phase5_regime_summary.csv"
