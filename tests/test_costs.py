@@ -31,3 +31,13 @@ class CostModelTests(unittest.TestCase):
         self.assertAlmostEqual(trigger_base('buy_premium',24000,65,10),650.0)
 
 if __name__=='__main__': unittest.main()
+
+class HistoricalLotSizeTests(unittest.TestCase):
+    def test_historical_nifty_lots(self):
+        from scripts.extract_strategy_inputs import nifty_lot_size
+        self.assertEqual(nifty_lot_size(date(2021,7,29)), 75)
+        self.assertEqual(nifty_lot_size(date(2021,8,5)), 50)
+        self.assertEqual(nifty_lot_size(date(2024,5,2)), 25)
+        self.assertEqual(nifty_lot_size(date(2024,11,21)), 75)
+        self.assertEqual(nifty_lot_size(date(2026,1,6)), 65)
+
