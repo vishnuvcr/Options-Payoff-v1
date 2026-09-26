@@ -1,0 +1,18 @@
+{
+  "workflow_run_id": 36256634939,
+  "candidate_rows": 2093,
+  "eligible_entry_timestamps": 891,
+  "selected_trades": 28,
+  "selection_rate_pct": 3.142536475869809,
+  "mean_net_pnl_inr": 5937.177496751328,
+  "median_net_pnl_inr": 9431.274121702349,
+  "win_rate_pct": 67.85714285714286,
+  "total_net_pnl_inr": 166240.9699090372,
+  "total_costs_inr": 3863.7363409627624,
+  "threshold_pct": 2.5,
+  "trigger_base_mode": "buy_premium",
+  "slippage_pct": 0.0025,
+  "selection_period_start": "2021-08-05",
+  "selection_period_end": "2024-01-17",
+  "data_input_period": "2021-06-01 to 2026-08-31"
+}
