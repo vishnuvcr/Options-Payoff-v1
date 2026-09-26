@@ -69,6 +69,13 @@ class StrategyPayoffTests(unittest.TestCase):
     def test_candidate_strikes(self) -> None:
         self.assertEqual(strike_candidates(24175.0, 50.0), (24200.0, 23800.0, 24600.0))
 
+    def test_grid_candidates_are_50_points_through_500(self):
+        shifts = tuple(range(-500, 501, 50))
+        self.assertEqual(len(shifts), 21)
+        self.assertEqual(shifts[0], -500)
+        self.assertEqual(shifts[-1], 500)
+        self.assertEqual(shifts[10], 0)
+
     def test_threshold_is_strictly_greater_than(self) -> None:
         self.assertTrue(threshold_met(2.51, 100.0, 2.5))
         self.assertFalse(threshold_met(2.50, 100.0, 2.5))
