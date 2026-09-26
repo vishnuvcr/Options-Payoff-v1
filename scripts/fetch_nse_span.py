@@ -19,7 +19,7 @@ DATE_FORMATS = ("%Y%m%d", "%d%m%Y", "%Y-%m-%d", "%d-%m-%Y")
 def fetch_text(url: str) -> str:
     r = requests.get(
         url,
-        timeout=45,
+        timeout=20,
         headers={"User-Agent": "Options-Payoff-v1 research bot/1.0"},
     )
     r.raise_for_status()
@@ -41,8 +41,6 @@ def direct_candidates(date_token: str) -> list[str]:
     ]
     roots = [
         "https://www.archive.nseclearing.in/marketreports/",
-        "https://www.archive.nseclearing.in/marketreports/derivatives/",
-        "https://www.archive.nseclearing.in/marketreports/FO/",
     ]
     return [base + name for base in roots for name in names]
 
@@ -78,7 +76,7 @@ def candidate_urls(date_token: str) -> set[str]:
 def download_bytes(url: str) -> bytes:
     r = requests.get(
         url,
-        timeout=120,
+        timeout=20,
         headers={"User-Agent": "Options-Payoff-v1 research bot/1.0"},
     )
     r.raise_for_status()
