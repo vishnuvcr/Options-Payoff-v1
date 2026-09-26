@@ -57,3 +57,13 @@ Statistical validation, walk-forward tests, drawdowns and regime attribution rem
 ## Historical NIFTY lot-size calendar
 
 The backtest now derives lot size from the expiry date rather than using one modern lot for the full sample. The research calendar is: 75 through the July 2021 weekly cycle; 50 from August 2021 through the April 2024 weekly cycle; 25 from the May 2, 2024 weekly cycle through the final old-lot weekly contracts; 75 for new weekly contracts from November 2024; and 65 from the January 6, 2026 weekly cycle. The 2024 and 2025 changes retained old lots for already-existing weekly/monthly contracts until their expiry, so the implementation keys the lot to the actual expiry date. Transition observations where the near and next expiry have different lots are excluded from the one-for-one spread backtest rather than being silently treated as equal notional. These dates are supported by NSE/market circular summaries.
+
+## Clarified strike-selection implementation
+
+The prior ATM / -400 / +400 fallback was incorrect. The backtest now implements the clarified strategy literally:
+
+- ATM is tested first.
+- If ATM does not exceed the configured 2.5% chart trigger, all common strikes at 50-point increments from ATM-500 through ATM+500 are evaluated, excluding ATM.
+- Every fallback strike whose chart trigger exceeds 2.5% is a qualifying trade; no ranking among qualifying fallback strikes is imposed.
+- The same common strike is used for all four legs.
+- If ATM qualifies, fallback strikes are not traded for that timestamp.
