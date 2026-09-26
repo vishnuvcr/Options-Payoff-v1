@@ -4,18 +4,19 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 6 — corrected empirical manuscript: COMPLETE**
+**Phase 7 — payoff-platform semantics and maximum equal-flatline selection: ACTIVE**
 
-The research has been rerun after the strategy was clarified to use:
+The previous full-grid study is now a historical comparator. The user has changed the selection rule again:
 
-- ATM first;
-- if ATM fails the >2.5% payoff-chart trigger, search every 50-point strike shift from -500 through +500;
-- trade every qualifying fallback strike;
+- evaluate every 50-point strike from ATM-400 through ATM+400, including ATM;
+- compute the estimated positive flatline max-profit=max-loss value for each candidate;
+- select exactly one candidate per timestamp: the maximum estimated equal max-profit=max-loss value;
+- keep the historical 2.5% percentage as a separately labeled sensitivity until the platform's exact historical margin denominator is reconstructed;
 - exit at expiry.
 
 The earlier ATM/-400/+400 analysis is superseded.
 
-### Corrected baseline
+### Historical comparator — superseded selection rule
 
 Using the working buy-premium denominator, 0.25% slippage and ₹20/order brokerage:
 
@@ -32,7 +33,7 @@ Using the working buy-premium denominator, 0.25% slippage and ₹20/order broker
 
 The 2.5% denominator remains an implementation assumption because it was not specified in the strategy description. A tested spot-notional denominator produced no qualifying trades across 1%–5% thresholds.
 
-### Corrected phase runs
+### Superseded phase runs
 
 - Phase 2: 36255238050
 - Phase 3 full-grid: 36262958536
@@ -53,12 +54,18 @@ The 2.5% denominator remains an implementation assumption because it was not spe
 - [Phase 5 regime summary](results/phase5_grid_regime_summary.csv)
 - [Corrected figures](docs/figures/)
 
-### Interpretation
+### Phase 7 interpretation
 
 The payoff chart's green flatline is a static one-spot representation. The economic cross-expiry position has terminal exposure to S2-S1, so the flatline is not by itself evidence of risk-free arbitrage.
 
-The current evidence supports a reproducible historical positive point estimate under the stated implementation, but not a robust, denominator-independent or risk-free conclusion.
+Phase 7 now tests the requested maximum-flatline-value selection. The earlier 63-trade result is preserved only as a historical comparator for the superseded rule.
 
-### Future research
+Platform review: [Streak and Sensibull payoff semantics](docs/PAYOFF_PLATFORM_REVIEW.md).
 
-The next priorities are quote-level bid/ask validation, official settlement validation, recovery of the exact chart-percentage denominator, cross-market/FII-DII/India VIX/option-IV integration and an untouched out-of-sample validation period.
+Phase 7 workflow: [.github/workflows/phase-7-max-equal-selection.yml](.github/workflows/phase-7-max-equal-selection.yml).
+
+The exact Sensibull-style percentage uses margin required as its denominator; the current historical dataset does not contain that margin series. Phase 7 therefore uses the reproducible INR flatline value as the primary score and keeps the old 2.5% proxy only as a sensitivity.
+
+### Phase 7 status
+
+Implementation is complete on branch `phase-7-max-equal-selection`; automated tests and the artifact-backed backtest are running/completing in GitHub Actions.
