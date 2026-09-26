@@ -32,3 +32,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 7 | Economic decomposition | Static chart value contributed ₹36,138.75 versus ₹142,545.00 from realized S2-S1 before entry slippage and fees. |
 | 2026-09-27 | 7 | Robustness/loss audit | 95% bootstrap intervals include zero; 19/19 losing trades were negative before fees; loss-side S2-S1 contribution was -₹309,305.00. |
 | 2026-09-27 | 7 | Sensitivity | Net P&L remained positive at 0%, 0.25%, 0.50% and 1.00% slippage; no-gate maximum-flatline selection produced materially worse drawdown than the 2.5%-gated rule. |
+| 2026-09-27 | 7A | Started historical margin reconstruction | Created branch `phase-7A-margin-reconstruction` and calibration workflow for the screenshot position. |
+| 2026-09-27 | 7A | Calibration target formalized | Screenshot position: sell 29-Sep-2026 23450 CE, buy 29-Sep-2026 23450 PE, buy 06-Oct-2026 23450 CE, sell 06-Oct-2026 23450 PE; 65 units; screenshot standalone margin ₹88,076. |
+| 2026-09-27 | 7A | NSE margin methodology reviewed | NSE Clearing states that SPAN margin uses daily risk arrays over price/volatility scenarios and publishes daily SPAN risk-parameter files. |
