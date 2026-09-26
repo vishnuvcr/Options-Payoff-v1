@@ -4,63 +4,55 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Phase:** 2 — Market-data acquisition, cleaning and cache
-**Status:** IN PROGRESS; strategy-input pipeline and literature review are implemented. Manual workflow execution is the next validation step.
+**Active research phase:** Phase 3 — Backtest engine and transaction-cost model
+**Status:** IMPLEMENTED; historical execution is pending manual GitHub Actions run.
 **Date:** 2026-09-26
 
-The strategy under study is:
+## Key analytical finding
 
-1. Sell an ATM call and buy an ATM put in the near weekly expiry.
-2. Buy an ATM call and sell an ATM put in the next weekly expiry.
-3. Reproduce the user's payoff-chart trigger, including the >2.5% threshold.
-4. When ATM does not qualify, test a common strike shifted by -400 and +400 points.
-5. Hold to expiry/settlement according to the strategy rules.
-6. Include bid/ask execution assumptions, slippage, brokerage, statutory charges and other transaction costs.
+The position is a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With common strike K, its expiry payoff is S(next expiry) - S(near expiry). A chart that applies one identical terminal spot to both expiries will look flat because the intrinsic terms cancel. That flatline is not the realized held-to-expiry payoff.
 
-### Phase 1 finding
+## Current implementation
 
-The four legs are a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With a common strike K, the intrinsic expiry component is S(next expiry) - S(near expiry). A one-dimensional chart that applies the same hypothetical terminal spot to both expiries will show a flat line because the two synthetic-forward intrinsic terms cancel. That flatline is not a valid representation of the held-to-expiry cross-expiry P&L.
+- Phase 1: analytical payoff model and unit tests.
+- Phase 2: reproducible NIFTY option/index data extraction with cached Hugging Face source files.
+- Phase 3: chart-trigger selection, gross cross-expiry P&L, slippage, brokerage, exchange fees, SEBI fee, stamp duty, GST, entry-sale STT and expiry-exercise STT.
 
-### Phase 2 data finding
+## Critical open inputs
 
-The primary public research dataset is thetrademarkk/india-index-options-1m on Hugging Face. The pipeline uses the NIFTY index file plus per-expiry option files, preserves the historical Thursday-to-Tuesday NIFTY expiry transition, and caches downloaded source files in GitHub Actions. The dataset provides OHLCV/OI bars, not bid/ask quotes, so Phase 2 marks the base entry prices as 09:20 close proxies. Phase 3 must stress execution costs explicitly rather than treating closes as executable quotes.
+The 2.5% chart denominator is not specified in the original rule, so the backtest exposes three denominator modes rather than silently selecting one.
+
+A historical NIFTY lot-size calendar is required for multi-year rupee P&L; the Phase 3 workflow requires an explicit verified lot size for the date window.
+
+Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close is only a proxy. The base research run uses configurable slippage and later validation must compare against quote-level data when available.
 
 ## Research files
 
 - research/RESEARCH_PLAN.md
+- research/RESEARCH_INSTRUCTIONS.md
 - research/STATUS.md
 - research/ERROR_LOG.md
 - research/ACTIVITY_LOG.md
 - research/SOURCES.md
-- research/RESEARCH_INSTRUCTIONS.md
 - docs/PHASE_1_SPECIFICATION.md
 - docs/PHASE_2_DATA_PLAN.md
 - docs/LITERATURE_REVIEW.md
+- docs/PHASE_3_BACKTEST.md
 - src/options_payoff.py
+- src/costs.py
 - tests/test_options_payoff.py
+- tests/test_costs.py
 - scripts/extract_strategy_inputs.py
-- data/SOURCE_MANIFEST.json
+- scripts/run_backtest.py
 
-## Phases
+## Manual workflows
 
-- Phase 0 — Bootstrap and research governance — COMPLETE
-- Phase 1 — Strategy specification and analytical validation — COMPLETE
-- Phase 2 — Market-data acquisition, cleaning and cache — IN PROGRESS
-- Phase 3 — Backtest engine and transaction-cost model
-- Phase 4 — Statistical validation and robustness
-- Phase 5 — Regime/cross-market attribution
-- Phase 6 — Manuscript, conclusion and future research
+- Phase 1: .github/workflows/phase-1-specification.yml
+- Phase 2: .github/workflows/phase-2-data.yml
+- Phase 3: .github/workflows/phase-3-backtest.yml
 
-Each research phase will live on its own Git branch and expose a manual GitHub Actions workflow.
-
-## Scope
-
-Default test market: NIFTY 50 weekly index options. Current NSE contract specifications list four weekly expiries and Tuesday weekly expiry, subject to holiday adjustment. The historical pipeline also respects the 2025 transition from Thursday to Tuesday.
-
-## Costs
-
-The model uses dated, configurable cost inputs rather than silently assuming zero friction. NSE states that from 1 April 2026 the STT rate on sale of an option is 0.15% of option premium; broker brokerage and other charges are modeled separately.
+Each phase remains on its own branch and the workflow is manually runnable.
 
 ## Reproducibility
 
-Data sources, dataset versions/checksums, assumptions, code versions, and backtest outputs will be recorded so results can be regenerated without repeatedly downloading the same source files.
+Source revisions, assumptions, data-quality flags, research status and errors are recorded. Raw public source data are cached in GitHub Actions instead of being downloaded blindly on every run.
