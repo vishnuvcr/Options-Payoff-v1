@@ -1,37 +1,30 @@
 # Research status
 
-**As of:** 2026-09-26  
-**Active branch:** phase-1-specification  
-**Overall phase:** 1 — Strategy specification and analytical validation COMPLETE
+**As of:** 2026-09-26
+**Active branch:** phase-2-data
+**Overall phase:** 2 — Market-data acquisition, cleaning and cache IN PROGRESS
 
 | Phase | Status | Evidence / next action |
 |---|---|---|
 | 0 Bootstrap | COMPLETE | Governance files initialized. |
 | 1 Specification | COMPLETE | Strategy equations, strike candidates, threshold helper, tests, and manual workflow added. |
-| 2 Data | NEXT | Select, acquire and validate historical NIFTY option data. |
-| 3 Backtest | NOT STARTED | Execute historical strategy with full cost model. |
+| 2 Data | IN PROGRESS | Source manifest, data plan, extractor and manual GitHub Actions workflow added. Execute and validate the historical input table next. |
+| 3 Backtest | NOT STARTED | Requires validated Phase 2 inputs and dated cost model. |
 | 4 Validation | NOT STARTED | Out-of-sample and robustness analysis. |
 | 5 Regimes | NOT STARTED | Conditional/regime attribution. |
 | 6 Manuscript | NOT STARTED | Final research manuscript and supplements. |
 
-## Phase 1 results
+## Phase 2 results so far
 
-1. The position can be decomposed into a short near-expiry synthetic forward and a long next-expiry synthetic forward.
-2. For a common strike K, the expiry intrinsic component is S2 - S1, not zero.
-3. A one-dimensional chart that applies the same terminal spot to both expiries is flat at the initial net premium cashflow. This is a projection artifact, not evidence of flat realized P&L.
-4. The 2.5% threshold must remain parameterized because the original rule does not specify the denominator.
-5. Default deterministic research assumptions are NIFTY 50, 09:20 IST entry observation, ATM/-400/+400 common-strike candidates and one lot for reporting.
-
-## Verification
-
-Phase 1 unit tests pass locally for:
-- static flatline payoff construction
-- cross-expiry P&L directionality
-- a hidden-loss example
-- strike-candidate construction
-- strict >2.5% threshold logic
+1. Primary data source selected: thetrademarkk/india-index-options-1m on Hugging Face.
+2. Source manifest records the dataset structure, license, cross-check source and caching policy.
+3. The extractor creates a long-form candidate table containing ATM, ATM-400 and ATM+400 candidates, the four option entry prices, near and next expiry settlements, and data-quality status.
+4. Because source bars are OHLC rather than bid/ask quotes, the Phase 2 entry price is a 09:20 close proxy and is explicitly tagged as such.
+5. Lot size is deliberately left unfilled until a dated NSE lot-size calendar is verified in Phase 3.
+6. An initial literature review has been added, focusing on put-call parity, synthetic forwards and the erosion of apparent arbitrage after execution costs.
 
 ## Blockers
 
-- Historical intraday option data must be sourced, licensed/qualified, cached and validated before Phase 3.
-- The primary backtest needs exact entry fills and settlement prices for both expiries.
+- The manual Phase 2 workflow has not yet been executed through GitHub Actions in this session.
+- Bid/ask quote history is not present in the primary dataset; Phase 3 must either source quote-level data for a subset or use conservative slippage/spread sensitivity bands.
+- Dated NIFTY lot sizes and the full Paytm Money/NSE charge stack must be verified before net P&L is treated as final.
