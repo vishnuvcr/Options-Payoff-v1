@@ -9,3 +9,5 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 0 | Reviewed broker/regulatory cost references | Paytm Money currently describes a flat brokerage model; NSE states 2026 option-sale STT is 0.15%. Costs will remain configurable and dated. |
 | 2026-09-26 | 0 | Reviewed public historical-data sources | Candidate public datasets exist on Hugging Face and GitHub; licensing/coverage will be validated in Phase 2. |
 | 2026-09-26 | 0 | Formalized research plan | Six research phases defined; Phase 1 is next.
+
+| 2026-09-26 | 5 | Created `phase-5-regimes` branch | Added frozen regime attribution protocol, source audit, executable scaffold and manual workflow; empirical execution remains gated. |
