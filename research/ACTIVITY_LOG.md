@@ -26,3 +26,5 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 5 | Added regime protocol | Point-in-time regime variables and acceptance criteria frozen before empirical execution. |
 | 2026-09-26 | 5 | Added executable attribution scaffold | Script and manual GitHub Actions workflow added; execution awaits Phase 3/4 ledger. |
 | 2026-09-26 | 5 | Workflow audit after continuation | Found that Phase 4/5 manual runs expected a local Phase 3 file that a separate workflow run would not have. Updated both workflows to download the selected Phase 3 artifact by run ID. Also corrected Phase 3 configured-capital trigger handling and kept chart-trigger denominator based on observed premiums while applying slippage only to realized P&L. |
+
+| 2026-09-26 | 3 | Improved phase-to-phase data handoff | Phase 3 can now consume the cached Phase 2 strategy-input artifact by run ID, avoiding unnecessary reconstruction when that artifact exists; it retains an explicit fallback build path. |
