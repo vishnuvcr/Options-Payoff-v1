@@ -34,3 +34,7 @@ Phase 1: implement the strategy specification, payoff equations, and unit tests.
 ## Latest branch update — 2026-09-26
 
 Phase 5 regime-attribution protocol has been implemented on branch `phase-5-regimes`. It is intentionally gated on the validated Phase 3/4 historical trade ledger. No empirical regime result has been fabricated. See the Phase 5 branch for the protocol, source audit, script and manual workflow.
+
+## Latest continuation audit — 2026-09-26
+
+The Phase 5 branch was audited before further execution. Separate Phase 4/5 workflow runs were found to require explicit Phase 3 artifact handoff; those workflows are now repaired on `phase-5-regimes`. A configured-capital trigger path was also corrected. Empirical results remain gated because no completed Phase 3/4 workflow artifact is currently available.
