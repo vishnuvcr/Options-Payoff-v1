@@ -33,3 +33,5 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 5 | Added point-in-time spot-derived regime builder | Uses only pre-entry 09:20 NIFTY spot history to classify prior 20-observation trend, prior 20-observation annualized volatility, and prior-entry move. No same-day end-of-day information is used. |
 | 2026-09-26 | 5 | Regime-builder runtime repair | Corrected dependency ordering and the NumPy logarithmic-return import; another bounded Phase 5 run will verify the point-in-time regime table. |
 | 2026-09-26 | 5 | Corrected regime summary output | Phase 5 now reports only the predeclared categorical trend, volatility and entry-move regimes, avoiding one-row-per-continuous-value artifacts. |
+
+| 2026-09-26 | 5 | Final corrected regime rerun | Run 36263974629 succeeded on the full-grid ledger and uploaded the corrected regime summary. |
