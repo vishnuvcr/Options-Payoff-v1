@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="480" viewBox="0 0 900 480">
+<rect width="100%" height="100%" fill="white"/>
+<text x="450" y="32" text-anchor="middle" font-family="Arial" font-size="22">Threshold sensitivity at 0.25% slippage</text>
+<line x1="80" x2="860" y1="410" y2="410" stroke="#444"/>
+<polyline fill="none" stroke="#4a90e2" stroke-width="3" points="80,190.2 177.5,60 275,233.2 372.5,231.7 470,233.9 665,265.9 860,314.9"/>
+<text x="80" y="440" text-anchor="middle" font-family="Arial" font-size="10">1%</text><text x="177.5" y="440" text-anchor="middle" font-family="Arial" font-size="10">1.5%</text><text x="275" y="440" text-anchor="middle" font-family="Arial" font-size="10">2%</text><text x="372.5" y="440" text-anchor="middle" font-family="Arial" font-size="10">2.5%</text><text x="470" y="440" text-anchor="middle" font-family="Arial" font-size="10">3%</text><text x="665" y="440" text-anchor="middle" font-family="Arial" font-size="10">4%</text><text x="860" y="440" text-anchor="middle" font-family="Arial" font-size="10">5%</text>
+<text x="450" y="468" text-anchor="middle" font-family="Arial" font-size="12">Trigger threshold</text>
+<text x="80" y="180" text-anchor="middle" font-family="Arial" font-size="10">205k</text><text x="177.5" y="50" text-anchor="middle" font-family="Arial" font-size="10">326k</text><text x="275" y="223" text-anchor="middle" font-family="Arial" font-size="10">165k</text><text x="372.5" y="221.5" text-anchor="middle" font-family="Arial" font-size="10">166k</text><text x="470" y="213.9" text-anchor="middle" font-family="Arial" font-size="10">164k</text><text x="665" y="255.9" text-anchor="middle" font-family="Arial" font-size="10">134k</text><text x="860" y="304.9" text-anchor="middle" font-family="Arial" font-size="10">89k</text>
+<text x="20" y="250" font-family="Arial" font-size="12" transform="rotate(-90 20 250)">Total net P&amp;L (INR)</text>
+</svg>
