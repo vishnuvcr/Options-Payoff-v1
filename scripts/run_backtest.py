@@ -14,7 +14,7 @@ def parse_args():
     p=argparse.ArgumentParser()
     p.add_argument('--inputs', required=True)
     p.add_argument('--out-dir', default='results/phase3')
-    p.add_argument('--lot-size', type=int, required=True)
+    p.add_argument('--lot-size', type=int, required=False, help='Override lot size for every row; normally omitted')
     p.add_argument('--threshold-pct', type=float, default=2.5)
     p.add_argument('--trigger-base-mode', choices=['buy_premium','spot_notional','configured_capital'], default='buy_premium')
     p.add_argument('--configured-capital-per-lot', type=float)
@@ -23,18 +23,25 @@ def parse_args():
     return p.parse_args()
 
 def candidate_row_metrics(row, args, model):
+    if hasattr(row, 'near_lot_size') and hasattr(row, 'next_lot_size'):
+        near_lot=int(row.near_lot_size); next_lot=int(row.next_lot_size)
+    else:
+        near_lot=next_lot=args.lot_size
+    if near_lot != next_lot:
+        return None
+    lot_size=args.lot_size if args.lot_size else near_lot
     premiums=[row.near_call_close,row.near_put_close,row.next_call_close,row.next_put_close]
     if any(pd.isna(x) for x in premiums) or pd.isna(row.near_settlement) or pd.isna(row.next_settlement):
         return None
     execs=four_leg_entry_cashflow(*premiums, slippage_pct=model.slippage_pct)
-    base=trigger_base(args.trigger_base_mode,float(row.spot_at_entry),args.lot_size,execs['buy_premium_turnover'])
-    chart_pnl=float(row.net_entry_cashflow_per_unit)*args.lot_size
+    base=trigger_base(args.trigger_base_mode,float(row.spot_at_entry),lot_size,execs['buy_premium_turnover'])
+    chart_pnl=float(row.net_entry_cashflow_per_unit)*lot_size
     chart_return=100.0*chart_pnl/base if base>0 else None
     gross_per_unit=float(row.net_entry_cashflow_per_unit)+float(row.next_settlement)-float(row.near_settlement)
-    gross_pnl=gross_per_unit*args.lot_size
+    gross_pnl=gross_per_unit*lot_size
     long_call_intrinsic=intrinsic_value('CE',float(row.next_settlement),float(row.strike))
     long_put_intrinsic=intrinsic_value('PE',float(row.near_settlement),float(row.strike))
-    costs=transaction_costs(pd.Timestamp(row.entry_timestamp).date(),execs['premium_turnover'],execs['sell_premium_turnover'],execs['buy_premium_turnover'],long_call_intrinsic,long_put_intrinsic,args.lot_size,model)
+    costs=transaction_costs(pd.Timestamp(row.entry_timestamp).date(),execs['premium_turnover'],execs['sell_premium_turnover'],execs['buy_premium_turnover'],long_call_intrinsic,long_put_intrinsic,lot_size,model)
     net_pnl=gross_pnl-costs['total_costs']
     return {'chart_pnl_inr':chart_pnl,'chart_return_pct':chart_return,'gross_pnl_inr':gross_pnl,'net_pnl_inr':net_pnl,'total_costs_inr':costs['total_costs'],'premium_turnover_inr':execs['premium_turnover']*args.lot_size,**costs}
 
@@ -50,7 +57,7 @@ def main():
     for row in df.itertuples(index=False):
         metrics=candidate_row_metrics(row,args,model)
         if metrics is None: continue
-        candidate_records.append({'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,'candidate_label':row.candidate_label,'strike':row.strike,'near_expiry':row.near_expiry,'next_expiry':row.next_expiry,'spot_at_entry':row.spot_at_entry,**metrics})
+        candidate_records.append({'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,'candidate_label':row.candidate_label,'strike':row.strike,'near_expiry':row.near_expiry,'next_expiry':row.next_expiry,'spot_at_entry':row.spot_at_entry,'lot_size':(args.lot_size if args.lot_size else int(row.near_lot_size)),**metrics})
     candidates=pd.DataFrame(candidate_records)
     if candidates.empty: raise RuntimeError('No complete candidate rows available')
     order=['ATM']+[x.strip() for x in args.fallback_order.split(',') if x.strip()]
