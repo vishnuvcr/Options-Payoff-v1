@@ -4,81 +4,26 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current research status
 
-**Active phase:** Phase 6 — empirical manuscript and reproducibility package  
+**Active phase:** Phase 6A — loss-trade audit and reproducibility correction  
 **Status:** COMPLETE  
-**Date:** 2026-09-26
+**Date:** 2026-09-27
 
-### Primary result
+### Superseded result
 
-The corrected historical backtest selected 28 trades from 891 eligible entry timestamps under the buy-premium interpretation of the 2.5% trigger, with 0.25% slippage and ₹20/order baseline brokerage.
+The earlier 28-trade ATM/±400 result is superseded and must not be used as evidence for the clarified strategy.
 
-Net P&L was ₹166,240.97; mean trade P&L ₹5,937.18; median ₹9,431.27; win rate 67.86%; profit factor 2.33; maximum drawdown -₹48,161.45.
+### Corrected full-grid result
 
-The iid bootstrap CI for mean trade P&L spans approximately -₹434 to ₹11,735, and the weekly block bootstrap CI spans approximately -₹1,689 to ₹12,745. The chronological 70/30 split remains positive in the 9-trade test segment.
+The authoritative corrected implementation tests ATM first and, when ATM fails, every 50-point common-strike shift from -500 through +500, retaining every qualifying fallback strike.
 
-### Important interpretation
-
-The flatline payoff chart is not the realized economic payoff of the cross-expiry position. The correct expiry component is S(next expiry) - S(near expiry), plus the entry premium edge and costs.
-
-The 2.5% denominator remains a material specification ambiguity. The buy-premium denominator generated trades; the tested spot-notional denominator generated none across 1%–5% thresholds.
-
-The selected sample is sparse and concentrated: 28 trades, all from 2021-08-05 through 2024-01-17, with approximately 89.3% of total selected-trade P&L coming from May and October 2022.
-
-### Research outputs
-
-- docs/MANUSCRIPT.md — complete research manuscript
-- results/phase3_summary.json
-- results/phase4_validation_summary.json
-- results/phase4_brokerage_sensitivity.csv
-- results/phase4_monthly_pnl.csv
-- results/phase5_regime_summary.csv
-- docs/figures/*.svg
-
-### Phase status
-
-- Phase 0 — governance: COMPLETE
-- Phase 1 — strategy/payoff specification: COMPLETE
-- Phase 2 — market-data engineering: COMPLETE
-- Phase 3 — cost-aware backtest: COMPLETE
-- Phase 4 — statistical validation and robustness: COMPLETE
-- Phase 5 — point-in-time spot-derived regime attribution: COMPLETE
-- Phase 6 — manuscript and reproducibility package: COMPLETE
-
-### Remaining research opportunities
-
-Quote-level bid/ask validation, official settlement-price validation, India VIX, FII/DII, option-IV/term-structure, USD/INR, gold, global equity and event-window data remain future extensions. They are intentionally not presented as completed results.
-
-### Governance
-
-Research plan: research/RESEARCH_PLAN.md  
-Instructions: research/RESEARCH_INSTRUCTIONS.md  
-Status: research/STATUS.md  
-Error log: research/ERROR_LOG.md  
-Activity log: research/ACTIVITY_LOG.md  
-Sources: research/SOURCES.md
-
-Each phase remains on its own branch and exposes a manual GitHub Actions workflow.
-
-The complete manuscript is on the phase-6-manuscript branch.
-
-### Important correction — selection terminology
-
-The previously reported **28 “selected trades” are provisional**. The backtest code imposed a selection gate of ATM first, then ATM-400, then ATM+400, requiring the chart metric to exceed 2.5% under the buy_premium denominator. That was an implementation choice and should not be described as a separately supplied user selection criterion.
-
-The user has now clarified that no separate selection criterion was supplied. Accordingly, the 28-trade result and all statistics derived from that conditional sample are **not final evidence for the user's strategy**. The research is paused at this specification point rather than inventing a new criterion.
-
-
-## Corrected full-grid research result (2026-09-26)
-
-The earlier ATM/-400/+400 implementation is superseded. The strategy has now been rerun using the clarified rule: ATM first; if ATM fails, evaluate every 50-point common-strike shift from -500 through +500 and trade every qualifying fallback strike.
-
-Authoritative corrected runs:
+Authoritative runs:
 - Phase 2: 36255238050
-- Phase 3: 36262958536
-- Phase 4: 36263760476
-- Phase 5: 36263974629
+- Phase 3 grid: 36262958536
+- Phase 4 validation: 36263760476
+- Phase 5 regimes: 36263974629
+- Phase 6A loss audit: 36264710663
 
-Corrected baseline under the working buy-premium denominator, 0.25% slippage and ₹20/order brokerage:
+Baseline under the working buy-premium denominator, 0.25% slippage and ₹20/order brokerage:
 - 63 trade rows
 - 52 distinct entry timestamps
 - 24 ATM trades
@@ -89,6 +34,55 @@ Corrected baseline under the working buy-premium denominator, 0.25% slippage and
 - 1.37 profit factor
 - -₹194,854.37 maximum drawdown
 
-The 2.5% denominator is still not confirmed by the user; it is an explicit working implementation assumption. The tested spot-notional denominator generated no qualifying trades from 1% through 5%.
+The 2.5% denominator is not explicitly confirmed by the original strategy description. The buy-premium denominator is a working implementation assumption. The tested spot-notional denominator generated no qualifying trades from 1% through 5%.
 
-See the final corrected manuscript on branch phase-6-manuscript-grid: docs/MANUSCRIPT.md.
+### Loss-trade audit — 2026-09-27
+
+A direct artifact-backed audit was run against the authoritative 63-row Phase 3 selected-trade file.
+
+- 38 winning rows
+- 25 losing rows
+- losing contribution: -₹454,335.44
+- winning contribution: +₹623,001.39
+- largest loss: -₹55,420.58
+- 25/25 losers were negative before modeled brokerage/statutory fees
+- 0/25 were fee-only losses
+- 7 ATM losses and 18 fallback losses
+- modeled costs on losing rows: ₹3,557.82
+
+The key result is that every losing trade passed the positive >2.5% entry-chart trigger. The dominant failure mechanism is therefore the realized cross-expiry economic outcome, not transaction costs.
+
+Full audit: docs/LOSS_TRADE_ANALYSIS.md
+
+### Reproducibility correction
+
+The 63-row result is authoritative from branch phase-3-strike-grid and run 36262958536.
+
+A later phase-6-manuscript-grid branch contains a stale copy of scripts/run_backtest.py using the old ATM/±400 fallback order. That stale script must not be used to reproduce the 63-row result. The discrepancy is recorded in the phase-6-loss-audit error log and status.
+
+### Research outputs
+
+- docs/MANUSCRIPT.md — complete research manuscript
+- docs/LOSS_TRADE_ANALYSIS.md — complete 25-loss ledger and diagnosis
+- results/phase3_grid_summary.json
+- results/phase4_grid_validation_summary.json
+- results/phase4_grid_robustness.csv
+- results/phase4_grid_brokerage_sensitivity.csv
+- results/phase5_grid_regime_summary.csv
+
+### Research status and governance
+
+Research plan: research/RESEARCH_PLAN.md  
+Instructions: research/RESEARCH_INSTRUCTIONS.md  
+Status: research/STATUS.md  
+Error log: research/ERROR_LOG.md  
+Activity log: research/ACTIVITY_LOG.md  
+Sources: research/SOURCES.md
+
+Each phase remains on its own branch and exposes a manual GitHub Actions workflow.
+
+## Main conclusion
+
+Under the current working denominator and execution assumptions, the corrected full-grid backtest is historically positive, but the uncertainty intervals include zero, the chronology is strongly time-dependent, and the exact chart-percentage denominator remains unresolved.
+
+The loss audit shows why the positive aggregate cannot be interpreted as a risk-free payoff-chart arbitrage: the static chart edge can be positive while the realized two-expiry settlement component is strongly negative.
