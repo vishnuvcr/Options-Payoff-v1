@@ -42,6 +42,7 @@ Bid/ask quotes are not available in the primary Phase 2 dataset, so 09:20 close 
 - docs/PHASE_3_BACKTEST.md
 - docs/PHASE_4_VALIDATION.md
 - docs/PHASE_5_REGIME_ANALYSIS.md
+- docs/PHASE_5_SOURCE_AUDIT.md
 - scripts/analyze_regimes.py
 
 ## Manual workflows
