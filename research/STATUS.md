@@ -51,3 +51,16 @@ The unresolved denominator, sparse selected sample, concentration of P&L, uncert
 ## Final manuscript
 
 See docs/MANUSCRIPT.md and the result snapshots under results/.
+
+## Strike-grid rerun in progress
+
+The previous 28-trade result is superseded as the primary specification. Phase 3 has been rewritten to match the clarified user rule:
+
+1. Construct the four ATM legs.
+2. Evaluate the payoff chart.
+3. If ATM exceeds the 2.5% trigger, use ATM.
+4. Otherwise evaluate every 50-point common-strike shift from -500 through +500 (excluding ATM).
+5. Trade every fallback strike whose payoff chart exceeds 2.5%.
+6. Exit at expiry.
+
+The expanded data extraction has already completed 19,341 candidate rows (15,701 complete; 3,498 unavailable; 142 missing settlements). Net-P&L analysis is waiting on the corrected backtest workflow to complete. The earlier 28-trade statistics remain historical/provisional only.
