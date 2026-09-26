@@ -26,6 +26,27 @@ def fetch_text(url: str) -> str:
     return r.text
 
 
+
+def direct_candidates(date_token: str) -> list[str]:
+    # NSE Clearing's daily derivatives reports use names such as
+    # nsccl.YYYYMMDD.s.spn and nsccl.YYYYMMDD.i01.spn.
+    # Try common archive locations before falling back to page discovery.
+    names = [
+        f"nsccl.{date_token}.s.spn",
+        f"nsccl.{date_token}.i01.spn",
+        f"nsccl.{date_token}.i02.spn",
+        f"nsccl.{date_token}.i03.spn",
+        f"nsccl.{date_token}.i04.spn",
+        f"nsccl.{date_token}.i05.spn",
+    ]
+    roots = [
+        "https://www.archive.nseclearing.in/marketreports/",
+        "https://www.archive.nseclearing.in/marketreports/derivatives/",
+        "https://www.archive.nseclearing.in/marketreports/FO/",
+    ]
+    return [base + name for base in roots for name in names]
+
+
 def candidate_urls(date_token: str) -> set[str]:
     pages = []
     for url in (ARCHIVE_URL, LANDING_URL):
@@ -90,14 +111,21 @@ def main() -> None:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    urls = sorted(candidate_urls(date_token))
+    urls = direct_candidates(date_token)
+    urls.extend(sorted(candidate_urls(date_token)))
     if not urls:
         raise RuntimeError(
             "No SPAN-like links discovered from NSE Clearing market-report archive."
         )
 
     tried = []
-    for url in urls[: args.max_candidates]:
+    seen = set()
+    for url in urls:
+        if url in seen:
+            continue
+        seen.add(url)
+        if len(seen) > args.max_candidates:
+            break
         tried.append(url)
         try:
             payload = download_bytes(url)
