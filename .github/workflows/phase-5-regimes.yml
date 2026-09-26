@@ -6,8 +6,11 @@ on:
       phase3_run_id:
         description: 'Completed GitHub Actions run ID containing phase-3-backtest-results'
         required: true
+      phase2_run_id:
+        description: 'Completed Phase 2 workflow run ID containing phase-2-strategy-inputs'
+        required: true
       regimes_path:
-        description: 'Optional point-in-time regime table committed to this branch (CSV/Parquet)'
+        description: 'Optional externally prepared point-in-time regime table (CSV/Parquet)'
         required: false
         default: ''
       output_path:
@@ -33,6 +36,16 @@ jobs:
         run: |
           mkdir -p results/phase3
           gh run download "${{ inputs.phase3_run_id }}" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
+      - name: Download Phase 2 strategy inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/derived
+          gh run download "${{ inputs.phase2_run_id }}" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
+          test -s data/derived/strategy_inputs.parquet
+      - name: Build point-in-time spot regimes
+        run: |
+          python scripts/build_spot_regimes.py --inputs data/derived/strategy_inputs.parquet --out data/derived/spot_regimes.csv
       - name: Check prerequisite ledger
         run: |
           test -s results/phase3/selected_trades.parquet || {
@@ -47,7 +60,7 @@ jobs:
             test -f "${{ inputs.regimes_path }}"
             python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --regimes "${{ inputs.regimes_path }}" --out "${{ inputs.output_path }}"
           else
-            python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --out "${{ inputs.output_path }}"
+            python scripts/analyze_regimes.py --trades results/phase3/selected_trades.parquet --regimes data/derived/spot_regimes.csv --out "${{ inputs.output_path }}"
           fi
       - name: Upload Phase 5 result
         uses: actions/upload-artifact@v4
