@@ -157,10 +157,23 @@ def main():
     expiry_dates = [x[0] for x in expiry_files]
     filename_by_expiry = dict(expiry_files)
     settle = settlement_map(index_df)
+    entry_ts_by_expiry = {}
+    for row in entry_df.itertuples(index=False):
+        pair = expiry_pair(row.trading_date, expiry_dates)
+        if pair is None:
+            continue
+        ts_utc = row.timestamp.tz_convert("UTC")
+        for expiry in pair:
+            entry_ts_by_expiry.setdefault(expiry, set()).add(ts_utc)
+
     cache = {}
     def get_option(expiry):
         if expiry not in cache:
-            cache[expiry] = load_option_file(expiry, filename_by_expiry[expiry])
+            cache[expiry] = load_option_file(
+                expiry,
+                filename_by_expiry[expiry],
+                entry_ts_by_expiry.get(expiry),
+            )
         if len(cache) > 3:
             for old in sorted(cache)[:-3]:
                 del cache[old]
@@ -184,7 +197,7 @@ def main():
             label = "ATM" if shift == 0 else ("SHIFT_PLUS_%03d" % shift if shift > 0 else "SHIFT_MINUS_%03d" % abs(shift))
             strike = atm + shift
             if strike not in common:
-                rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'near_lot_size':nifty_lot_size(near_expiry),'next_lot_size':nifty_lot_size(next_expiry),'candidate_label':label,'strike':strike,'status':'candidate_strike_unavailable'})
+                rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'near_lot_size':nifty_lot_size(near_expiry),'next_lot_size':nifty_lot_size(next_expiry),'candidate_label':label,'shift_points':shift,'strike':strike,'status':'candidate_strike_unavailable'})
                 continue
             vals = [exact_bar(near,entry_ts,strike,'CE'), exact_bar(near,entry_ts,strike,'PE'), exact_bar(nxt,entry_ts,strike,'CE'), exact_bar(nxt,entry_ts,strike,'PE')]
             near_call, near_put, next_call, next_put = vals
@@ -197,14 +210,14 @@ def main():
             elif near_settle is None or next_settle is None:
                 status = 'missing_settlement'
             net_entry_cashflow = None if missing else near_call - near_put - next_call + next_put
-            rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'candidate_label':label,'strike':strike,'near_call_close':near_call,'near_put_close':near_put,'next_call_close':next_call,'next_put_close':next_put,'near_settlement':near_settle,'next_settlement':next_settle,'net_entry_cashflow_per_unit':net_entry_cashflow,'execution_fidelity':'09:20 close proxy; bid/ask unavailable','lot_size':None,'status':status})
+            rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'candidate_label':label,'shift_points':shift,'strike':strike,'near_call_close':near_call,'near_put_close':near_put,'next_call_close':next_call,'next_put_close':next_put,'near_settlement':near_settle,'next_settlement':next_settle,'net_entry_cashflow_per_unit':net_entry_cashflow,'execution_fidelity':'09:20 close proxy; bid/ask unavailable','near_lot_size':nifty_lot_size(near_expiry),'next_lot_size':nifty_lot_size(next_expiry),'status':status})
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     result = pd.DataFrame(rows)
     if result.empty:
         raise RuntimeError('No strategy input rows were generated')
     result.to_parquet(out,index=False)
-    metadata = {'dataset':DATASET,'start':args.start,'end':args.end,'entry_time_ist':args.entry_time,'rows':len(result),'status_counts':result['status'].value_counts(dropna=False).to_dict(),'execution_fidelity':'close-only proxy','lot_size':'not inferred; Phase 3 requires a verified dated NSE lot-size calendar'}
+    metadata = {'dataset':DATASET,'start':args.start,'end':args.end,'entry_time_ist':args.entry_time,'rows':len(result),'status_counts':result['status'].value_counts(dropna=False).to_dict(),'candidate_shifts_points':list(range(-500,501,50)),'execution_fidelity':'close-only proxy','lot_size':'date-effective historical NIFTY weekly lots'}
     out.with_suffix('.metadata.json').write_text(json.dumps(metadata,indent=2,default=str),encoding='utf-8')
     print(json.dumps(metadata,indent=2,default=str))
 
