@@ -1,38 +1,53 @@
 # Research status
 
 **As of:** 2026-09-26
-**Active branch:** phase-5-regimes
-**Overall phase:** 5 — Regime attribution framework IMPLEMENTED; workflow handoffs repaired; empirical execution still gated on Phase 3/4 artifacts
+**Active branch:** phase-6-manuscript
+**Overall phase:** 6 — Empirical manuscript and reproducibility package COMPLETE
 
-| Phase | Status | Evidence / next action |
+| Phase | Status | Evidence |
 |---|---|---|
-| 0 Bootstrap | COMPLETE | Governance files initialized. |
-| 1 Specification | COMPLETE | Strategy equations, payoff tests and manual workflow added. |
-| 2 Data | IMPLEMENTED; VALIDATION PENDING | Extractor, source manifest and cache workflow exist; runtime artifact still required. |
-| 3 Backtest | IMPLEMENTED; VALIDATION PENDING | Cost-aware ledger exists in code; historical run has not been executed in this session. |
-| 4 Validation | IMPLEMENTED; EXECUTION PENDING | Statistical/robustness framework exists; requires Phase 3 results. |
-| 5 Regimes | FRAMEWORK COMPLETE; EXECUTION BLOCKED | Point-in-time regime protocol, script and manual workflow added; requires validated trade ledger. |
-| 6 Manuscript | NOT STARTED | Starts after empirical Phases 3–5 are complete. |
+| 0 Bootstrap | COMPLETE | Repository governance, plan, status, logs and sources initialized. |
+| 1 Specification | COMPLETE | Strategy equations, payoff tests and threshold helper validated. |
+| 2 Data | COMPLETE | Phase 2 run 36255238050 produced 2,763 candidate rows: 2,128 ok, 610 shifted-strike-unavailable, 25 missing-settlement. |
+| 3 Backtest | COMPLETE | Corrected Phase 3 run 36256634939 produced a 28-trade cost-aware selected ledger. |
+| 4 Validation | COMPLETE | Corrected Phase 4 run 36257292327 completed descriptive validation, block bootstrap, walk-forward, slippage, threshold, denominator and brokerage sensitivity. |
+| 5 Regimes | COMPLETE | Corrected categorical Phase 5 run 36257664922 completed point-in-time NIFTY spot-derived attribution. |
+| 6 Manuscript | COMPLETE | Manuscript, figures, result snapshots, discussion, limitations and future research added. |
 
-## Current analytical findings
+## Primary empirical result
 
-1. The static flatline chart is not the realized payoff of the cross-expiry position.
-2. The economically relevant expiry component is S2 - S1, plus the entry premium edge and transaction costs.
-3. The 2.5% denominator is unspecified and must remain an explicit sensitivity dimension.
-4. Historical NIFTY lot-size changes require expiry-specific treatment; unequal-lot pairs are excluded from the one-for-one spread sample.
-5. Primary public data lack bid/ask history, so close-based execution is only a proxy.
+Under the buy-premium denominator, 0.25% premium slippage and ₹20/order baseline brokerage assumption, 28 selected trades produced:
 
-## Phase 5 protocol result
+- total net P&L: ₹166,240.97
+- mean trade P&L: ₹5,937.18
+- median trade P&L: ₹9,431.27
+- win rate: 67.86%
+- profit factor: 2.33
+- maximum drawdown: -₹48,161.45
 
-Regime attribution is now predeclared across realized volatility, India VIX, gap, trend, liquidity, IV level/term structure, FII/DII activity, USD/INR, gold, global equity benchmarks and event windows where point-in-time data are available. The protocol prohibits using future or same-day end-of-day information that was not known at the 09:20 entry.
+The 95% iid bootstrap CI for mean trade P&L was approximately -₹434 to ₹11,735; the weekly block-bootstrap CI was approximately -₹1,689 to ₹12,745.
 
-## Blockers
+## Key robustness findings
 
-- GitHub Actions run-history audit previously reported zero workflow runs for the repository; no empirical Phase 3/4 artifact is currently available to consume.
-- Phase 4/5 workflow handoffs have been repaired so future manual runs can pull the Phase 3 artifact by run ID.
-- Phase 3/4 historical artifacts are required before empirical regime analysis.
-- Quote-level bid/ask and IV surface history remain a separate data requirement.
-- The user's exact 2.5% denominator remains unconfirmed; supported alternatives must be reported.
-## Next executable step
+- The result remained positive across 0% to 1% tested slippage.
+- Brokerage sensitivity from ₹10 to ₹40 per executed order remained positive.
+- The chronological 70/30 split produced positive P&L in the 9-trade test segment.
+- The result is highly sparse and concentrated: 28 trades were selected from 891 eligible timestamps, and two months accounted for approximately 89.3% of total selected-trade P&L.
+- The buy-premium denominator generated trades; the tested spot-notional denominator generated none from 1% through 5% thresholds.
+- ATM accounted for 24 of 28 selected trades; the -400 fallback accounted for 4 and the +400 fallback for none.
 
-Run the manual Phase 2 workflow first; then pass its run ID into Phase 3. After Phase 3 completes, pass that run ID to Phase 4 and Phase 5. The current research environment does not expose a workflow-dispatch action, so this is the only external execution step currently blocking empirical results.
+## Phase 5 result
+
+Point-in-time spot-derived attribution was completed using prior 20-observation trend, prior 20-observation annualized volatility and prior 09:20 entry move. The descriptive results showed the largest mean P&L in the prior down-trend and medium-volatility buckets. These are not new trading rules and should not be interpreted causally.
+
+Cross-market/FII-DII/India VIX/IV-surface ingestion remains a future data-extension item, not a missing result that was fabricated.
+
+## Final research conclusion
+
+The specified rule is reproducible and historically positive in the tested cost-aware sample, but the evidence is not strong enough to treat it as a robust, denominator-independent or risk-free arbitrage. The original flatline chart is not the correct economic payoff representation because the two synthetic forwards settle at different dates.
+
+The unresolved denominator, sparse selected sample, concentration of P&L, uncertainty intervals, close-based execution proxy and settlement-price proxy are the principal limitations.
+
+## Final manuscript
+
+See docs/MANUSCRIPT.md and the result snapshots under results/.
