@@ -43,3 +43,5 @@ This is the observable research/repository activity log. It records actions, out
 
 | 2026-09-26 | 3 | Strike-grid schema repair | Added the missing shift_points field to expanded Phase 3 inputs, persisted the full candidate-shift metadata, and triggered a clean rerun. |
 | 2026-09-26 | 3 | Workflow efficiency repair | Added concurrency cancellation and cache save-always so debugging cannot leave multiple long data-extraction runs consuming runners. |
+
+| 2026-09-26 | 4 | Final full-grid validation | Run 36263760476 succeeded after adding the missing brokerage helper; all declared robustness and sensitivity outputs were produced. |
