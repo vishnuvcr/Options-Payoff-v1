@@ -39,13 +39,13 @@ def main() -> None:
     missing = REQUIRED_TRADES - set(trades.columns)
     if missing:
         raise ValueError(f'Missing trade columns: {sorted(missing)}')
-    trades['entry_timestamp'] = pd.to_datetime(trades['entry_timestamp'], utc=True)
+    trades['entry_timestamp'] = pd.to_datetime(trades['entry_timestamp'], utc=True).astype('datetime64[ns, UTC]')
     trades = trades.sort_values('entry_timestamp').reset_index(drop=True)
     if args.regimes is not None:
         regimes = read_table(args.regimes)
         if 'entry_timestamp' not in regimes.columns:
             raise ValueError('Regime table must contain entry_timestamp')
-        regimes['entry_timestamp'] = pd.to_datetime(regimes['entry_timestamp'], utc=True)
+        regimes['entry_timestamp'] = pd.to_datetime(regimes['entry_timestamp'], utc=True).astype('datetime64[ns, UTC]')
         regimes = regimes.sort_values('entry_timestamp')
         trades = pd.merge_asof(trades, regimes, on='entry_timestamp', direction='backward', allow_exact_matches=True)
     summaries = []
