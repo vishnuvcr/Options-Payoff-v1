@@ -4,24 +4,24 @@ This is the observable research/repository activity log. It records actions, out
 
 | Date | Phase | Step | Outcome |
 |---|---|---|---|
-| 2026-09-26 | 0 | Inspected repository metadata | Repository is public, empty, default branch main, write access available. |
-| 2026-09-26 | 0 | Reviewed current NIFTY contract specification | NIFTY 50 has four weekly option expiries; weekly expiry is Tuesday subject to holiday adjustment. |
-| 2026-09-26 | 0 | Reviewed broker/regulatory cost references | Paytm Money current material supports a flat brokerage model for the applicable account population; NSE states 2026 option-sale STT is 0.15%. |
-| 2026-09-26 | 0 | Reviewed public historical-data sources | Candidate public datasets exist on Hugging Face and GitHub; licensing/coverage will be validated in Phase 2. |
-| 2026-09-26 | 0 | Formalized research plan | Six research phases defined; Phase 1 is next. |
-| 2026-09-26 | 1 | Implemented strategy/payoff functions | Encoded the four legs, static chart payoff, correct cross-expiry payoff, strike candidates and threshold helper. |
-| 2026-09-26 | 1 | Added deterministic Phase 1 tests | Unit tests passed in the local mirrored harness for flat chart construction, cross-expiry P&L, hidden-loss case, strike shifts and threshold logic. |
-| 2026-09-26 | 1 | Added manual GitHub Actions workflow | Phase 1 workflow can be run manually from GitHub Actions. |
-| 2026-09-26 | 2 | Selected primary data source | thetrademarkk/india-index-options-1m selected for 1-minute NIFTY index/options data; source manifest added. |
-| 2026-09-26 | 2 | Added data specification | Historical expiry transition, no-look-ahead rules, source validation and output schema documented. |
-| 2026-09-26 | 2 | Added strategy-input extractor | Builds per-entry ATM/-400/+400 candidate rows from the NIFTY index and per-expiry option files. |
-| 2026-09-26 | 2 | Added manual GitHub Actions workflow | Workflow caches Hugging Face files and uploads the derived strategy-input table as an artifact. |
-| 2026-09-26 | 2 | Added initial literature review | Research references on put-call parity, synthetic forwards and transaction-cost frictions recorded. |
-| 2026-09-26 | 3 | Added transaction-cost model | Added brokerage, exchange, SEBI, stamp duty, GST, entry STT and expiry-exercise STT components. |
-| 2026-09-26 | 3 | Added backtest engine | Added deterministic ATM then fallback selection, configurable 2.5% trigger denominator and selected-trade/candidate outputs. |
-| 2026-09-26 | 3 | Added manual Phase 3 workflow | Workflow rebuilds Phase 2 inputs, runs the backtest and uploads results. |
-| 2026-09-26 | 3 | Added correction for expiry STT | Long-leg intrinsic value at expiry is now charged under the applicable exercise-STT rate. |
-| 2026-09-26 | 3 | Attempted exact-runtime validation | Environment could not resolve raw.githubusercontent.com; no claim of an executed GitHub Actions backtest is made. |
-| 2026-09-26 | 3 | Verified historical NIFTY lot-size transitions | Encoded expiry-date lot sizes and excluded unequal-lot transition pairs from the one-for-one spread sample. |
-
-| 2026-09-26 | 4 | Added validation framework | Added bootstrap CI, monthly aggregation, profit factor, drawdown and validation-gate workflow; execution awaits Phase 3 output artifact. |
+| 2026-09-26 | 0 | Inspected repository metadata | Repository was public, empty, default branch main, write access available. |
+| 2026-09-26 | 0 | Reviewed current NIFTY contract specification | NIFTY 50 weekly options and Tuesday expiry convention documented. |
+| 2026-09-26 | 0 | Reviewed broker/regulatory cost references | Paytm Money brokerage is configurable; NSE charge schedules are separately documented. |
+| 2026-09-26 | 0 | Reviewed public historical-data sources | Public datasets and NSE report endpoints identified. |
+| 2026-09-26 | 0 | Formalized research plan | Six research phases defined. |
+| 2026-09-26 | 1 | Implemented strategy/payoff functions | Four legs, static chart payoff and correct cross-expiry payoff encoded. |
+| 2026-09-26 | 1 | Added deterministic tests | Formula, strike-shift and threshold assertions added. |
+| 2026-09-26 | 1 | Added manual workflow | Phase 1 can be manually executed in GitHub Actions. |
+| 2026-09-26 | 2 | Selected primary data source | Public 1-minute NIFTY index/options source selected for reproducible extraction. |
+| 2026-09-26 | 2 | Added data specification/extractor | Entry candidates and expiry pairing are generated deterministically. |
+| 2026-09-26 | 2 | Added cache workflow | Source files are cached during workflow execution. |
+| 2026-09-26 | 2 | Added literature review | Put-call parity, synthetic forwards and transaction-cost references recorded. |
+| 2026-09-26 | 3 | Added transaction-cost model | Brokerage, exchange, SEBI, stamp duty, GST, STT and slippage components added. |
+| 2026-09-26 | 3 | Added backtest engine | ATM trigger with -400/+400 fallback and configurable denominator implemented. |
+| 2026-09-26 | 3 | Corrected expiry STT | Exercise STT on long-leg intrinsic value added. |
+| 2026-09-26 | 3 | Corrected historical lot treatment | Expiry-specific lot sizes used; unequal-lot transition pairs excluded. |
+| 2026-09-26 | 3 | Attempted exact-runtime validation | Container could not resolve raw.githubusercontent.com; no historical result was claimed. |
+| 2026-09-26 | 4 | Added statistical validation framework | Bootstrap CI, monthly aggregation, walk-forward and sensitivity workflow prepared. |
+| 2026-09-26 | 5 | Audited official regime-data sources | NSE historical derivatives reports and India VIX sources were verified; RBI/FBIL FX provenance documented. |
+| 2026-09-26 | 5 | Added regime protocol | Point-in-time regime variables and acceptance criteria frozen before empirical execution. |
+| 2026-09-26 | 5 | Added executable attribution scaffold | Script and manual GitHub Actions workflow added; execution awaits Phase 3/4 ledger. |
