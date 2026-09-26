@@ -1,5 +1,9 @@
 name: Phase 4 - Statistical validation
 
+concurrency:
+  group: phase-4-validation-grid
+  cancel-in-progress: true
+
 on:
   push:
     branches: [phase-4-validation-grid]
@@ -47,12 +51,12 @@ jobs:
           mkdir -p results/phase3
           gh run download "$PHASE3_RUN_ID" --repo "${{ github.repository }}" --name phase-3-backtest-results --dir results/phase3
           test -s results/phase3/selected_trades.parquet
-      - name: Download Phase 2 strategy inputs
+      - name: Download expanded Phase 3 strategy inputs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p data/derived
-          gh run download "$PHASE2_RUN_ID" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
+          gh run download "$PHASE3_RUN_ID" --repo "${{ github.repository }}" --name phase-3-expanded-strategy-inputs --dir data/derived
           test -s data/derived/strategy_inputs.parquet
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
