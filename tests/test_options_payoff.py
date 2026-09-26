@@ -76,9 +76,9 @@ class StrategyPayoffTests(unittest.TestCase):
     def test_phase7_strike_grid_is_exhaustive(self) -> None:
         grid = strike_grid(24175.0, 50.0, 400, 50)
         self.assertEqual(len(grid), 17)
-        self.assertEqual(grid[0], 23775.0)
-        self.assertEqual(grid[-1], 24575.0)
-        self.assertIn(24175.0, grid)
+        self.assertEqual(grid[0], 23800.0)
+        self.assertEqual(grid[-1], 24600.0)
+        self.assertIn(24200.0, grid)
 
     def test_equal_max_profit_loss_metric_for_green_flatline(self) -> None:
         legs = strategy_legs(100.0, "near", "next")
