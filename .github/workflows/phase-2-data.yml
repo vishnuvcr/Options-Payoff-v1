@@ -1,6 +1,8 @@
 name: Phase 2 - Data acquisition and validation
 
 on:
+  push:
+    branches: [phase-2-data]
   workflow_dispatch:
     inputs:
       start:
@@ -14,6 +16,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   build-data:
@@ -50,3 +53,9 @@ jobs:
           path: |
             data/derived/strategy_inputs.parquet
             data/derived/strategy_inputs.metadata.json
+      - name: Chain to Phase 3
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run phase-3-backtest.yml --repo "${{ github.repository }}" --ref phase-3-backtest -f phase2_run_id="${{ github.run_id }}" -f start="${{ inputs.start }}" -f end="${{ inputs.end }}" -f trigger_base="buy_premium" -f configured_capital_per_lot="" -f slippage_pct="0.0025"
