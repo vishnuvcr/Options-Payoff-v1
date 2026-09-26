@@ -4,8 +4,8 @@ Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current status
 
-**Phase:** 1 — Strategy specification and analytical validation  
-**Status:** COMPLETE; Phase 2 data work is next.  
+**Phase:** 2 — Market-data acquisition, cleaning and cache
+**Status:** IN PROGRESS; strategy-input pipeline and literature review are implemented. Manual workflow execution is the next validation step.
 **Date:** 2026-09-26
 
 The strategy under study is:
@@ -19,13 +19,11 @@ The strategy under study is:
 
 ### Phase 1 finding
 
-The four legs are a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With a common strike K, the intrinsic expiry component is:
+The four legs are a short synthetic forward in the near expiry plus a long synthetic forward in the next expiry. With a common strike K, the intrinsic expiry component is S(next expiry) - S(near expiry). A one-dimensional chart that applies the same hypothetical terminal spot to both expiries will show a flat line because the two synthetic-forward intrinsic terms cancel. That flatline is not a valid representation of the held-to-expiry cross-expiry P&L.
 
-S(next expiry) - S(near expiry)
+### Phase 2 data finding
 
-A one-dimensional chart that applies the same hypothetical terminal spot to both expiries will cancel the intrinsic terms and show a flat line. That flatline is therefore not a valid representation of the held-to-expiry risk.
-
-The Phase 1 unit tests reproduce the flatline construction and independently prove that the economically correct two-expiry P&L varies with the two settlement prices.
+The primary public research dataset is thetrademarkk/india-index-options-1m on Hugging Face. The pipeline uses the NIFTY index file plus per-expiry option files, preserves the historical Thursday-to-Tuesday NIFTY expiry transition, and caches downloaded source files in GitHub Actions. The dataset provides OHLCV/OI bars, not bid/ask quotes, so Phase 2 marks the base entry prices as 09:20 close proxies. Phase 3 must stress execution costs explicitly rather than treating closes as executable quotes.
 
 ## Research files
 
@@ -36,15 +34,18 @@ The Phase 1 unit tests reproduce the flatline construction and independently pro
 - research/SOURCES.md
 - research/RESEARCH_INSTRUCTIONS.md
 - docs/PHASE_1_SPECIFICATION.md
+- docs/PHASE_2_DATA_PLAN.md
+- docs/LITERATURE_REVIEW.md
 - src/options_payoff.py
 - tests/test_options_payoff.py
-- config/strategy_phase1.toml
+- scripts/extract_strategy_inputs.py
+- data/SOURCE_MANIFEST.json
 
 ## Phases
 
 - Phase 0 — Bootstrap and research governance — COMPLETE
 - Phase 1 — Strategy specification and analytical validation — COMPLETE
-- Phase 2 — Market-data acquisition, cleaning and cache — NEXT
+- Phase 2 — Market-data acquisition, cleaning and cache — IN PROGRESS
 - Phase 3 — Backtest engine and transaction-cost model
 - Phase 4 — Statistical validation and robustness
 - Phase 5 — Regime/cross-market attribution
@@ -54,7 +55,7 @@ Each research phase will live on its own Git branch and expose a manual GitHub A
 
 ## Scope
 
-Default test market: NIFTY 50 weekly index options, because NSE currently lists four weekly NIFTY 50 option expiries and the weekly expiry is Tuesday (or the preceding trading day when Tuesday is a holiday). This is a documented default, not a claim that the strategy is suitable for trading.
+Default test market: NIFTY 50 weekly index options. Current NSE contract specifications list four weekly expiries and Tuesday weekly expiry, subject to holiday adjustment. The historical pipeline also respects the 2025 transition from Thursday to Tuesday.
 
 ## Costs
 
@@ -62,4 +63,4 @@ The model uses dated, configurable cost inputs rather than silently assuming zer
 
 ## Reproducibility
 
-Data sources, dataset versions/checksums, assumptions, code versions, and backtest outputs will be recorded so results can be regenerated without repeatedly downloading the same data.
+Data sources, dataset versions/checksums, assumptions, code versions, and backtest outputs will be recorded so results can be regenerated without repeatedly downloading the same source files.
