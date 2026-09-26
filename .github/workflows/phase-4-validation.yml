@@ -30,8 +30,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
             echo "PHASE3_RUN_ID=$(python -c 'import json; print(json.load(open(".github/phase3_trigger.json"))["phase3_run_id"])')" >> "$GITHUB_ENV"
+            echo "OUTPUT_DIR=results/phase4" >> "$GITHUB_ENV"
           else
             echo "PHASE3_RUN_ID=${{ inputs.phase3_run_id }}" >> "$GITHUB_ENV"
+            echo "OUTPUT_DIR=${{ inputs.out_dir }}" >> "$GITHUB_ENV"
           fi
       - name: Download Phase 3 results
         env:
@@ -43,12 +45,12 @@ jobs:
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
       - name: Validate selected trades
-        run: python scripts/validate_results.py --trades results/phase3/selected_trades.parquet --out-dir "${{ inputs.out_dir }}"
+        run: python scripts/validate_results.py --trades results/phase3/selected_trades.parquet --out-dir "$OUTPUT_DIR"
       - name: Upload validation results
         uses: actions/upload-artifact@v4
         with:
           name: phase-4-validation
-          path: "${{ inputs.out_dir }}"
+          path: "$OUTPUT_DIR"
       - name: Chain to Phase 5
         if: success()
         run: |
