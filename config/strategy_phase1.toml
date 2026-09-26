@@ -1,0 +1,16 @@
+[strategy]
+underlying = "NIFTY"
+entry_time_ist = "09:20"
+threshold_pct = 2.5
+position_lots = 1
+atm_step = 50
+strike_shifts = [0, -400, 400]
+
+[candidate_order]
+priority = ["ATM", "ATM_MINUS_400", "ATM_PLUS_400"]
+
+[costs]
+# Phase 1 keeps costs as explicit inputs. Phase 3 will populate a dated
+# transaction-cost schedule from primary broker/exchange sources.
+brokerage_per_executed_order_inr = 20.0
+option_sale_stt_pct = 0.15
