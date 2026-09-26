@@ -3,12 +3,16 @@ name: Phase 3 - Backtest
 on:
   workflow_dispatch:
     inputs:
+      phase2_run_id:
+        description: 'Optional completed Phase 2 run ID containing phase-2-strategy-inputs'
+        required: false
+        default: ''
       start:
-        description: Start date (YYYY-MM-DD)
+        description: Start date (YYYY-MM-DD), used when phase2_run_id is empty
         required: true
         default: '2025-11-01'
       end:
-        description: End date (YYYY-MM-DD)
+        description: End date (YYYY-MM-DD), used when phase2_run_id is empty
         required: true
         default: '2026-08-31'
       trigger_base:
@@ -30,6 +34,7 @@ on:
         default: '0.0025'
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -45,30 +50,33 @@ jobs:
           python -m pip install --upgrade pip
           pip install 'huggingface_hub>=0.34' 'pandas>=2.2' 'pyarrow>=18'
       - name: Restore/cache Hugging Face source files
+        if: inputs.phase2_run_id == ''
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
           key: hf-nifty-options-v3-${{ inputs.start }}-${{ inputs.end }}
           restore-keys: hf-nifty-options-v3-
-      - name: Build Phase 2 strategy inputs
+      - name: Download Phase 2 strategy inputs from selected run
+        if: inputs.phase2_run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python scripts/extract_strategy_inputs.py \
-            --start '${{ inputs.start }}' \
-            --end '${{ inputs.end }}' \
-            --entry-time '09:20' \
-            --out data/derived/strategy_inputs.parquet
+          mkdir -p data/derived
+          gh run download "${{ inputs.phase2_run_id }}" --repo "${{ github.repository }}" --name phase-2-strategy-inputs --dir data/derived
+          test -s data/derived/strategy_inputs.parquet
+      - name: Build Phase 2 strategy inputs when no Phase 2 run ID is supplied
+        if: inputs.phase2_run_id == ''
+        run: |
+          python scripts/extract_strategy_inputs.py --start '${{ inputs.start }}' --end '${{ inputs.end }}' --entry-time '09:20' --out data/derived/strategy_inputs.parquet
       - name: Run backtest
         run: |
           EXTRA=''
-          if [ '${{ inputs.trigger_base }}' = 'configured_capital' ]; then EXTRA="--configured-capital-per-lot '${{ inputs.configured_capital_per_lot }}'"; fi
-          python scripts/run_backtest.py \
-            --inputs data/derived/strategy_inputs.parquet \
-            --out-dir results/phase3 \
-            --threshold-pct '2.5' \
-            --trigger-base-mode '${{ inputs.trigger_base }}' \
-            --slippage-pct '${{ inputs.slippage_pct }}' $EXTRA
+          if [ '${{ inputs.trigger_base }}' = 'configured_capital' ]; then
+            EXTRA="--configured-capital-per-lot '${{ inputs.configured_capital_per_lot }}'"
+          fi
+          python scripts/run_backtest.py --inputs data/derived/strategy_inputs.parquet --out-dir results/phase3 --threshold-pct '2.5' --trigger-base-mode '${{ inputs.trigger_base }}' --slippage-pct '${{ inputs.slippage_pct }}' $EXTRA
       - name: Run unit tests
-        run: python -m unittest tests/test_costs.py -v
+        run: python -m unittest discover -s tests -v
       - name: Upload Phase 3 results
         uses: actions/upload-artifact@v4
         with:
