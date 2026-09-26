@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: phase-4-validation
-          path: "$OUT_DIR"
+          path: results/phase4
       - name: Chain to Phase 5
         if: success()
         env:
