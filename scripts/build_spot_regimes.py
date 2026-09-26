@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-import numpy as np
+from math import sqrt
 import pandas as pd
 
 
@@ -36,33 +36,19 @@ def main() -> None:
     x["entry_return_1d"] = s / s.shift(1) - 1.0
     x["trend_5d_return"] = s.shift(1) / s.shift(6) - 1.0
     x["trend_20d_return"] = s.shift(1) / s.shift(21) - 1.0
-    x["realized_vol_20d_ann"] = daily_ret.shift(1).rolling(20).std() * np.sqrt(252.0)
+    x["realized_vol_20d_ann"] = daily_ret.shift(1).rolling(20).std() * sqrt(252.0)
 
-    x["trend_regime"] = np.select(
-        [
-            x["trend_20d_return"] <= -0.01,
-            x["trend_20d_return"] >= 0.01,
-        ],
-        ["down", "up"],
-        default="sideways",
+    x["trend_regime"] = pd.Series(
+        ["down" if v <= -0.01 else "up" if v >= 0.01 else "sideways" for v in x["trend_20d_return"]],
+        index=x.index,
     )
-
-    x["vol_regime"] = np.select(
-        [
-            x["realized_vol_20d_ann"] < 0.15,
-            x["realized_vol_20d_ann"] >= 0.25,
-        ],
-        ["low", "high"],
-        default="medium",
+    x["vol_regime"] = pd.Series(
+        ["low" if v < 0.15 else "high" if v >= 0.25 else "medium" for v in x["realized_vol_20d_ann"]],
+        index=x.index,
     )
-
-    x["entry_move_regime"] = np.select(
-        [
-            x["entry_return_1d"] <= -0.005,
-            x["entry_return_1d"] >= 0.005,
-        ],
-        ["down_move", "up_move"],
-        default="small_move",
+    x["entry_move_regime"] = pd.Series(
+        ["down_move" if v <= -0.005 else "up_move" if v >= 0.005 else "small_move" for v in x["entry_return_1d"]],
+        index=x.index,
     )
 
     x["regime_source"] = "Phase-2 09:20 NIFTY spot series; point-in-time only"
