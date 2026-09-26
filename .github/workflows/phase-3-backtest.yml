@@ -14,7 +14,7 @@ on:
       lot_size:
         description: Verified lot size for the selected date window
         required: true
-        default: '65'
+        default: ''
       trigger_base:
         description: Trigger denominator mode
         required: true
