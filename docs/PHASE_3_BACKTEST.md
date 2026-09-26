@@ -18,7 +18,7 @@ For each selected trade:
 
 `gross P&L = (C1 - P1 - C2 + P2 + S2 - S1) × lot_size`
 
-where the four option premiums are entry prices and S1/S2 are the actual near/next expiry index settlements.
+where the four option premiums are entry prices and S1/S2 are the near/next expiry index settlements.
 
 ## Cost model
 
@@ -30,18 +30,21 @@ Base parameters are configurable. The current 2026 reference inputs are:
 - SEBI turnover fee: 0.0001%.
 - Equity-option stamp duty: 0.003% on buyer turnover.
 - GST: 18% on brokerage plus exchange/SEBI service charges.
-- STT: 0.10% on option-sale premium before 1 April 2026; 0.15% from 1 April 2026.
-- Slippage: configurable; 0.25% of premium is the initial conservative research shock because the Phase 2 source lacks bid/ask quotes.
+- STT on option sale: 0.10% before 1 April 2026 and 0.15% from 1 April 2026.
+- STT on option exercise: 0.125% before 1 April 2026 and 0.15% from 1 April 2026, applied to the intrinsic value of long legs at expiry.
+- Slippage: configurable; 0.25% of premium is the initial research shock because the Phase 2 source lacks bid/ask quotes.
 
-These are research inputs rather than a claim about a particular user's exact contract note. Paytm Money's current pricing material notes that its brokerage calculator does not include every possible platform/depository/other fee, so the final live-cost check must reconcile against the user's contract note.
+These are research inputs rather than a claim about a particular user's exact contract note. Paytm Money's current pricing calculator notes that not every possible platform/depository/other fee is included, so a live-use reconciliation must use the user's actual contract note.
 
 ## Selection and validation
 
-The output includes every complete candidate and the selected trades, so researchers can compare the triggered sample with the rejected ATM/-400/+400 candidates and test alternative trigger denominators.
+The output includes every complete candidate and the selected trades, so researchers can compare the triggered sample with rejected ATM/-400/+400 candidates and test alternative trigger denominators.
 
-## Important limitation
+## Important limitations
 
-Phase 3 cannot yet be treated as the final historical result until two data items are verified: (1) a dated NIFTY lot-size calendar, and (2) quote-level bid/ask or a validated spread/slippage model. The engine deliberately requires lot size as an explicit input instead of silently using a modern lot size for old contracts.
+1. Phase 3 requires a verified lot-size calendar; the engine deliberately requires lot size as an explicit input instead of silently using a modern lot size for old contracts.
+2. Phase 2 uses 09:20 close proxies rather than bid/ask quotes, so slippage is a sensitivity assumption until quote-level data can be validated.
+3. The chart trigger is separated from realized P&L. A candidate can pass the static chart trigger and still lose money when S2 < S1 or when costs exceed the gross edge.
 
 ## Outputs
 
