@@ -222,7 +222,7 @@ The research must not declare a strategy successful based on a single backtest o
 - Underlying: NIFTY 50.
 - Weekly expiry: NSE-defined weekly contracts.
 - Entry observation: 09:20 IST.
-- Candidate strikes: ATM, ATM-400, ATM+400.
+- Candidate strikes: ATM first. If ATM fails the chart trigger, search every 50 NIFTY points from -500 through +500 relative to ATM (excluding ATM) and evaluate every qualifying strike.
 - Holding: settlement/expiry as specified, with near and next expiry tracked separately.
 - Threshold: 2.5%, configurable denominator.
 - Position size: 1 lot by default for reporting; scale tests later.
