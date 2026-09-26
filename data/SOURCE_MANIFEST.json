@@ -1,0 +1,34 @@
+{
+  "primary_source": {
+    "provider": "Hugging Face",
+    "dataset": "thetrademarkk/india-index-options-1m",
+    "repository": "thetrademarkk/india-index-options-1m",
+    "revision": "main",
+    "license": "cc-by-nc-4.0",
+    "coverage": "~2021-2026",
+    "index_file": "index/NIFTY.parquet",
+    "option_pattern": "options/NIFTY/YYYY-MM-DD.parquet",
+    "schema": [
+      "timestamp", "open", "high", "low", "close", "volume",
+      "open_interest", "trading_day", "symbol", "strike",
+      "option_type", "expiry"
+    ]
+  },
+  "cross_check_source": {
+    "provider": "Hugging Face",
+    "dataset": "artist-23/nifty-options-data",
+    "repository": "artist-23/nifty-options-data",
+    "coverage": "2020-2025",
+    "purpose": "cross-check only until license is independently verified"
+  },
+  "official_reference": {
+    "provider": "NSE India",
+    "purpose": "contract metadata, expiry rules, settlement and official validation",
+    "expiry_transition": "NIFTY derivatives moved from Thursday to Tuesday for contracts expiring on or after 2025-09-01"
+  },
+  "cache_policy": {
+    "raw_data": "not committed by default",
+    "cache": "GitHub Actions cache keyed by source revision and date window",
+    "derived": "compact strategy-relevant inputs may be committed only after confirming redistribution terms"
+  }
+}
