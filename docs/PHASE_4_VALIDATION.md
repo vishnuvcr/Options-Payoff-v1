@@ -27,3 +27,15 @@ A strategy configuration is considered research-positive only if net P&L remains
 ## Regime analysis
 
 Phase 5 will condition results on realized volatility, VIX/India VIX where available, trend, gap size, option IV/skew, FII/DII flow, USD/INR, global equity futures and major corporate/news-event windows where data can be matched without look-ahead.
+## Executed implementation
+
+The Phase 4 workflow now executes `scripts/validate_results.py` plus `scripts/run_robustness.py` against the Phase 2 strategy-input artifact. Outputs include:
+
+- `validation_summary.json` and monthly P&L.
+- `robustness_grid.csv` across slippage {0, 0.10, 0.25, 0.50, 1.00%}, trigger thresholds {1, 1.5, 2, 2.5, 3, 4, 5%}, and the currently specified `buy_premium` and `spot_notional` denominators.
+- `walkforward_baseline.json` using a chronological 70/30 holdout by eligible entry timestamp.
+- `block_bootstrap_baseline.json` using weekly blocks.
+- `selection_by_label.csv` and `unconditional_atm_baseline.json`.
+- `data_quality_sensitivity.json` for source-status and lot-transition exclusions.
+
+Configured-capital denominator sensitivity remains intentionally uncomputed because the required capital figure was not supplied; no value is invented.
