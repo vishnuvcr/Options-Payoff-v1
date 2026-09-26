@@ -17,3 +17,6 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 6 | Final research conclusion recorded | The tested buy-premium specification produced positive historical net P&L, but denominator ambiguity, sparse selection, concentration, uncertainty and execution/settlement proxies prevent a robust/risk-free interpretation. |
 
 | 2026-09-26 | 6 | User challenged the meaning of “selected trades” | Audited the Phase 3 code. It explicitly chooses ATM, then -400, then +400 when chart_return_pct > 2.5%, with buy_premium as the default denominator. This was an implementation choice, not a separately confirmed user-provided historical selection criterion. Results are now treated as provisional pending specification clarification. |
+
+
+| 2026-09-26 | 3-6 | Corrected full-grid rerun completed | Phase 3 run 36262958536, Phase 4 run 36263760476 and Phase 5 run 36263974629 completed using the clarified ATM-first plus 50-point ±500 fallback grid. Manuscript and corrected result snapshots prepared on phase-6-manuscript-grid. |
