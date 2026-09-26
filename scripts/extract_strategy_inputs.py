@@ -137,7 +137,8 @@ def main():
             continue
         spot = float(entry.close)
         atm = min(common, key=lambda k: abs(k - spot))
-        for label, shift in [('ATM',0.0),('ATM_MINUS_400',-400.0),('ATM_PLUS_400',400.0)]:
+        for shift in range(-500, 501, 50):
+            label = "ATM" if shift == 0 else f"SHIFT_{\"PLUS\" if shift > 0 else \"MINUS\"}_{abs(shift):03d}"
             strike = atm + shift
             if strike not in common:
                 rows.append({'entry_timestamp':entry_ts,'entry_date':entry_date,'spot_at_entry':spot,'near_expiry':near_expiry,'next_expiry':next_expiry,'near_lot_size':nifty_lot_size(near_expiry),'next_lot_size':nifty_lot_size(next_expiry),'candidate_label':label,'strike':strike,'status':'candidate_strike_unavailable'})
