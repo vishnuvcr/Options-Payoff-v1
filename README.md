@@ -40,3 +40,7 @@ Official NSE sources expose historical derivatives reports, contract-wise option
 - Phase 5 source audit: `docs/PHASE_5_SOURCE_AUDIT.md`
 
 Latest phase branch: https://github.com/vishnuvcr/Options-Payoff-v1/tree/phase-5-regimes
+
+## Execution dependency
+
+The current research branch has repaired Phase 2 → Phase 3 → Phase 4/5 artifact handoffs. Because the connected GitHub interface in this research session does not expose workflow dispatch, the first empirical run still requires the repository's manual workflow buttons. No performance result is claimed until those artifacts exist.
