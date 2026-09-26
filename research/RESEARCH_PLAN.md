@@ -226,3 +226,9 @@ The research must not declare a strategy successful based on a single backtest o
 - Holding: settlement/expiry as specified, with near and next expiry tracked separately.
 - Threshold: 2.5%, configurable denominator.
 - Position size: 1 lot by default for reporting; scale tests later.
+
+## Specification clarification currently required
+
+The Phase 3 implementation used an operational gate that must not be treated as user-confirmed: for each entry timestamp it checked ATM first and then ATM-400/ATM+400, retaining a candidate only when the coded chart metric exceeded 2.5% under a buy_premium denominator.
+
+The user has clarified that no separate trade-selection criterion was supplied. This is a material specification issue. The research plan therefore requires an explicit confirmation of whether the 2.5% figure is intended as (a) a trade-entry gate, (b) a descriptive payoff-chart threshold only, or (c) something else, and what denominator defines the percentage. Until that is specified, the prior 28-trade “selected” results are provisional and must not be used as the final strategy result.
