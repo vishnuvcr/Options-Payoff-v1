@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-6-loss-audit  
-**Overall status:** Loss-trade audit complete for the clarified full strike-grid result
+**Active branch:** phase-7-max-equal-selection  
+**Overall status:** Phase 7 implementation complete; empirical rerun pending/completing
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -14,8 +14,9 @@
 | 5 Regimes | COMPLETE | Run 36263974629 completed point-in-time trend/volatility/entry-move attribution. |
 | 6 Manuscript | COMPLETE | Corrected manuscript and figures added. |
 | 6A Loss audit | COMPLETE | Workflow 36264710663 audited all 63 selected rows directly from the Phase 3 artifact. |
+| 7 Payoff semantics + maximum-flatline selection | IMPLEMENTED | Exhaustive ATM-400..ATM+400 selection code, platform review, unit tests and manual workflow added; empirical run pending/completing. |
 
-## Corrected primary result
+## Historical comparator — superseded selection rule
 
 Working implementation assumptions:
 
@@ -68,7 +69,7 @@ The audit shows that the positive chart trigger did not guarantee positive reali
 
 The authoritative 63-row result is from branch phase-3-strike-grid and run 36262958536. The earlier stale run_backtest.py on phase-6-manuscript-grid was corrected in commit 08a82c499e3344adbb6f5403a73210a28b77d5d4.
 
-## Key outputs
+## Phase 7 outputs
 
 - docs/MANUSCRIPT.md
 - docs/LOSS_TRADE_ANALYSIS.md
@@ -77,3 +78,16 @@ The authoritative 63-row result is from branch phase-3-strike-grid and run 36262
 - results/phase4_grid_robustness.csv
 - results/phase4_grid_brokerage_sensitivity.csv
 - results/phase5_grid_regime_summary.csv
+- docs/PAYOFF_PLATFORM_REVIEW.md
+- .github/workflows/phase-7-max-equal-selection.yml
+
+
+## Phase 7 specification
+
+Primary rule:
+- candidate strikes: ATM-400 to ATM+400 in 50-point steps, including ATM;
+- selection: one candidate per timestamp, maximizing the positive estimated equal max-profit=max-loss flatline value;
+- primary score: estimated equal max-profit=max-loss value in INR;
+- 2.5% legacy percentage gate: sensitivity only, because the exact platform margin denominator has not yet been reconstructed.
+
+The previous 63-trade result is preserved as historical evidence for the superseded ATM-first/full-grid fallback rule and must not be reported as the Phase 7 result.
