@@ -1,0 +1,95 @@
+{
+  "primary_rule": "Within ATM-400..ATM+400 in 50-point steps, require legacy proxy chart_return_pct > 2.5%, then select the single candidate with the maximum estimated equal max-profit=max-loss flatline VALUE in INR.",
+  "important_denominator_note": "The exact Sensibull percentage uses margin required. The historical margin series is not available in the cached dataset, so the 2.5% eligibility gate uses the repository's legacy buy-premium denominator as an explicit proxy.",
+  "candidate_grid_rows": 13824,
+  "timestamps_total_in_grid": 905,
+  "timestamps_with_proxy_gt_2_5_pct": 48,
+  "selected_trade_rows": 48,
+  "selected_timestamps": 48,
+  "slippage_pct": 0.0025,
+  "brokerage_per_order_inr": 20,
+  "total_net_pnl_inr": 166866.5054552809,
+  "mean_net_pnl_inr": 3476.385530318352,
+  "median_net_pnl_inr": 6242.510494258506,
+  "win_rate_pct": 60.416666666666664,
+  "profit_factor": 1.5562769811219468,
+  "max_drawdown_inr": -124060.72233772645,
+  "largest_loss_inr": -55321.89177141902,
+  "largest_win_inr": 35233.55102532894,
+  "total_costs_inr": 7334.772669719456,
+  "total_static_chart_pnl_inr": 36138.75,
+  "total_s2_minus_s1_inr": 142545.00000000017,
+  "gross_pnl_after_slippage_before_costs_inr": 174201.27812500033,
+  "mean_s2_minus_s1_inr": 2969.6875000000036,
+  "iid_bootstrap_mean_ci_95_inr": [
+    -1943.6062458814108,
+    8927.909027106094
+  ],
+  "weekly_block_bootstrap_mean_ci_95_inr": [
+    -3672.5630971741684,
+    9932.600428205125
+  ],
+  "chronological_70_30": {
+    "train_n": 33,
+    "test_n": 15,
+    "train_net_pnl_inr": 18711.334563606863,
+    "test_net_pnl_inr": 148155.170891674,
+    "train_mean_net_pnl_inr": 567.0101382911171,
+    "test_mean_net_pnl_inr": 9877.011392778268
+  },
+  "loss_audit": {
+    "n_losses": 19,
+    "loss_contribution_inr": -299970.178738531,
+    "winner_contribution_inr": 466836.68419381185,
+    "largest_loss_inr": -55321.89177141902,
+    "mean_loss_inr": -15787.904144133212,
+    "median_loss_inr": -9384.999086108646,
+    "loss_costs_inr": 2641.975613530844,
+    "negative_before_fees": 19,
+    "fee_only_flips": 0,
+    "loss_s2_minus_s1_inr": -309305.00000000023,
+    "loss_static_chart_pnl_inr": 13681.24999999999
+  },
+  "slippage_sensitivity": {
+    "0.0": 171346.7188178824,
+    "0.0025": 166866.5054552809,
+    "0.005": 162386.29209267834,
+    "0.01": 153425.86536747433
+  },
+  "no_gate_comparator": {
+    "selected_trades": 146,
+    "total_net_pnl_inr": 116595.799156922,
+    "mean_net_pnl_inr": 798.6013640885069,
+    "win_rate_pct": 56.849315068493155,
+    "profit_factor": 1.103842669208006,
+    "max_drawdown_inr": -379090.1766785911
+  },
+  "max_proxy_percent_comparator": {
+    "selected_trades": 48,
+    "total_net_pnl_inr": 166211.41134825963,
+    "mean_net_pnl_inr": 3462.7377364220756,
+    "win_rate_pct": 60.416666666666664,
+    "profit_factor": 1.5540953371532324,
+    "max_drawdown_inr": -124060.72233772645,
+    "same_selected_strike_count_as_value_rule": 31,
+    "different_selected_strike_count": 17
+  },
+  "selected_shift_counts": {
+    "0": 1,
+    "50": 3,
+    "100": 1,
+    "150": 2,
+    "200": 2,
+    "250": 3,
+    "300": 5,
+    "350": 3,
+    "400": 1,
+    "-400": 8,
+    "-350": 2,
+    "-300": 5,
+    "-250": 5,
+    "-200": 2,
+    "-150": 3,
+    "-100": 2
+  }
+}
