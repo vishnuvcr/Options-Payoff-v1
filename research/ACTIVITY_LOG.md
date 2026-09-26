@@ -36,3 +36,7 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 6 | Began Phase 6 manuscript | Empirical Phases 3–5 produced completed artifacts; manuscript structure was populated with equations, methods, tables, figures, results, discussion, limitations and future research. |
 | 2026-09-26 | 6 | Added reproducibility package | Key Phase 3/4/5 result snapshots and SVG figures were committed to the Phase 6 branch. |
 | 2026-09-26 | 6 | Final research assessment | Historical performance is positive under the tested buy-premium specification, but denominator ambiguity, sparse selection, concentration, uncertainty and execution-data limitations prevent a robust/risk-free interpretation. |
+
+| 2026-09-26 | 3 | Corrected strike-selection specification | Replaced the earlier ATM/-400/+400 implementation with ATM first, then all 50-point shifts from -500 through +500 when ATM fails; every fallback strike exceeding the trigger is retained, with no extra ranking rule. |
+| 2026-09-26 | 3 | Expanded Phase 3 input extraction | New extraction produced 19,341 rows: 15,701 complete, 3,498 unavailable candidate strikes, 142 missing settlements. |
+| 2026-09-26 | 3 | Repaired strike-grid workflow runtime | Three reruns reached data extraction but failed at the src import. Added workflow PYTHONPATH=. and optional HF token wiring; a new rerun is in progress. |
