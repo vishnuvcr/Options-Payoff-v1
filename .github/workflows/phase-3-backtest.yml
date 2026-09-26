@@ -43,6 +43,9 @@ permissions:
 jobs:
   backtest:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
