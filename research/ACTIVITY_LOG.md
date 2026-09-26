@@ -23,3 +23,5 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 3 | Added correction for expiry STT | Long-leg intrinsic value at expiry is now charged under the applicable exercise-STT rate. |
 | 2026-09-26 | 3 | Attempted exact-runtime validation | Environment could not resolve raw.githubusercontent.com; no claim of an executed GitHub Actions backtest is made. |
 | 2026-09-26 | 3 | Verified historical NIFTY lot-size transitions | Encoded expiry-date lot sizes and excluded unequal-lot transition pairs from the one-for-one spread sample. |
+
+| 2026-09-26 | 4 | Added validation framework | Added bootstrap CI, monthly aggregation, profit factor, drawdown and validation-gate workflow; execution awaits Phase 3 output artifact. |
