@@ -18,3 +18,6 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 2 | Added strategy-input extractor | Builds per-entry ATM/-400/+400 candidate rows from the NIFTY index and per-expiry option files. |
 | 2026-09-26 | 2 | Added manual GitHub Actions workflow | Workflow caches Hugging Face files and uploads the derived strategy-input table as an artifact. |
 | 2026-09-26 | 2 | Added initial literature review | Research references on put-call parity, synthetic forwards and transaction-cost frictions recorded. |
+| 2026-09-26 | 2 | Executed full-range autonomous data build | 2,763 candidate rows generated: 2,128 `ok`, 610 unavailable shifted-strike candidates, 25 missing-settlement rows. Artifact uploaded as run 36254740764. |
+| 2026-09-26 | 2 | Audited chain failure | Phase 2 data build succeeded, but CLI dispatch to the Phase 3 workflow returned HTTP 404 because the workflow file lives on a non-default phase branch. |
+| 2026-09-26 | 2 | Repaired phase handoffs | Phase 2 now writes a trigger file to `phase-3-backtest`; Phase 3 triggers Phase 4 the same way; Phase 4 triggers Phase 5 the same way. Each phase retains its own branch and manual dispatch path. |
