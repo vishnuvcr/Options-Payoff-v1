@@ -20,3 +20,6 @@
 ## Logging rule
 
 Append new rows for reproducible mistakes, failed assumptions, data-quality issues or workflow failures. Do not delete historical rows.
+| 2026-09-26 | 5 | Separate Phase 4/5 workflow runs cannot see Phase 3's workspace files by path alone. | Manual workflow buttons could fail even after a successful Phase 3 run. | Phase 4 and Phase 5 now accept a Phase 3 run ID and download the named artifact before analysis. |
+| 2026-09-26 | 3 | Configured-capital trigger mode was wired into the CLI but not passed into `trigger_base`, so that mode could not execute. | One of the declared denominator sensitivity modes would fail at runtime. | Pass the configured capital value explicitly and add the mode to the execution path. |
+| 2026-09-26 | 3 | The chart trigger numerator used observed premiums while its buy-premium denominator used slippage-adjusted execution premiums. | Trigger percentage changed with the execution shock, mixing signal definition with cost stress. | Chart trigger now uses observed entry premiums; slippage is applied only to realized execution/P&L. |
