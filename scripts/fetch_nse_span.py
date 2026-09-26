@@ -130,70 +130,54 @@ def extract_span_payload(payload: bytes, name: str) -> tuple[str, bytes] | None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--date", required=True, help="YYYY-MM-DD")
-    ap.add_argument("--out-dir", required=True)
-    ap.add_argument("--max-candidates", type=int, default=50)
+    ap.add_argument('--date', required=True, help='YYYY-MM-DD')
+    ap.add_argument('--out-dir', required=True)
     args = ap.parse_args()
 
-    date_token = args.date.replace("-", "")
+    date_token = args.date.replace('-', '')
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    direct = direct_candidates(date_token)
-    urls = []
-    with ThreadPoolExecutor(max_workers=8) as ex:
-        futures = {ex.submit(probe_url, u): u for u in direct}
-        for fut in as_completed(futures):
-            u = futures[fut]
-            try:
-                if fut.result():
-                    urls.append(u)
-            except Exception:
-                pass
-    if not urls:
-        try:
-            urls.extend(sorted(candidate_urls(date_token)))
-        except Exception as exc:
-            print(f"Archive discovery failed: {type(exc).__name__}: {exc}")
-    if not urls:
-        try:
-            urls.extend(sorted(candidate_urls(date_token)))
-        except Exception as exc:
-            print(f"Archive discovery failed: {type(exc).__name__}: {exc}")
-    if not urls:
-        raise RuntimeError(
-            "No SPAN-like links discovered from NSE Clearing market-report archive."
-        )
-
+    headers = {
+        'User-Agent': (
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/120.0.0.0 Safari/537.36'
+        ),
+        'Accept': 'application/octet-stream,*/*;q=0.8',
+        'Accept-Language': 'en-IN,en-US;q=0.9,en;q=0.8',
+        'Referer': 'https://www.nseindia.com/',
+    }
+    base = 'https://nsearchives.nseindia.com/archives/nsccl/span/'
     tried = []
-    seen = set()
-    for url in urls:
-        if url in seen:
-            continue
-        seen.add(url)
-        if len(seen) > args.max_candidates:
-            break
+    for version in range(5, 0, -1):
+        url = f'{base}nsccl.{date_token}.i{version}.zip'
         tried.append(url)
         try:
-            payload = download_bytes(url)
-            extracted = extract_span_payload(payload, Path(url.split("?")[0]).name)
-            if extracted is None:
-                continue
-            name, data = extracted
-            target = out / name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(data)
-            print(f"SPAN_FILE={target}")
-            print(f"SOURCE_URL={url}")
-            print(f"BYTES={len(data)}")
-            return
+            r = requests.get(url, headers=headers, timeout=(6, 45), stream=True)
+            content_type = str(r.headers.get('Content-Type') or '').lower()
+            status = r.status_code
+            if status == 200 and 'text/html' not in content_type:
+                payload = r.content
+                name = url.rsplit('/', 1)[-1]
+                extracted = extract_span_payload(payload, name)
+                r.close()
+                if extracted is not None:
+                    name, data = extracted
+                    target = out / name
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    target.write_bytes(data)
+                    print(f'SPAN_FILE={target}')
+                    print(f'SOURCE_URL={url}')
+                    print(f'BYTES={len(data)}')
+                    return
+            print(f'SPAN_PROBE status={status} type={content_type} url={url}')
+            r.close()
         except Exception as exc:
-            print(f"SKIP {url}: {type(exc).__name__}: {exc}")
+            print(f'SPAN_PROBE_ERROR url={url} error={type(exc).__name__}:{exc}')
 
-    raise RuntimeError(
-        "Could not download/extract a usable .spn file. Tried:\n" + "\n".join(tried)
-    )
+    raise RuntimeError('Could not retrieve an NSE SPAN i1-i5 archive for ' + date_token + '. Tried: ' + ', '.join(tried))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
