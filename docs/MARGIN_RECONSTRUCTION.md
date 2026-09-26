@@ -97,14 +97,15 @@ The difference between these two 2.5% thresholds is only ₹6.59 for this calibr
 
 ### Margin formula validated by the calibration
 
-The reconstructed portfolio margin decomposes into:
-
-`SPAN ₹27,647.10 + exposure ₹60,165.30 + option-premium ₹529.75 = ₹88,342.15`
-
-However, `marginism`'s consolidated basket total is ₹87,812.40 because the option-premium component is handled within the engine's portfolio aggregation/offset treatment. The authoritative calibration output in the workflow should be treated as the consolidated basket total, not as a naïve sum of displayed line components.
+The consolidated initial/final margin is exactly `SPAN ₹27,647.10 + exposure ₹60,165.30 = ₹87,812.40`. The `option_premium ₹529.75` field is reported separately by the engine and is not added to the consolidated margin total. The authoritative calibration output should therefore use the consolidated basket total ₹87,812.40.
 
 ### Historical implication
 
 The 2.5% denominator question is now resolved in principle: it is a **margin-required denominator**, and the SPAN-based reconstruction reproduces the user's screenshot closely. The remaining work is to generate the historical margin series for the full candidate set and attach a margin value to every entry timestamp/strike.
 
 That historical series should use the exchange's contemporaneous SPAN archive for each entry date, not today's margin rates retroactively.
+## Direct NSE SPAN source and checksum
+
+The calibration used the official archive naming/pattern documented by an independent open-source NSE/NSCCL margin integration: `https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.20260925.i5.zip`. The extracted SPAN payload was `nsccl.20260925.i05.spn` with SHA-256 `b1d00132a6397e5b8d5b13524f89142605fefc8901cecabe370ff73509ba0f3f`.
+
+The complete calibration report is committed at `results/phase7a/margin_calibration_2026-09-25.json`.
