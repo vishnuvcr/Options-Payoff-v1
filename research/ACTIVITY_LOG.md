@@ -11,3 +11,5 @@ This is the observable research/repository activity log. It records actions, out
 | 2026-09-26 | 0 | Formalized research plan | Six research phases defined; Phase 1 is next.
 
 | 2026-09-26 | 5 | Created `phase-5-regimes` branch | Added frozen regime attribution protocol, source audit, executable scaffold and manual workflow; empirical execution remains gated. |
+
+| 2026-09-26 | 5 | Audited continuation after user approval | Repaired Phase 4/5 artifact handoffs and corrected Phase 3 configured-capital trigger plumbing on `phase-5-regimes`; empirical execution remains pending. |
