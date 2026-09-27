@@ -199,3 +199,10 @@ Its current historical implementation remains negative after modeled costs.
 Phase 8 does not rescue it through an (S_2-S_1) filter.
 
 The research should therefore move to final synthesis rather than adding more predictors without a new, predeclared source of information or a materially larger independent dataset.
+
+
+## CRITICAL CORRECTION — Phase 8A is superseded
+
+The Phase 8A predictor was trained and evaluated against a realized-P&L decomposition that assumed the far-expiry options remained open until the far expiry. The user's actual strategy manually closes those far legs at the near expiry. Consequently the S2-S1 target and all Phase 8A economic filter results are not valid for the actual strategy and must not be used for deployment decisions.
+
+Phase 8A may be retained as a historical analysis of a different holding-period variant, but it is not part of the corrected strategy evidence.
