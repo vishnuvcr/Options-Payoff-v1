@@ -14,3 +14,7 @@
 
 ### Rissin validation result — 2026-09-27
 The dedicated Rissin coverage workflow sampled 96 timestamps for each far-rank (H2/H3) across 2024–2026. H2 had far-expiry rows at 64/96 samples and an exact 17-shift grid at 26/96; H3 had far-expiry rows at 63/96 and an exact 17-shift grid at 15/96. The 2024 samples were pre-coverage and had zero rows; the dataset's intraday track starts in October 2024. Therefore Rissin **passes the empirical coverage gate for 2025–2026 and partially for late 2024**, but is not a complete 2021–2026 source.
+
+
+### External-source review extension — 2026-09-27
+Current public-source review identified two additional replacement candidates. optionsdata.shop publicly advertises 1-minute NIFTY option chains with every strike and every expiry from June 2021 through September 2026, including OI, in Parquet/CSV. SauMStats' NIFTY data engine documents arbitrary expiry + trade-date queries and intraday option prices, with explicit expiry/strike/type fields. These are source leads only until an empirical pre-entry H2/H3 coverage test is run. The current Rissin branch remains the first open-source source being reconstructed.
