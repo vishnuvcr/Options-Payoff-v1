@@ -256,3 +256,10 @@ The corrected code and regression tests are committed on `phase-9-near-expiry-ex
 ## Phase 9A latest correction checkpoint
 
 Before accepting any realized H1 output, three implementation audits are now resolved: (1) far legs use observed near-expiry option prices rather than far-expiry settlement; (2) entry and far-leg exit slippage is included in realized gross P&L, not only fees; (3) entry and near-expiry exit/exercise tax dates are handled separately. Phase 9A v3 run **36296334057** is executing the corrected code. Phase 9B validation is prepared on `phase-9B-near-exit-validation` and will trigger from successful v3 completion.
+
+
+## Phase 9A completed result
+
+Authoritative GitHub Actions run **36297418698** completed successfully using the corrected near-expiry manual-close convention. The H1 artifact contains **252 weekly cycles**, **64 selected trades**, **₹12,317.86 net P&L**, **₹25,859.55 gross P&L**, **₹13,541.69 modeled costs**, **51.56% win rate**, and **1.47 profit factor** at 0.25% premium slippage and ₹20/order brokerage. Independent audit found 27/31 losers already negative before costs, 4 cost-only flips, no missing far-leg exits, and no far-leg exit after near expiry. See `docs/PHASE9A_RESULTS.md`.
+
+Phase 9B is now the next required validation phase. H2/H3 remain frozen until Phase 9B completes.
