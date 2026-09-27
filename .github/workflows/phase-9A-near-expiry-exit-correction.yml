@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v10 chunked)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v11 chunked)
 
 on:
   workflow_dispatch:
@@ -67,9 +67,7 @@ jobs:
           YEAR_END="${YEAR}-12-31"
           if [[ "$YEAR_START" < "$INPUT_START" ]]; then YEAR_START="$INPUT_START"; fi
           if [[ "$YEAR_END" > "$INPUT_END" ]]; then YEAR_END="$INPUT_END"; fi
-          if [[ "$YEAR_START" > "$YEAR_END" ]]; then
-            echo 'No dates in this matrix chunk; create a sentinel and exit.'
-            mkdir -p data/derived
+          mkdir -p data/derived
             python - <<'PY'
 import pandas as pd
 pd.DataFrame(columns=['entry_timestamp','status']).to_parquet('data/derived/strategy_inputs_${{ matrix.year }}.parquet', index=False)
