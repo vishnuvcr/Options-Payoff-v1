@@ -88,6 +88,36 @@ def main():
     summary_df=pd.DataFrame(summaries); summary_df.to_csv(out/'horizon_summary.csv',index=False)
     annual_rows(horizons).to_csv(out/'annual_summary.csv',index=False)
 
+    # Predeclared selection-behaviour analysis: compare first-positive decision time
+    # and selected strike displacement across fixed H1/H2/H3 horizons.
+    selection_rows=[]
+    for h,df in horizons.items():
+        if df.empty:
+            continue
+        x=df.copy()
+        x['entry_timestamp']=pd.to_datetime(x['entry_timestamp'],errors='coerce')
+        if 'shift_points' not in x.columns:
+            continue
+        x['entry_hour_decimal']=x['entry_timestamp'].dt.hour + x['entry_timestamp'].dt.minute/60.0
+        selection_rows.append({
+            'horizon':h,
+            'trades':int(len(x)),
+            'mean_first_positive_minutes_after_0920':float(((x['entry_timestamp'].dt.hour*60+x['entry_timestamp'].dt.minute)-560).mean()),
+            'median_first_positive_minutes_after_0920':float(((x['entry_timestamp'].dt.hour*60+x['entry_timestamp'].dt.minute)-560).median()),
+            'p90_first_positive_minutes_after_0920':float(((x['entry_timestamp'].dt.hour*60+x['entry_timestamp'].dt.minute)-560).quantile(0.90)),
+            'mean_selected_shift_points':float(pd.to_numeric(x['shift_points'],errors='coerce').mean()),
+            'median_selected_shift_points':float(pd.to_numeric(x['shift_points'],errors='coerce').median()),
+            'abs_shift_mean_points':float(pd.to_numeric(x['shift_points'],errors='coerce').abs().mean()),
+            'atm_selection_pct':float(100*(pd.to_numeric(x['shift_points'],errors='coerce')==0).mean()),
+        })
+    pd.DataFrame(selection_rows).to_csv(out/'selection_behaviour_summary.csv',index=False)
+    for h,df in horizons.items():
+        if df.empty or 'shift_points' not in df.columns:
+            continue
+        pd.DataFrame({'shift_points':sorted(pd.to_numeric(df['shift_points'],errors='coerce').dropna().unique())}).assign(
+            count=lambda z:[int((pd.to_numeric(df['shift_points'],errors='coerce')==v).sum()) for v in z['shift_points']]
+        ).to_csv(out/f'{h}_strike_shift_distribution.csv',index=False)
+
     paired=[]
     h1k=h1[['near_expiry','net_pnl_inr']].copy(); h1k['near_expiry']=h1k['near_expiry'].astype(str); h1k=h1k.rename(columns={'net_pnl_inr':'h1_net'})
     for h in ('H2','H3'):
