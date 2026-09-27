@@ -2,3 +2,6 @@
 
 ### Tooling correction — 2026-09-27
 Run 1 failed because the validator compared an Arrow timezone-aware timestamp column with string filter bounds. This was a validation-code defect; no source-coverage conclusion was drawn. The filter now uses the dataset's date column with a typed Arrow scalar.
+
+### Tooling correction 2 — 2026-09-27
+The first automated patch encoded a literal backslash-n in the Python import line, causing a SyntaxError before any data were read. This was a repository-editing defect only; no source inference was accepted. The source-validation branch is being rerun from a corrected file.
