@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-9G-final-results
-**Overall status:** Phase 9G COMPLETE — corrected H1 result accepted; H2/H3 not adjudicated on primary source
+**Active branch:** phase-9H-loss-entry-analysis
+**Overall status:** Phase 9G COMPLETE; Phase 9H OPEN — bounded loss-trade entry analysis running against the frozen H1 rule
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -219,6 +219,7 @@ The economically important cross-expiry S2-S1 term is not predicted robustly eno
 | 7C Greeks / entry features | COMPLETE | No single Greek/IV/moneyness feature robust enough to adopt. |
 | 8A S2-S1 predictability | COMPLETE | No sufficiently stable OOS S2-S1 filter; no predictor adopted. |
 | 8B External variables | NOT PROMOTED | Predeclared stop rule prevents open-ended predictor search without stronger independent data. |
+| 9H Loss-trade entry analysis | OPEN | Tests bounded entry-time/strike alternatives around realized H1 losses; no strategy change accepted yet. |
 
 Current consolidated conclusion: **the final positive-flatline weekly strategy is not validated as a deployable edge under the cached historical implementation.** See `docs/PHASE8_S2_S1_RESULTS.md` and `docs/FINAL_CONCLUSION.md`.
 
@@ -465,3 +466,16 @@ The exact current H1 rule has positive historical net P&L after modeled costs, b
 Final report: docs/PHASE9G_FINAL_RESULTS.md  
 Candidate strategy: docs/PHASE9G_CANDIDATE_STRATEGY_FINAL.md  
 Final machine-readable summary: results/phase9g/final_summary.json
+
+
+## Phase 9H — Loss-trade entry analysis OPEN — 2026-09-27
+
+Branch: phase-9H-loss-entry-analysis
+
+The frozen Phase 9G H1 rule is not being changed yet. Phase 9H tests whether realized losses could have been avoided by bounded entry changes:
+- alternate strike at the same valid decision timestamp;
+- next valid exact-17 timestamp;
+- fixed 15/30/60/120 minute waits;
+- ex-post later-entry upper bounds.
+
+No exit changes, additional market filters, or free-form timestamp optimization are allowed in this phase. Results are not yet accepted.
