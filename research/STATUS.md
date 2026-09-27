@@ -409,3 +409,6 @@ The dedicated source audit (runs 36317177731 and 36317271416) sampled 152 timest
 
 ### 2026-09-27 — Three-year interim H1 checkpoint
 Corrected run 27 has now completed 2021, 2024 and 2026. Combined interim H1: **54 realized trades, ₹51,403.50 net P&L, 72.22% realized win rate** at the primary cost model. Remaining years 2022/2023/2025 are still reconstructing. No pooled Phase 9G conclusion is accepted.
+
+### 2026-09-27 — Cross-source measurement sensitivity
+The same H1 rule and primary cost model produced different annual results across the HF and Rissin datasets, especially in 2026 (net difference ₹37,212.29). This is now a formal limitation: no cross-source pooling or vendor preference is allowed without measurement-equivalence evidence.
