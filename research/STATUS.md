@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-9D-intraday-recheck-correction
-**Overall status:** Phase 9D — corrected no-skip intraday H1 reconstruction in progress
+**Active branch:** phase-9G-final-results
+**Overall status:** Phase 9G COMPLETE — corrected H1 result accepted; H2/H3 not adjudicated on primary source
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -416,3 +416,52 @@ The same H1 rule and primary cost model produced different annual results across
 
 ### 2026-09-27 — Interim Rissin H2/H3 reconstruction
 The corrected Rissin branch has completed 2024 and 2026. 2024: H1 11 selected/9 realized/₹18,690.31 net; H2 6/4/₹5,306.22; H3 0. 2026: H1 18/18/₹58,226.92; H2 16/15/₹78,568.51; H3 11/11/₹74,265.41. The pooled same-source paired tests across these completed years remain statistically unresolved: H2-H1 mean ₹1,272.74 with block-4 bootstrap CI crossing zero; H3-H1 mean ₹3,367.84 with CI crossing zero. No horizon selector adopted; 2025 remains pending.
+
+
+## Phase 9G — FINAL STATUS — 2026-09-27
+
+**Status: COMPLETE.**
+
+Authoritative primary reconstruction: run **36313815542**, frozen execution commit **63b399a9a1d631316dd5233bc684a4ee0a197b25**.
+
+All six yearly reconstruction jobs (2021–2026) completed successfully. The run-27 pooled merge initially failed only because a zero-byte incomplete CSV was passed to pandas. This aggregation defect was repaired on branch phase-9G-final-merge-run27 and the corrected merge workflow **36320697995** completed successfully using the six frozen yearly artifacts.
+
+### Corrected primary H1
+
+- 131 complete realized trades; 2 incomplete selected rows.
+- Net P&L: **₹71,868.76**
+- Gross P&L: ₹100,816.81
+- Modeled costs: ₹28,948.05
+- Realized win rate: **58.78%**
+- Wilson 95% CI: **50.22%–66.84%**
+- Profit factor: **2.29**
+- Maximum drawdown: **₹15,704.24**
+- IID bootstrap mean-P&L CI: **₹212.77–₹867.02**
+- Four-trade block bootstrap mean-P&L CI: **₹199.66–₹872.13**
+- Static chart-positive rate: **100%**; realized win rate is not 100%.
+
+### Selection behaviour
+
+- Median first-positive delay: 210 minutes after 09:20.
+- P90 delay: 357 minutes.
+- ATM selection: 0%.
+- Median selected shift: -250 points.
+- Mean absolute selected shift: 329.4 points.
+
+### H2/H3 decision
+
+The primary Hugging Face source cannot adjudicate H2/H3 because the far-rank-2 and far-rank-3 partitions do not contain the required pre-entry intraday observations. This is a data-source coverage limitation, not zero strategy performance. No H2/H3 result is interpreted as a zero-P&L result.
+
+The independent Rissin reconstruction is retained as source-sensitivity evidence only. Its positive same-source paired H2-H1 and H3-H1 differences do not override the primary-source coverage limitation and do not justify dynamic horizon selection.
+
+### Execution sensitivity
+
+At the primary 0.25% slippage + ₹20/order model, H1 net P&L is ₹71,868.76. The result remains positive through 0.50% slippage at all tested brokerage levels and through 1.00% slippage at ₹10/₹20 brokerage; it is negative at 1.00% slippage + ₹40/order.
+
+### Phase conclusion
+
+The exact current H1 rule has positive historical net P&L after modeled costs, but not a 100% realized win rate. H2/H3 are not adjudicated from the primary source. No dynamic horizon-switching rule is adopted.
+
+Final report: docs/PHASE9G_FINAL_RESULTS.md  
+Candidate strategy: docs/PHASE9G_CANDIDATE_STRATEGY_FINAL.md  
+Final machine-readable summary: results/phase9g/final_summary.json
