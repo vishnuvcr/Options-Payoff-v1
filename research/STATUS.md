@@ -201,3 +201,7 @@ The primary weekly rule is fixed: first positive observation in the weekly cycle
 63 selected weekly trades contained 36 winners and 27 losers. Greek/IV/moneyness winner-loser differences were not robust after Benjamini-Hochberg correction (best q ≈ 0.435 among tested Greek/IV features). Every full-coverage single-feature selector tested underperformed maximum positive flatline. Walk-forward training selected near-expiry call-put IV skew (maximum) in both splits, but it underperformed the baseline by ₹100.98/week and ₹66.24/week respectively in the two 16-week test blocks. Primary strike-selection rule remains unchanged.
 
 Reproducibility tables published under `results/phase7c/`; detailed methodology/results are in `docs/ENTRY_FEATURE_GREEK_ANALYSIS.md`. Phase 7C is frozen unless the primary rule or underlying data changes.
+
+## Phase 8A — S2-S1 predictor analysis OPEN
+
+Hypothesis: the cross-expiry settlement difference can be predicted sufficiently well from information available at the first-positive entry observation to improve the weekly trade/no-trade decision. The first test is deliberately internal-data-only; external market variables are reserved for Phase 8B if justified by the internal baseline.
