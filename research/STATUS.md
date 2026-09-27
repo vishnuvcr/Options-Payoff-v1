@@ -221,3 +221,19 @@ The economically important cross-expiry S2-S1 term is not predicted robustly eno
 | 8B External variables | NOT PROMOTED | Predeclared stop rule prevents open-ended predictor search without stronger independent data. |
 
 Current consolidated conclusion: **the final positive-flatline weekly strategy is not validated as a deployable edge under the cached historical implementation.** See `docs/PHASE8_S2_S1_RESULTS.md` and `docs/FINAL_CONCLUSION.md`.
+
+
+## Phase 9 — Far-expiry selection grid OPEN
+
+**Branch:** phase-9-far-expiry-selection-grid
+
+User-proposed extension: keep the near weekly expiry fixed but allow the far leg to be selected from next week (H=1), next-next week (H=2), or next-next-next week (H=3).
+
+Primary design:
+- scan H=1/2/3 × the 17 common strikes;
+- keep only positive/all-green flatlines;
+- select the maximum positive estimated equal max-profit=max-loss value;
+- preserve the first-positive observation rule;
+- model H=2/H=3 positions as overlapping across weekly cycles rather than as independent trades.
+
+No empirical Phase 9 result has yet been accepted. The H=1 current strategy remains the frozen comparator until the new analysis is run with walk-forward and portfolio-level overlap accounting.
