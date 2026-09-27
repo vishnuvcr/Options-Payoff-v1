@@ -199,3 +199,30 @@ def threshold_met(pnl: float, base_value: float, threshold_pct: float = 2.5) -> 
     if base_value <= 0:
         raise ValueError("base_value must be positive")
     return (pnl / base_value) * 100.0 > threshold_pct
+
+
+
+def near_expiry_manual_close_pnl(
+    near_spot: float,
+    common_strike: float,
+    near_call: float,
+    near_put: float,
+    far_call_entry: float,
+    far_put_entry: float,
+    far_call_exit: float,
+    far_put_exit: float,
+) -> float:
+    """Gross per-unit P&L when all four legs are closed at near expiry.
+
+    The near-expiry short CE and long PE settle intrinsically at T1. The
+    farther-expiry long CE and short PE are manually squared off at T1 using
+    their observed executable exit prices. This is the user's actual exit
+    convention and is distinct from holding the far options to their own
+    expiry.
+    """
+    entry_cashflow = near_call - near_put - far_call_entry + far_put_entry
+    near_pair_payoff = -intrinsic_value("CE", near_spot, common_strike) + intrinsic_value(
+        "PE", near_spot, common_strike
+    )
+    far_close_value = far_call_exit - far_put_exit
+    return entry_cashflow + near_pair_payoff + far_close_value
