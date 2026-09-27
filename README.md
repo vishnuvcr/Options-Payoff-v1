@@ -230,3 +230,23 @@ Machine-readable results: [results/phase9e/summary.json](results/phase9e/summary
 Validation workflow: [.github/workflows/phase-9E-h1-validation.yml](.github/workflows/phase-9E-h1-validation.yml)
 
 **Next:** a non-optimizing point-in-time cross-market/regime audit of the corrected H1 ledger; H2/H3 remains frozen until that audit completes.
+
+## Phase 9F — Cross-market and regime audit COMPLETE
+
+Phase 9F completed a descriptive, point-in-time contextual audit of the corrected H1 ledger without changing the trading rule.
+
+- Workflow: **36304036908**
+- 169 complete trades analyzed
+- India VIX and NIFTY coverage: 100%; Sensex: 160/169
+- FII/DII source had only 16 recoverable rows and was excluded from inference under strict recency controls
+- Highest India-VIX quartile: 42 trades, **₹2,925.31 net P&L**, **₹69.65 mean/trade**, PF **1.10**, dependence-aware CI crossing zero
+- Sensex-outperform group: **₹978.79 mean/trade**; NIFTY-outperform group: **₹411.26** — descriptive only
+- No continuous market-context association survived BH correction at 5%
+- No regime filter or global/FII-DII filter adopted
+
+Detailed report: [docs/PHASE9F_RESULTS.md](docs/PHASE9F_RESULTS.md)  
+Source/plan: [docs/PHASE9F_REGIME_CROSSMARKET_PLAN.md](docs/PHASE9F_REGIME_CROSSMARKET_PLAN.md)  
+Machine-readable results: [results/phase9f/summary.json](results/phase9f/summary.json)  
+Workflow: [.github/workflows/phase-9F-regime-crossmarket-audit.yml](.github/workflows/phase-9F-regime-crossmarket-audit.yml)
+
+**Next:** H2/H3 far-expiry selection research is reopened on a separate preregistered branch; the H1 rule remains frozen while that research runs.
