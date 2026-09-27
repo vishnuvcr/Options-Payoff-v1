@@ -141,7 +141,7 @@ def main():
     trades=pd.read_csv(args.trades)
     if len(trades)!=169: raise SystemExit(f'Expected 169 complete trades, got {len(trades)}')
     trades['entry_date']=pd.to_datetime(trades['entry_date']).dt.date
-    start=min(trades.entry_date).isoformat(); end=(max(trades.entry_date)+pd.Timedelta(days=2)).date().isoformat()
+    start=min(trades.entry_date).isoformat(); end=(pd.Timestamp(max(trades.entry_date))+pd.Timedelta(days=2)).date().isoformat()
 
     nse_idx,nse_vix,nse_source=fetch_nse()
     if nse_idx.empty: nse_idx=fetch_yf('^NSEI','2021-01-01',end); nse_source='yfinance fallback' if not nse_idx.empty else 'unavailable'
@@ -181,7 +181,7 @@ def main():
 
     # Same-day opening gap is known by 09:20, and remains known for later entries.
     if not nifty.empty and {'open','close'}.issubset(nifty.columns):
-        op=nifty[['date','open','close']].copy(); op['date']=pd.to_datetime(op['date']); op['prev_close']=op['close'].shift(1); op['gap']=op['open']/op['prev_close']-1; op=op.drop(columns=['open','close','prev_close'])
+        op=nifty[['date','open','close']].copy(); op['date']=pd.to_datetime(op['date']); op['prev_close']=op['close'].shift(1); op['nifty_same_day_open_gap']=op['open']/op['prev_close']-1; op=op.drop(columns=['open','close','prev_close'])
         joined=joined.merge(op,left_on='entry_date',right_on='date',how='left').drop(columns=['date'],errors='ignore')
 
     # Predeclared descriptive regimes.
@@ -190,7 +190,7 @@ def main():
         if len(ok)<8: return pd.Series([np.nan]*len(s),index=s.index)
         qs=ok.quantile([.25,.5,.75]).to_list(); return pd.cut(s,[-np.inf,*qs,np.inf],labels=['Q1','Q2','Q3','Q4'])
     if 'vix_india_vix_prev' in joined: joined['india_vix_regime']=qbin(joined['vix_india_vix_prev'])
-    if 'nifty_nifty_open_gap' in joined: joined['nifty_gap_regime']=np.select([joined.nifty_nifty_open_gap < -0.002, joined.nifty_nifty_open_gap > 0.002],['negative','positive'],default='flat')
+    if 'nifty_same_day_open_gap' in joined: joined['nifty_gap_regime']=np.select([joined.nifty_same_day_open_gap < -0.002, joined.nifty_same_day_open_gap > 0.002],['negative','positive'],default='flat')
     if 'fii_dii_fii_net' in joined: joined['fii_regime']=np.where(joined.fii_dii_fii_net>=0,'FII_net_buy','FII_net_sell')
     if 'fii_dii_dii_net' in joined: joined['dii_regime']=np.where(joined.fii_dii_dii_net>=0,'DII_net_buy','DII_net_sell')
     if {'global_sp500_ret','global_nasdaq_ret'}.issubset(joined.columns): joined['global_risk_regime']=np.where((joined.global_sp500_ret>=0)&(joined.global_nasdaq_ret>=0),'risk_on',np.where((joined.global_sp500_ret<0)&(joined.global_nasdaq_ret<0),'risk_off','mixed'))
@@ -206,7 +206,7 @@ def main():
     pd.DataFrame(reg).to_csv(out/'regime_summary.csv',index=False)
 
     corr=[]
-    numeric=[c for c in joined.columns if any(k in c for k in ['india_vix_prev','nifty_nifty_open_gap','nifty_nifty_prev_ret','global_','fii_dii_'])]
+    numeric=[c for c in joined.columns if any(k in c for k in ['india_vix_prev','nifty_same_day_open_gap','nifty_nifty_open_gap','nifty_nifty_prev_ret','global_','fii_dii_'])]
     for c in numeric:
         x=pd.to_numeric(joined[c],errors='coerce'); y=pd.to_numeric(joined.net_pnl_inr,errors='coerce'); mask=x.notna()&y.notna()
         if mask.sum()<10: continue
