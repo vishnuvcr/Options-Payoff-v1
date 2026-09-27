@@ -130,12 +130,20 @@ def fetch_fii_json(dates):
     return pd.DataFrame(rows)
 
 def prior_merge(trades, ctx, prefix):
-    ctx=ctx.copy(); ctx['date']=pd.to_datetime(ctx['date'])
-    t=trades.copy(); t['entry_date']=pd.to_datetime(t['entry_date'])
-    t=t.sort_values('entry_date'); ctx=ctx.sort_values('date')
-    out=pd.merge_asof(t,ctx,left_on='entry_date',right_on='date',direction='backward',allow_exact_matches=False,suffixes=('','_ctx'))
-    ren={c:f'{prefix}_{c}' for c in ctx.columns if c!='date' and c in out.columns}
-    return out.rename(columns=ren)
+    ctx=ctx.copy()
+    ctx['date']=pd.to_datetime(ctx['date'],errors='coerce')
+    ctx=ctx.dropna(subset=['date']).sort_values('date')
+    t=trades.copy()
+    t['entry_date']=pd.to_datetime(t['entry_date'],errors='coerce')
+    # Remove merge-helper columns created by earlier context joins.
+    helper_cols=[col for col in t.columns if col=='date' or col.startswith('date_')]
+    if helper_cols: t=t.drop(columns=helper_cols)
+    t=t.sort_values('entry_date')
+    data_cols=[col for col in ctx.columns if col!='date']
+    right=ctx[['date']+data_cols].copy()
+    right=right.rename(columns={col:f'{prefix}_{col}' for col in data_cols})
+    out=pd.merge_asof(t,right,left_on='entry_date',right_on='date',direction='backward',allow_exact_matches=False)
+    return out.drop(columns=['date'],errors='ignore')
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--trades',required=True); ap.add_argument('--out-dir',required=True); ap.add_argument('--seed',type=int,default=20260927); args=ap.parse_args()
