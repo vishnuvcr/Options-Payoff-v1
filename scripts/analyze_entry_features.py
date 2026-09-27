@@ -340,7 +340,7 @@ def main():
         "positive_candidate_definition":"static one-dimensional flatline > 0 at the decision timestamp",
         "primary_rule":"first positive weekly observation; among positive candidates maximize estimated equal max-profit=max-loss flatline",
         "selector_test_note":"Each alternative feature selects one positive candidate per week by max/min. These are exploratory univariate tests and must not be treated as an optimized final strategy without out-of-sample validation.",
-        "baseline_selector_total_net_pnl_inr": float(baseline_selector.total_net_pnl_inr.iloc[0]) if not baseline_selector.empty else None
+        "baseline_selector_total_net_pnl_inr": float(baseline_selector.alt_total_net_pnl_inr.iloc[0]) if not baseline_selector.empty else None
     }
     (out/"summary.json").write_text(json.dumps(summary,indent=2),encoding="utf-8")
     print(json.dumps(summary,indent=2))
