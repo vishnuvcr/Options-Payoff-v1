@@ -287,3 +287,11 @@ The authoritative Phase 9D audit found the old 169-trade control did not consist
 
 ### Phase 9G live reconstruction checkpoint — 2026-09-27
 Run **36313815542** is the current corrected execution and remains **in progress** on the frozen exact-17-strike commit **63b399a9a1d631316dd5233bc684a4ee0a197b25**. The H1 completeness gate has completed successfully. All six yearly H1/H2/H3 reconstruction jobs have completed checkout, dependency installation and option-data caching and are currently in the reconstruction step. No yearly P&L, horizon comparison, sensitivity, or H2/H3 conclusion has been accepted yet.
+
+
+### Phase 9G source-coverage finding — 2026-09-27
+The corrected run has now completed 2024 and 2026 H1 reconstructions. Interim H1 results are 26 realized trades / ₹20,656.83 net for 2024 and 14 realized trades / ₹21,014.63 net for 2026, at the primary 0.25% slippage + ₹20/order cost model. These are interim yearly results only, not the pooled Phase 9G conclusion.
+
+A dedicated H2/H3 data-coverage audit then found a source limitation in thetrademarkk/india-index-options-1m: across 152 sampled timestamps for each of far-rank 2 and far-rank 3, the far-expiry file had zero rows on the entry date, hence zero common CE/PE strikes and zero exact 17-shift surfaces. The expiry files typically start about eight calendar days before their own expiry, which is enough to cover H1 but not H2/H3 entry dates. This is documented in docs/PHASE9G_SOURCE_COVERAGE.md and results/phase9g_h2_h3_source_coverage_audit.json.
+
+Interpretation: H2/H3 zero counts from this source are a data-coverage limitation, not a strategy result. NSE currently specifies four weekly NIFTY 50 option expiries, so the absence of H2/H3 observations in this dataset cannot be interpreted as non-existence of the contracts. A source with pre-entry intraday quotes for every live expiry is required before H2/H3 inference is accepted.
