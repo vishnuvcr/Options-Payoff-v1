@@ -17,6 +17,7 @@ class NearExpiryBacktestTests(unittest.TestCase):
             far_call_close=10.0,
             far_put_close=10.0,
             near_settlement=100.0,
+            near_exit_timestamp="2026-08-04 15:30:00+05:30",
             far_call_exit_close=12.0,
             far_put_exit_close=7.0,
             near_lot_size=50,
