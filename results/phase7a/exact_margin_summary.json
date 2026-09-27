@@ -1,0 +1,71 @@
+{
+  "exact_rule": {
+    "candidate_range": "ATM-400 to ATM+400 in 50-point steps",
+    "threshold_pct": 2.5,
+    "denominator": "NSE/NSCCL SPAN-based margin required; i1 begin-day primary, s settlement-file sensitivity",
+    "primary_selector": "maximum estimated equal max-profit=max-loss value in INR",
+    "secondary_selector": "maximum max-profit percentage; identical selections to primary in the exact qualifying set"
+  },
+  "coverage": {
+    "total_historical_entry_dates": 891,
+    "span_i1_coverage_pct": 100,
+    "span_s_coverage_pct": 100,
+    "dates_requiring_candidate_margin_reconstruction": 11,
+    "candidate_rows_reconstructed_after_exact_elm_prefilter": 31,
+    "qualifying_rows_i1": 4,
+    "qualifying_timestamps_i1": 4,
+    "qualifying_rows_s": 3,
+    "qualifying_timestamps_s": 3
+  },
+  "i1_primary": {
+    "trades": 4,
+    "net_pnl_inr": 42680.169233918576,
+    "mean_pnl_inr": 10670.042308479644,
+    "median_pnl_inr": 12309.19907608396,
+    "win_rate_pct": 75,
+    "profit_factor": 8.369552433716072,
+    "max_drawdown_inr": -5791.419440705064,
+    "largest_loss_inr": -5791.419440705064,
+    "largest_win_inr": 23853.19052245572,
+    "total_costs_inr": 647.480766081425,
+    "static_chart_pnl_inr": 7895.000000000003,
+    "gross_pnl_inr": 43327.649999999994,
+    "mean_margin_required_inr": 52621,
+    "selected_shifts": [
+      100,
+      300,
+      -250,
+      -400
+    ]
+  },
+  "s_sensitivity": {
+    "trades": 3,
+    "net_pnl_inr": 23671.26373408646,
+    "mean_pnl_inr": 7890.421244695487,
+    "median_pnl_inr": 5609.492652335804,
+    "win_rate_pct": 66.66666666666666,
+    "profit_factor": 5.087299145993931,
+    "max_drawdown_inr": -5791.419440705064,
+    "largest_loss_inr": -5791.419440705064,
+    "largest_win_inr": 23853.19052245572,
+    "total_costs_inr": 466.55501591358757,
+    "static_chart_pnl_inr": 6222.500000000002,
+    "gross_pnl_inr": 24137.818750000042,
+    "selected_shifts": [
+      100,
+      300,
+      -250
+    ]
+  },
+  "platform_calibration": {
+    "screenshot_margin_inr": 88076,
+    "reconstructed_i5_margin_inr": 87812.4,
+    "difference_pct": 0.2992869794,
+    "screenshot_2_5pct_amount_inr": 2201.9,
+    "reconstructed_2_5pct_amount_inr": 2195.31
+  },
+  "key_correction": {
+    "note": "The first exact-margin artifact used a deliberately loose 1% per-short ELM prefilter and the wider cached ±500 candidate grid. This was a superset only; after applying the actual 2% per-short NIFTY index ELM lower bound and the requested ±400 strategy range, the complete primary qualifying set is the four i1 trades above. No qualifying candidate is lost by the corrected lower-bound prefilter.",
+    "superset_result_rows_before_range_filter": 296
+  }
+}
