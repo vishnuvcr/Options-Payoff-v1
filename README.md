@@ -180,3 +180,30 @@ The corrected operational P&L for a selected strike is based on:
 The corrected backtest therefore requires point-in-time prices for the far-expiry options at the near-expiry close. Far-expiry settlement is not an acceptable substitute.
 
 The H=2/H=3 far-expiry selection experiment is paused until the corrected H=1 baseline is completed.
+
+## Phase 9D — Corrected intraday H1 baseline
+
+The final operational interpretation is now implemented: **09:20 is the first check, not a skip gate**. Every available NIFTY 1-minute timestamp from 09:20 through 15:29 is checked; if no positive/all-green payoff exists, the scan continues later that day and across subsequent trading days in the same weekly cycle. At the first positive timestamp, all 17 strikes from ATM-400 through ATM+400 are evaluated and the maximum positive estimated equal Max Profit = Max Loss candidate is selected.
+
+The authoritative H1 run is **36302077730**. It checked **448,280 intraday timestamps**, generated **17,606 decision-surface rows**, and selected **172 weekly-cycle entries**. Three entries had incompatible near/far expiry lot sizes and were retained in the audit but excluded from realized P&L, leaving **169 complete realized trades**.
+
+At **0.25% premium slippage and ₹20/order brokerage**, the corrected near-expiry manual-close model produced:
+
+- **Gross P&L:** ₹162,953.84
+- **Modeled costs:** ₹37,265.02
+- **Net P&L:** **₹125,688.82**
+- **Realized win rate:** 63.91%
+- **Profit factor:** 2.94
+- **Maximum drawdown:** ₹16,200.65
+- **Mean realized-trade P&L:** ₹743.72
+- **Static chart-positive rate:** 100% (a selection-condition metric, not a realized win rate)
+
+Execution sensitivity remained positive at 0.5% and 1.0% premium slippage and at ₹40/order brokerage in the tested historical sample. IID and four-trade block bootstrap intervals for mean realized-trade P&L were approximately ₹442–₹1,039 and ₹444–₹1,069 respectively.
+
+Detailed report: [docs/PHASE9D_RESULTS.md](docs/PHASE9D_RESULTS.md)  
+Compact summary: [results/phase9d/summary.json](results/phase9d/summary.json)  
+Execution sensitivity: [results/phase9d/sensitivity.csv](results/phase9d/sensitivity.csv)  
+Incomplete-selection audit: [results/phase9d/incomplete_selected_trades.csv](results/phase9d/incomplete_selected_trades.csv)
+
+**Research status:** corrected H1 baseline complete; independent walk-forward/holdout validation is next. H2/H3 far-expiry selection remains frozen until that validation phase completes.
+
