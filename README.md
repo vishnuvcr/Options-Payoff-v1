@@ -358,3 +358,21 @@ Annual results: [results/phase9g/annual_summary.csv](results/phase9g/annual_summ
 Execution sensitivity: [results/phase9g/execution_sensitivity.csv](results/phase9g/execution_sensitivity.csv)  
 Strike distribution: [results/phase9g/H1_strike_shift_distribution.csv](results/phase9g/H1_strike_shift_distribution.csv)  
 Merged workflow artifact: [GitHub Actions run 36320697995](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36320697995)
+
+
+## Phase 9H — Loss-trade entry analysis — OPEN
+
+The frozen Phase 9G H1 strategy is now being stress-tested specifically through its realized losing trades. The objective is not to optimize the strategy freely, but to answer a bounded question: could an observed loss have been turned profitable by changing only the entry strike or entry time?
+
+Predeclared tests:
+- same-timestamp alternative strike across all 17 shifts;
+- second valid exact-17 timestamp;
+- 15/30/60/120-minute entry delays;
+- ex-post later-entry upper bounds, clearly labeled non-deployable.
+
+No exit optimization or new market filter is introduced. Results will be compared on the full sample before any candidate change can be considered.
+
+Plan: research/RESEARCH_PLAN.md
+Status: research/STATUS.md
+Error log: research/ERROR_LOG.md
+Workflow: .github/workflows/phase-9H-loss-entry-analysis.yml
