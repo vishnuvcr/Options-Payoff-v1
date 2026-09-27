@@ -484,3 +484,8 @@ No exit changes, additional market filters, or free-form timestamp optimization 
 ## Phase 9H-A — targeted loss-cycle analysis
 
 The initial full-sample Phase 9H implementation was cancelled because the immediate research question is loss-specific and did not require recomputing all winners. The phase has been narrowed to reconstructing the exact entry decision surface only for the 54 realized H1 loss cycles. This preserves the frozen rule, the exact 17-strike completeness gate, the near-expiry far-leg exit convention, and the primary cost model.
+
+
+## Phase 9H accounting correction — 2026-09-27
+
+A first targeted loss reconstruction exposed a transaction-cost accounting defect: far-call exit STT was double-counted. The pre-fix Phase 9H outputs are explicitly invalidated. The corrected implementation now separates entry-leg sell STT from far-call exit STT and the workflow contains a hard baseline-reproduction gate against the frozen Phase 9G loss ledger.
