@@ -233,3 +233,7 @@ A replacement source must provide pre-entry intraday observations for every live
 ## Interim corrected H1 results
 
 Run 27 has completed 2024 and 2026. Under the primary execution-cost model (0.25% premium slippage and ₹20/order brokerage), 2024 contains 26 realized trades with ₹20,656.83 net P&L, while 2026 contains 14 realized trades with ₹21,014.63 net P&L. These are interim calendar-year results only and are not a pooled Phase 9G conclusion until all yearly reconstructions and the predeclared statistical audit complete.
+
+
+## Interim corrected H1 checkpoint
+Three corrected H1 yearly artifacts are complete. The combined interim subset (2021, 2024, 2026) contains 54 realized trades, ₹51,403.50 net P&L and 72.22% realized win rate under 0.25% slippage plus ₹20/order brokerage. The subset is descriptive only until the remaining years and predeclared sensitivity/statistical tests complete.
