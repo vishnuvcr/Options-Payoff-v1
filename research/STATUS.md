@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-7A-margin-reconstruction  
-**Overall status:** Phase 7A — screenshot margin calibration COMPLETE; historical per-entry margin cache PENDING
+**Overall status:** Phase 7A — exact historical margin-denominator selection COMPLETE; primary result is 4 trades
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -128,7 +128,7 @@ The previous 63-trade result is preserved as historical evidence for the superse
 See docs/PHASE7_RESULTS.md for detailed results and interpretation.
 ## Phase 7A status
 
-Calibration target: Sensibull standalone margin ₹88,076 for the screenshot-identifiable 25-Sep-2026 NIFTY 23450 four-leg position, one 65-unit lot. NSE Clearing publishes daily SPAN risk-parameter files and historical margin/volatility data; Phase 7A reconstructs this denominator before replacing the legacy percentage proxy. See `.github/workflows/phase-7A-margin-reconstruction.yml`.
+Calibration target: Sensibull standalone margin ₹88,076 for the screenshot-identifiable 25-Sep-2026 NIFTY 23450 four-leg position, one 65-unit lot. SPAN-based reconstruction calibrated the consolidated margin to ₹87,812.40 (0.2993% below the screenshot). Historical SPAN i1 and s coverage was 100% for all 891 entry dates. See `.github/workflows/phase-7A-margin-reconstruction.yml` and `docs/PHASE7A_RESULTS.md`.
 
 ## Phase 7A calibration result
 
@@ -143,3 +143,20 @@ Calibration target: Sensibull standalone margin ₹88,076 for the screenshot-ide
 - 2.5% of the observed ₹88,076 margin = ₹2,201.90; 2.5% of the closest reconstructed ₹87,812.40 = ₹2,195.31.
 
 The remaining Phase 7A task is historical margin reconstruction for all backtest entry dates/strikes. The screenshot denominator itself is now resolved.
+## Phase 7A exact result
+
+- Strategy range: ATM-400..ATM+400 in 50-point steps
+- Historical margin denominator: NSE/NSCCL SPAN-based margin required
+- Primary snapshot: i1 begin-day SPAN, no look-ahead
+- Exact qualifying i1 trades: 4
+- i1 net P&L: ₹42,680.17
+- i1 mean trade P&L: ₹10,670.04
+- i1 win rate: 75.0%
+- i1 profit factor: 8.37
+- i1 max drawdown: -₹5,791.42
+- i1 modeled costs: ₹647.48
+- Maximum-value vs maximum-percentage selection: identical on all 4 qualifying timestamps
+
+Settlement-file sensitivity produced 3 qualifying trades and ₹23,671.26 net P&L.
+
+The earlier 48-trade/₹166,866.51 Phase 7 result used the superseded buy-premium percentage proxy and must now be treated only as a sensitivity/comparator.
