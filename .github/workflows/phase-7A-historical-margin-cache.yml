@@ -13,7 +13,7 @@ on:
       exposure_lower_bound_rate:
         description: Conservative per-short NIFTY option ELM lower bound used only for prefiltering
         required: true
-        default: '0.01'
+        default: '0.02'
       threshold_pct:
         description: Exact margin-based Max Profit % gate
         required: true
@@ -57,7 +57,8 @@ jobs:
           mkdir -p results
           python scripts/prefilter_margin_candidates.py \
             --candidates data/phase3_source/candidate_results.parquet \
-            --exposure-rate-per-short '${{ inputs.exposure_lower_bound_rate || '0.01' }}' \
+            --exposure-rate-per-short '${{ inputs.exposure_lower_bound_rate || '0.02' }}' \
+            --max-shift-points 400 \
             --out results/phase7a_margin_prefilter.csv
 
       - name: Probe and download historical NSE SPAN i1 / s files
@@ -132,6 +133,7 @@ jobs:
             --span-dir data/margin/span_historical \
             --span-version i1 \
             --skip-missing \
+            --max-shift-points 400 \
             --out results/phase7a_margin_candidates_i1.csv
 
       - name: Analyze exact i1 margin-based selection
@@ -140,6 +142,7 @@ jobs:
           python scripts/analyze_historical_margin_selection.py \
             --margins results/phase7a_margin_candidates_i1.csv \
             --threshold-pct '${{ inputs.threshold_pct || '2.5' }}' \
+            --max-shift-points 400 \
             --out-dir results/phase7a_exact_selection_i1
 
       - name: Reconstruct settlement-file sensitivity margins
@@ -149,6 +152,7 @@ jobs:
             --span-dir data/margin/span_historical \
             --span-version s \
             --skip-missing \
+            --max-shift-points 400 \
             --out results/phase7a_margin_candidates_s.csv
 
       - name: Analyze settlement-file sensitivity
@@ -157,6 +161,7 @@ jobs:
           python scripts/analyze_historical_margin_selection.py \
             --margins results/phase7a_margin_candidates_s.csv \
             --threshold-pct '${{ inputs.threshold_pct || '2.5' }}' \
+            --max-shift-points 400 \
             --out-dir results/phase7a_exact_selection_s
 
       - name: Validate and summarize coverage
