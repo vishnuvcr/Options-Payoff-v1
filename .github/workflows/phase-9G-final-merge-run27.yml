@@ -1,0 +1,53 @@
+name: Phase 9G - Merge Existing Run 27 Artifacts
+
+on:
+  push:
+    branches:
+      - phase-9G-final-merge-run27
+    paths:
+      - .github/workflows/phase-9G-final-merge-run27.yml
+      - research/PHASE9G_RUN27_MERGE_STATUS.md
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Completed Phase 9G run containing yearly artifacts
+        required: true
+        default: '36313815542'
+      bootstrap_reps:
+        description: Bootstrap repetitions
+        required: true
+        default: '20000'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas numpy scipy pyarrow tabulate
+      - name: Download completed yearly artifacts from source run
+        uses: actions/download-artifact@v4
+        with:
+          pattern: phase9g-year-*
+          merge-multiple: false
+          path: phase9g_evidence
+          run-id: ${{ github.event.inputs.source_run_id || '36313815542' }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify all six yearly artifacts exist
+        run: |
+          for y in 2021 2022 2023 2024 2025 2026; do
+            test -d "phase9g_evidence/phase9g-year-$y" || { echo "Missing yearly artifact for $y"; exit 1; }
+          done
+      - name: Merge corrected Phase 9G evidence
+        run: python scripts/merge_phase9g_results.py --evidence-dir phase9g_evidence --out-dir results/phase9g --bootstrap-reps "${{ github.event.inputs.bootstrap_reps || '20000' }}"
+      - name: Upload merged Phase 9G evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9g-run27-merged-results
+          path: results/phase9g
