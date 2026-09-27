@@ -39,3 +39,8 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 7A | Screenshot margin reconstructed | Exact four-leg 23450 calendar/synthetic position calibrated at ₹87,812.40 versus Sensibull ₹88,076; discrepancy 0.2993%. |
 | 2026-09-27 | 7A | Intraday-version calibration | i05 was closest (0.2993%); i03 was 0.4005% away; all i1-i5 were within 0.91%. |
 | 2026-09-27 | 7A | Denominator resolved for screenshot | 2.5% of screenshot margin is ₹2,201.90; 2.5% of the closest reconstructed margin is ₹2,195.31. |
+| 2026-09-27 | 7A | Historical SPAN coverage complete | 891/891 entry dates have i1 and settlement/sensitivity s archives available; all i1-i5 were also available in the coverage probe. |
+| 2026-09-27 | 7A | Exact margin reconstruction complete | A superset of 296 candidates was reconstructed first; after enforcing the correct ±400 range and 2% per-short ELM lower bound, 31 candidates across 11 timestamps required exact margin checks. |
+| 2026-09-27 | 7A | Exact primary selection | 4 i1 timestamps pass the 2.5% margin-based gate; selected shifts are +100, +300, -250 and -400. |
+| 2026-09-27 | 7A | Exact primary P&L | 4 trades, ₹42,680.17 net, 75% win rate, PF 8.37, max drawdown -₹5,791.42 after modeled costs. |
+| 2026-09-27 | 7A | Percentage/value ambiguity resolved empirically | Maximum margin-based percentage and maximum estimated INR flatline select identical strikes on all 4 primary timestamps. |
