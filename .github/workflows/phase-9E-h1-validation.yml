@@ -1,0 +1,74 @@
+name: Phase 9E - Frozen H1 Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Authoritative Phase 9D workflow run containing H1 evidence
+        required: true
+        default: '36302077730'
+      bootstrap_reps:
+        description: Number of bootstrap repetitions
+        required: true
+        default: '20000'
+  push:
+    branches:
+      - phase-9E-h1-validation
+    paths:
+      - .github/workflows/phase-9E-h1-validation.yml
+      - scripts/validate_frozen_h1.py
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-9E-h1-validation
+
+      - name: Download authoritative Phase 9D evidence
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.source_run_id || '36302077730' }}
+          name: phase-9D-final-H1-evidence
+          path: phase9d_evidence
+
+      - name: Run frozen-rule validation
+        run: |
+          python scripts/validate_frozen_h1.py \
+            --evidence-dir phase9d_evidence \
+            --out-dir results/phase9e \
+            --bootstrap-reps ${{ github.event.inputs.bootstrap_reps || '20000' }}
+
+      - name: Validate output invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('results/phase9e/summary.json').read_text())
+          assert x['complete_realized_trades'] == 169
+          assert x['primary_metrics']['net_pnl_inr'] > 0
+          assert x['incomplete_selected_trades'] == 3
+          print(json.dumps(x, indent=2))
+          PY
+
+      - name: Upload Phase 9E evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9E-h1-validation-evidence
+          path: results/phase9e
+
+      - name: Persist validation results
+        env:
+          SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36302077730' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add results/phase9e
+          git commit -m "Add Phase 9E frozen-rule H1 validation results" || echo "No result changes to commit"
+          git push origin phase-9E-h1-validation
