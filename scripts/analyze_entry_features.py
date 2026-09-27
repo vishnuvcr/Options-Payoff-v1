@@ -297,11 +297,10 @@ def main():
     # Compute costs/outcome using the same four-leg economics as the backtest.
     def row_pnl(r):
         x=candidate_payoff_and_cost(r,args.slippage_pct)
-        if x is None:return np.nan
-        flat,gross=x
-        # Approximate the repository's costs are already represented by its selected result.
-        # For candidates, use the same flatline + cross-expiry settlement then subtract a conservative fixed cost proxy.
-        return gross
+        if x is None:
+            return np.nan
+        flat,gross,net,_=x
+        return net
     eligible["candidate_net_pnl_inr"]=eligible.apply(row_pnl,axis=1)
 
     selected_cols=["entry_timestamp","weekly_cycle","shift_points","net_pnl_inr","estimated_equal_max_profit_loss_inr"]
