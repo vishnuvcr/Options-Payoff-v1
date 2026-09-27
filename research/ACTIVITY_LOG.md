@@ -144,3 +144,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | H1 completeness audit | Run 12 reached the H1 gate but failed before data analysis because of doubled shell continuations. The workflow syntax was corrected; a fresh run will be authoritative. |
 
 | 2026-09-27 | 9G | H1 completeness audit | Run 13 successfully downloaded and opened the authoritative Parquet data. The audit then exposed a field-name mismatch (`entry_timestamp` vs `timestamp`), which has been corrected. No completeness conclusion was drawn from the failed attempt. |
+
+| 2026-09-27 | 9G | H1 completeness audit | Second corrected attempt reached data processing successfully; failure was only output-directory creation. Fixed before accepting or interpreting any completeness value. |
