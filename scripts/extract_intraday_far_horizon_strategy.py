@@ -81,7 +81,7 @@ def main():
     if entry_df.empty:
         raise RuntimeError('No intraday index timestamps found')
 
-    expiry_files=list_nifty_expiry_files(start,end)
+    expiry_files=list_nifty_expiry_files(start,end+dt.timedelta(days=35))
     expiry_dates=[x[0] for x in expiry_files]
     filename_by_expiry=dict(expiry_files)
 
@@ -204,7 +204,7 @@ def main():
     audit_df.to_parquet(args.out_scan_audit,index=False)
     surface_df.to_parquet(args.out_decision_surface,index=False)
     meta={
-        'dataset':DATASET,'start':args.start,'end':args.end,
+        'dataset':DATASET,'start':args.start,'end':args.end,'expiry_file_search_end':(end+dt.timedelta(days=35)).isoformat(),
         'entry_start_time_ist':args.entry_start_time,'entry_end_time_ist':args.entry_end_time,'far_rank':args.far_rank,
         'scan_frequency':'every available NIFTY 1-minute timestamp',
         'skipping_rule':'none based on 09:20; continue intraday and across following trading days until first positive candidate in each weekly cycle',
