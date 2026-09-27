@@ -545,3 +545,37 @@ Candidate replacement-source classes now recorded for validation include:
 4. Authenticated broker/API archives such as ICICI Breeze-derived pipelines or MoneyTicks where legally available.
 
 Acceptance gate: source coverage must be demonstrated on representative predeclared weekly cycles before any horizon comparison is pooled. If multiple sources are needed, source provenance and measurement heterogeneity must be analyzed explicitly rather than silently mixing them.
+
+
+## Phase 9G final exit record — 2026-09-27
+
+**Status: COMPLETE.**
+
+Primary frozen reconstruction run 36313815542 completed all six yearly jobs. Corrected merge run 36320697995 accepted the six frozen yearly artifacts.
+
+Primary-source H1 acceptance result:
+- 131 complete realized trades.
+- ₹71,868.76 net P&L at 0.25% slippage and ₹20/order.
+- 58.78% realized win rate.
+- PF 2.29.
+- ₹15,704.24 maximum drawdown.
+- 100% static chart-positive selection rate, not 100% realized wins.
+- H1 decision-time and selected-strike distributions persisted.
+
+H2/H3 primary-source acceptance gate failed on data coverage, not economics: the far-rank-2/3 expiry partitions lacked the required pre-entry observations. Therefore H2/H3 are not assigned zero performance and are not used to choose a production horizon.
+
+Independent Rissin reconstruction is retained only as source-sensitivity evidence. Its matched H2-H1 and H3-H1 results do not justify horizon promotion because source construction differs and there is no untouched holdout.
+
+Phase 9G exit criteria are satisfied:
+- exact 17-strike rule audited;
+- yearly reconstructions complete;
+- corrected pooled merge complete;
+- annual cohorts persisted;
+- execution sensitivity persisted;
+- bootstrap uncertainty persisted;
+- H2/H3 source coverage documented;
+- cross-source sensitivity documented;
+- error/activity logs updated;
+- final manuscript and candidate specification published.
+
+**Phase 9G decision:** retain the fixed H1 next-weekly-expiry rule as the research candidate; do not introduce dynamic H2/H3 switching. Proceed only to untouched forward-holdout and executable-quote validation before any deployment claim.
