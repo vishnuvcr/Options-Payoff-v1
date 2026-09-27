@@ -31,6 +31,7 @@ def build_timestamp_features(strategy_inputs: str, selected_csv: str):
     src=src[src.shift_points.between(-400,400) & (src.shift_points%50==0)].copy()
     # Exact 17-strike surface only. The target is identical across strikes at a given timestamp.
     feat=src.copy()
+    feat["estimated_equal_max_profit_loss_inr"]=(feat["near_call_close"]-feat["near_put_close"]-feat["next_call_close"]+feat["next_put_close"])*feat["near_lot_size"]
     feat=add_greek_features(feat)
     feat[TARGET]=feat["next_settlement"]-feat["near_settlement"]
 
