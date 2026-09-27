@@ -185,3 +185,5 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9H | Accounting regression discovered | A direct 2021-07-20 comparison showed the targeted Phase 9H baseline differed from the frozen Phase 9G ledger because far-call exit STT had been counted twice. All pre-fix Phase 9H outputs are discarded. |
 | 2026-09-27 | 9H | Accounting correction | Fixed entry STT to use only the four entry-leg sell turnover and retained far-call STT as the separate exit transaction. Added a hard baseline-P&L regression gate before any result is accepted. |
+
+| 2026-09-27 | 9H-A | Phase completed | All 54 frozen H1 loss cycles were reconstructed. Baseline P&L matched the accepted Phase 9G ledger within 1e-6 INR. Practical bounded entry counterfactuals rescued 14/54 losses in union; no entry rule adopted. |
