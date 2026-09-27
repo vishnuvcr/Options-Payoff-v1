@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-7A-margin-reconstruction  
-**Overall status:** Phase 7B — positive-only weekly selection in progress
+**Overall status:** Phase 7B — positive-only weekly selection analysis complete; final artifacts pending publication
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -167,3 +167,7 @@ User clarification: the intended operation is one weekly scan across all 17 stri
 ## Phase 7B rule correction
 
 The 2.5% rule is removed. Margin is no longer a trade-entry denominator. Every weekly cycle is scanned across ATM-400..ATM+400; the maximum positive/all-green flatline candidate is traded. No threshold-based skipping is used.
+
+## Phase 7B preliminary result
+
+The first-positive no-look-ahead rule produced 63 weekly cycles and 63 trades, with positive candidates in every cycle. Baseline net P&L is ₹-9,627.90 after 0.25% premium slippage and ₹20/order brokerage. Win rate 57.14%; modeled costs ₹9,861.15. This is the current primary result pending artifact-backed full statistical analysis.
