@@ -1,0 +1,8 @@
+{
+  "historical_entry_dates": 891,
+  "i1_coverage_pct": 100,
+  "s_coverage_pct": 100,
+  "source_run_id": 36286676530,
+  "source_artifact_id": 10921011598,
+  "note": "Full candidate coverage was obtained by probing all i1-i5 and s variants. Exact qualification used i1 primary and s as sensitivity."
+}
