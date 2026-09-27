@@ -81,3 +81,5 @@
 | 2026-09-27 | 9F | Initial cross-market audit script treated a Python `datetime.date` as a pandas timestamp when calculating the end date. | Phase 9F workflow 36303419672 failed before any context data were accepted. | Corrected the date conversion and also corrected the same-day NIFTY opening-gap alignment before rerunning. |
 
 | 2026-09-27 | 9F | The yfinance 1.7.0 downloader returned MultiIndex columns whose level order was not handled by the first normalizer. | Workflow 36303470349 failed while constructing global-context frames with `KeyError: ['close']`. | Replaced the symbol-specific MultiIndex assumption with explicit OHLC/date flattening and added a close-column invariant before accepting a frame. |
+
+| 2026-09-27 | 9F | NSEI/API normalizer still renamed multiple source fields to the same `date`/`close` target, causing pandas `ValueError: cannot assemble with duplicate keys` in workflow 36303520586. | Phase 9F stopped before joining context; no result accepted. | Rewrote the NSE normalizer to construct a clean target DataFrame from selected source fields instead of renaming the whole frame. |
