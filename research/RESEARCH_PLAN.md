@@ -349,3 +349,8 @@ Statistical plan:
 5. Treat all feature selection findings as exploratory until out-of-sample confirmation is run.
 
 Entry-selection criterion for any follow-on feature hypothesis: it must be observable at entry, operate inside the same 17-strike grid, survive transaction costs, and show stability under time-split/out-of-sample validation.
+## Phase 7C completion rule and result
+
+Phase 7C is complete when entry Greeks/IV/moneyness are compared between winners and losers, candidate-level within-week relationships are tested, alternative single-feature strike selectors are benchmarked against the maximum-positive-flatline rule, and at least one time-split/walk-forward test is completed. These criteria are met in workflow 36291838252.
+
+Result: none of the tested Greek/IV/moneyness features survives the multiple-comparison evidence threshold, all full-coverage simple alternative selectors underperform the baseline, and the best training-selected Greek/IV selector underperforms the baseline in both expanding walk-forward test blocks. **No new feature is adopted into the primary strategy.**
