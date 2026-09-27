@@ -302,3 +302,17 @@ Critical distinction:
 - the current Phase 7A '4 trades' figure counts qualifying historical observations under the available dataset/margin reconstruction and must not be described as the number of weekly scans performed.
 
 Before the weekly result is treated as final, the backtest must map each weekly expiry cycle to exactly one entry observation without look-ahead. The exact weekly entry day/time must not be invented; it must come from the user's documented execution convention or the dataset's actual observation schedule.
+
+## Phase 7B correction — user's latest rule
+
+The 2.5% threshold is **removed from the strategy**. Margin reconstruction remains a research capability but is no longer part of trade eligibility.
+
+Operational rule:
+- every weekly cycle is scanned;
+- evaluate all 17 common strikes from ATM-400 to ATM+400 in 50-point increments;
+- only a positive/all-green flatline qualifies;
+- select the candidate with the maximum positive estimated equal max-profit=max-loss value;
+- do not use a 2.5% gate, margin percentage, or buy-premium denominator;
+- there is no intentional skip caused by a percentage threshold.
+
+The weekly implementation uses one observation per near-expiry weekly cycle. The primary implementation uses the first available 09:20 observation in that cycle, with the last available observation reported as a timing sensitivity. This makes the weekly cadence explicit without using future information.
