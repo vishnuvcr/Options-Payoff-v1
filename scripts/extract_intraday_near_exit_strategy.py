@@ -10,6 +10,8 @@ from pathlib import Path
 import pandas as pd
 from huggingface_hub import HfApi, hf_hub_download
 
+from src.intraday_selection import max_positive_candidate
+
 from scripts.extract_near_exit_strategy_inputs import (
     DATASET,
     build_entry_lookup,
@@ -161,8 +163,9 @@ def main():
             })
             if not positive:
                 continue
-            positive.sort(key=lambda x:(-x['flatline_inr'],x['shift_points']))
-            winner=positive[0]
+            winner=max_positive_candidate(candidates)
+            if winner is None:
+                continue
             # Record the full 17-strike decision surface at the actual decision timestamp.
             for x in candidates:
                 x['selected']=bool(x is winner)
