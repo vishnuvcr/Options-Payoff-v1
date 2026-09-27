@@ -36,7 +36,7 @@ def main():
     ap.add_argument('--candidates',required=True)
     ap.add_argument('--out',required=True)
     args=ap.parse_args()
-    df=pd.read_csv(args.candidates)
+    df=pd.read_parquet(args.candidates)
     dates=sorted(pd.to_datetime(df['entry_date']).dt.strftime('%Y%m%d').unique())
     tasks=[(d,v) for d in dates for v in VARIANTS]
     with concurrent.futures.ThreadPoolExecutor(max_workers=12) as ex:
