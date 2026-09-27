@@ -53,29 +53,43 @@ jobs:
             --min-chart-return-pct 0.0 \
             --slippage-pct 0.0025
           test -s results/phase7b_metrics/candidate_results.parquet
-      - name: Weekly selection using first available 09:20 observation
+      - name: Primary weekly selection at first positive opportunity
         run: |
           python scripts/weekly_positive_selection.py \
             --inputs results/phase7b_metrics/candidate_results.parquet \
             --out-dir results/phase7b_weekly \
-            --observation first
-      - name: Weekly selection using last available observation sensitivity
+            --observation first_positive
+      - name: First-observation weekly timing sensitivity
         run: |
           python scripts/weekly_positive_selection.py \
             --inputs results/phase7b_metrics/candidate_results.parquet \
             --out-dir results/phase7b_weekly \
-            --observation last
+            --observation first_observation
+      - name: Last-observation weekly timing sensitivity
+        run: |
+          python scripts/weekly_positive_selection.py \
+            --inputs results/phase7b_metrics/candidate_results.parquet \
+            --out-dir results/phase7b_weekly \
+            --observation last_observation
+      - name: Best-positive-in-week oracle sensitivity
+        run: |
+          python scripts/weekly_positive_selection.py \
+            --inputs results/phase7b_metrics/candidate_results.parquet \
+            --out-dir results/phase7b_weekly \
+            --observation max_in_week
       - name: Validate weekly coverage and positive rule
         run: |
           python - <<'PY'
           import json, pathlib
-          for obs in ('first','last'):
+          for obs in ('first_positive','first_observation','last_observation','max_in_week'):
               p=pathlib.Path(f'results/phase7b_weekly/weekly_summary_{obs}.json')
               x=json.loads(p.read_text())
               print(obs,x)
-              assert x['selected_trades'] > 0
-              assert x['weeks_without_positive_candidate'] == 0
-              assert x['non_positive_selected_trades'] == 0
+              assert x['weekly_cycles'] == 251
+          primary=json.loads(pathlib.Path('results/phase7b_weekly/weekly_summary_first_positive.json').read_text())
+          assert primary['weeks_without_positive_candidate'] == 0
+          assert primary['non_positive_selected_trades'] == 0
+          assert primary['selected_trades'] == 251
           PY
       - name: Upload weekly results
         uses: actions/upload-artifact@v4
