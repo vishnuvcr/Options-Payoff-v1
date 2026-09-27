@@ -8,17 +8,21 @@ import pandas as pd
 ap=argparse.ArgumentParser()
 ap.add_argument('--audit',required=True)
 ap.add_argument('--selected',required=True)
+ap.add_argument('--surface',required=True)
 ap.add_argument('--out',required=True)
 a=ap.parse_args()
 
 audit=pd.read_parquet(a.audit)
 sel=pd.read_parquet(a.selected)
+surface=pd.read_parquet(a.surface)
 required_a={'near_expiry','timestamp','candidate_count','positive_count','decision'}
 required_s={'near_expiry','entry_timestamp'}
+required_surface={'near_expiry','timestamp','shift_points','near_call','near_put','far_call','far_put'}
 missing_a=required_a-set(audit.columns)
 missing_s=required_s-set(sel.columns)
-if missing_a or missing_s:
-    raise SystemExit(f'Missing columns audit={sorted(missing_a)} selected={sorted(missing_s)}')
+missing_surface=required_surface-set(surface.columns)
+if missing_a or missing_s or missing_surface:
+    raise SystemExit(f'Missing columns audit={sorted(missing_a)} selected={sorted(missing_s)} surface={sorted(missing_surface)}')
 
 audit['near_expiry']=audit['near_expiry'].astype(str)
 audit['timestamp']=pd.to_datetime(audit['timestamp'],errors='coerce')
@@ -48,5 +52,5 @@ out=Path(a.out); out.mkdir(parents=True,exist_ok=True)
 joined.to_csv(out/'h1_selected_timestamp_completeness.csv',index=False)
 positive_incomplete.to_csv(out/'h1_positive_incomplete_scan_timestamps.csv',index=False)
 print(json.dumps(summary,indent=2))
-if not summary['all_selected_timestamps_have_17']:
-    raise SystemExit('FAIL: at least one authoritative H1 selected timestamp did not evaluate all 17 strikes.')
+if not summary['all_selected_timestamps_pass_strict_completeness']:
+    raise SystemExit('FAIL: at least one authoritative H1 selected timestamp failed unique-17-strike completeness or had conflicting duplicate quotes.')
