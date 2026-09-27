@@ -62,6 +62,7 @@ jobs:
       - name: Build no-skip intraday selected opportunities
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          PYTHONPATH: .
         run: |
           python scripts/extract_intraday_near_exit_strategy.py \
             --start '${{ github.event.inputs.start || '2021-06-01' }}' \
