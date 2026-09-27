@@ -146,3 +146,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | H1 completeness audit | Run 13 successfully downloaded and opened the authoritative Parquet data. The audit then exposed a field-name mismatch (`entry_timestamp` vs `timestamp`), which has been corrected. No completeness conclusion was drawn from the failed attempt. |
 
 | 2026-09-27 | 9G | H1 completeness audit | Second corrected attempt reached data processing successfully; failure was only output-directory creation. Fixed before accepting or interpreting any completeness value. |
+
+| 2026-09-27 | 9G | Critical data-quality audit | Authoritative H1 audit returned 172 selected timestamps: 33 had 17 raw merged rows, 27 fewer, and 112 more. Positive timestamps frequently had row counts >17. This is not evidence of >17 strikes; it reveals duplicate quote rows. The pipeline was corrected to evaluate unique strike shifts and detect conflicting duplicates. |
