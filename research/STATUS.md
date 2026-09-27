@@ -1,7 +1,7 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-7B-weekly-cadence  
+**Active branch:** phase-7C-entry-features-greeks  
 **Overall status:** Phase 7B — positive-only weekly maximum-flatline research COMPLETE
 
 | Phase | Status | Corrected evidence |
@@ -191,3 +191,7 @@ The first-positive no-look-ahead rule produced 63 weekly cycles and 63 trades, w
 - four-week block bootstrap 95% CI: ₹-4,024 to ₹4,739
 
 Phase 7A's four-trade margin-gated result is superseded by the user's latest positive-only rule.
+
+## Phase 7C — Entry-feature / Greek analysis OPEN
+
+The primary weekly rule is fixed: first positive observation in the weekly cycle, then maximum positive flatline across the 17 strikes. This phase tests whether entry Greeks, IV structure, moneyness, or other observable parameters contain additional strike-selection information. No feature is accepted as a new rule before out-of-sample validation.
