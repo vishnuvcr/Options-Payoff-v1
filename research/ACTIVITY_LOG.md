@@ -173,3 +173,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9H | Phase opened | Frozen Phase 9G H1 rule is retained. New research branch phase-9H-loss-entry-analysis created from the accepted Phase 9G final-results commit. |
 | 2026-09-27 | 9H | Analysis protocol predeclared | Same-timestamp strike substitution, second valid timestamp, 15/30/60/120-minute delays, and two explicitly ex-post later-entry upper bounds defined before execution. |
 | 2026-09-27 | 9H | Workflow prepared | Manual GitHub Actions workflow added with yearly matrix, Hugging Face cache, and pooled result merge. No Phase 9H result accepted yet. |
+
+
+| 2026-09-27 | 9H | First Actions run failed before analysis | Run 36322209520 failed during the analysis step in all six years. Job-log inspection identified one Python indentation defect and one workflow expression-escaping defect; no data result was accepted. |
