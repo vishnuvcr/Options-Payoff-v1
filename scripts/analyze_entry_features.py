@@ -195,7 +195,7 @@ def candidate_selector_test(candidates, feature, direction):
             continue
         idx=pool[feature].idxmax() if direction=="max" else pool[feature].idxmin()
         chosen=pool.loc[idx]
-        rows.append({"weekly_cycle":week,"net_pnl_inr":chosen.net_pnl_inr})
+        rows.append({"weekly_cycle":week,"net_pnl_inr":chosen.candidate_net_pnl_inr})
     return pd.DataFrame(rows)
 
 
@@ -212,6 +212,29 @@ def cluster_selector_stats(candidates, feature):
         })
     return results
 
+
+
+def paired_bootstrap_diff(baseline, alternative, seed=42, n_boot=10000):
+    x = baseline.set_index('weekly_cycle').join(alternative.set_index('weekly_cycle'), lsuffix='_baseline', rsuffix='_alternative', how='inner')
+    if x.empty:
+        return {'weeks':0,'mean_difference_inr':np.nan,'ci_low_inr':np.nan,'ci_high_inr':np.nan}
+    diffs = (x['net_pnl_inr_alternative'] - x['net_pnl_inr_baseline']).to_numpy(float)
+    rng=np.random.default_rng(seed)
+    means=rng.choice(diffs,size=(n_boot,len(diffs)),replace=True).mean(axis=1)
+    return {'weeks':int(len(diffs)),'mean_difference_inr':float(diffs.mean()),'ci_low_inr':float(np.quantile(means,0.025)),'ci_high_inr':float(np.quantile(means,0.975))}
+
+
+def selector_results_with_bootstrap(candidates, features):
+    baseline = candidate_selector_test(candidates,'estimated_equal_max_profit_loss_inr','max')
+    all_rows=[]
+    for f in features:
+        for direction in ('max','min'):
+            alt=candidate_selector_test(candidates,f,direction)
+            if alt.empty:
+                continue
+            stat=paired_bootstrap_diff(baseline,alt)
+            all_rows.append({'feature':f,'direction':direction,**stat,'alt_total_net_pnl_inr':float(alt.net_pnl_inr.sum()),'alt_mean_net_pnl_inr':float(alt.net_pnl_inr.mean()),'alt_win_rate_pct':float(100*(alt.net_pnl_inr>0).mean())})
+    return pd.DataFrame(all_rows)
 
 def candidate_within_week_correlations(candidates):
     feats=[c for c in candidates.columns if c in [
@@ -297,17 +320,13 @@ def main():
     cor=candidate_within_week_correlations(feat)
     cor.to_csv(out/"candidate_within_week_spearman.csv",index=False)
 
-    selector_rows=[]
-    for f in [
+    selector_features=[
         "estimated_equal_max_profit_loss_inr","iv_term_spread","near_iv_skew_call_minus_put","next_iv_skew_call_minus_put",
         "abs_net_delta","abs_net_gamma","abs_net_vega","abs_net_theta_day","moneyness_pct","abs_moneyness_pct",
         "near_call_iv","near_put_iv","next_call_iv","next_put_iv"
-    ]:
-        if f in feat.columns:
-            selector_rows.extend(cluster_selector_stats(feat,f))
-    sel_df=pd.DataFrame(selector_rows)
-    # Baseline is max positive flatline; all rows are the positive candidate set at the actual first-positive decision time.
-    baseline=sel_df[(sel_df.feature=="estimated_equal_max_profit_loss_inr")&(sel_df.direction=="max")]
+    ]
+    selector_features=[f for f in selector_features if f in feat.columns]
+    sel_df=selector_results_with_bootstrap(feat,selector_features)
     sel_df.to_csv(out/"candidate_feature_selection_tests.csv",index=False)
 
     baseline_selector = sel_df[(sel_df.feature=="estimated_equal_max_profit_loss_inr")&(sel_df.direction=="max")] if not sel_df.empty else pd.DataFrame()
