@@ -1,0 +1,63 @@
+{
+  "rule": {
+    "cadence": "one trade per near-expiry weekly cycle",
+    "candidate_grid": "ATM-400..ATM+400 in 50-point steps",
+    "gate": "positive/all-green flatline only",
+    "threshold_pct": null,
+    "margin_filter": false,
+    "selection": "maximum positive estimated equal max-profit=max-loss flatline value",
+    "primary_timing": "first positive 09:20 observation within each weekly cycle",
+    "slippage_pct": 0.25,
+    "brokerage_per_order_inr": 20
+  },
+  "sample": {
+    "weekly_cycles": 63,
+    "selected_trades": 63,
+    "first_cycle": "2021-06-03",
+    "last_cycle": "2026-04-21",
+    "positive_weeks": 63,
+    "skipped_weeks": 0
+  },
+  "performance": {
+    "net_pnl_inr": -9627.903939543634,
+    "gross_pnl_inr": 233.24999999978172,
+    "modeled_costs_inr": 9861.153939543394,
+    "static_flatline_contribution_inr": 20213.00000000001,
+    "cross_expiry_contribution_inr": -19979.750000000244,
+    "mean_net_pnl_inr": -152.82387205624758,
+    "median_net_pnl_inr": 2179.3664106803794,
+    "win_rate_pct": 57.14285714285714,
+    "profit_factor": 0.9793575626337016,
+    "max_drawdown_inr": -174083.24165502473,
+    "largest_win_inr": 34652.56216713718,
+    "largest_loss_inr": -55786.13025303096,
+    "max_consecutive_losses": 4,
+    "iid_bootstrap_mean_ci_95_inr": [
+      -4996.38215358,
+      4409.52426472
+    ],
+    "block_bootstrap_mean_ci_95_inr": [
+      -4023.77849313,
+      4738.73824269
+    ]
+  },
+  "sensitivities": {
+    "first_observation": {
+      "trades": 38,
+      "net_pnl_inr": -32986.599209830485,
+      "win_rate_pct": 57.89473684210527
+    },
+    "last_observation": {
+      "trades": 41,
+      "net_pnl_inr": 177070.1476420357,
+      "win_rate_pct": 68.29268292682927
+    },
+    "best_positive_in_week_oracle": {
+      "trades": 63,
+      "net_pnl_inr": 3135.050740531362,
+      "profit_factor": 1.006813446326213,
+      "max_drawdown_inr": -169072.12284514718
+    },
+    "note": "Timing results are sensitivities. The best-positive-in-week result uses future information within each weekly cycle and is an ex-post oracle, not a deployable signal."
+  }
+}
