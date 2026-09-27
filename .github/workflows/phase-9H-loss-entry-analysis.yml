@@ -46,6 +46,7 @@ jobs:
           path: ~/.cache/huggingface/hub
           key: phase9h-hf-options-${{ matrix.year }}-${{ hashFiles('scripts/analyze_phase9h_loss_entries.py') }}
           restore-keys: |
+            phase9g-hf-options-${{ matrix.year }}-
             phase9h-hf-options-${{ matrix.year }}-
       - name: Analyze losses and entry perturbations
         env:
