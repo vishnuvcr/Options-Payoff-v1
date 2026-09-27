@@ -44,3 +44,4 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 7A | Exact primary selection | 4 i1 timestamps pass the 2.5% margin-based gate; selected shifts are +100, +300, -250 and -400. |
 | 2026-09-27 | 7A | Exact primary P&L | 4 trades, ₹42,680.17 net, 75% win rate, PF 8.37, max drawdown -₹5,791.42 after modeled costs. |
 | 2026-09-27 | 7A | Percentage/value ambiguity resolved empirically | Maximum margin-based percentage and maximum estimated INR flatline select identical strikes on all 4 primary timestamps. |
+| 2026-09-27 | 7B | User clarified weekly operation | The intended action is one weekly scan of all 17 common strikes from ATM-400 through ATM+400, select the maximum qualifying candidate, and trade only if its platform-style max-profit=max-loss percentage exceeds 2.5%. |
