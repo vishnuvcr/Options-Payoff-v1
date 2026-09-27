@@ -368,3 +368,7 @@ Added peer-reviewed/working literature on NIFTY box-spread efficiency, implied-v
 
 ### H1 control behavioural baseline — 2026-09-27
 Phase 9G now has a frozen H1 control reference for strike-selection and decision-time behaviour. H2/H3 must be compared on the same dimensions after reconstruction; these H1 values do not alter the control.
+
+
+### H1 annual stability reference — 2026-09-27
+The frozen H1 control now includes annual cohort performance for 2021–2026. This reference is descriptive and will be used for the paired H2/H3 temporal comparison.
