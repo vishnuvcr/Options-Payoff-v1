@@ -436,9 +436,7 @@ def main() -> int:
     report.append(
         "Entry-time and shift-band files are descriptive diagnostics only; no new filter is adopted from them in Phase 9E."
     )
-    (out / "PHASE9E_VALIDATION.md").write_text("
-".join(report) + "
-", encoding="utf-8")
+    (out / "PHASE9E_VALIDATION.md").write_text(chr(10).join(report) + chr(10), encoding="utf-8")
     return 0
 
 
