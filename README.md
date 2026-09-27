@@ -4,19 +4,17 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 7B — positive-only weekly maximum-flatline rule: COMPLETE**
+**Phase 7C — entry Greek / feature analysis: COMPLETE**
 
-The current research rule is now the exact platform-calibrated version. The superseded proxy studies remain in the repository only as comparators:
+Current operational rule:
+- every weekly expiry cycle is scanned chronologically;
+- at the first available observation where any candidate has a positive/all-green flatline, evaluate all 17 common strikes from ATM-400 to ATM+400 in 50-point steps;
+- trade the candidate with the maximum positive estimated equal max-profit=max-loss flatline value;
+- no 2.5% threshold, no margin percentage gate, and no threshold-based skipping.
 
-- evaluate every 50-point strike from ATM-400 through ATM+400, including ATM;
-- compute the estimated positive flatline max-profit=max-loss value for each candidate;
-- select exactly one candidate per timestamp: the maximum estimated equal max-profit=max-loss value;
-- require reconstructed margin-based max-profit=max-loss percentage > 2.5%;
-- select the maximum estimated equal max-profit=max-loss value in INR;
-- compare maximum margin-based percentage as a sensitivity;
-- exit at expiry.
+Phase 7C tested reconstructed entry Greeks, IV term structure/skew, moneyness, and Greek imbalance against 63 weekly trades (36 winners, 27 losers). No tested feature remained robust after multiple-testing correction; simple feature-based strike selectors all underperformed the maximum-positive-flatline baseline; the best training-selected Greek/IV selector also underperformed it in both expanding walk-forward test blocks.
 
-The earlier ATM/-400/+400 analysis is superseded.
+The primary entry-strike rule is therefore unchanged.
 
 ### Historical comparator — superseded selection rule
 
@@ -66,7 +64,7 @@ Platform review: [Streak and Sensibull payoff semantics](docs/PAYOFF_PLATFORM_RE
 
 Phase 7 workflow: [.github/workflows/phase-7-max-equal-selection.yml](.github/workflows/phase-7-max-equal-selection.yml).
 
-The exact platform denominator is now reconstructed from NSE/NSCCL SPAN margin data. The buy-premium percentage is no longer the primary gate.
+The Phase 7A margin reconstruction remains in the repository as a platform-semantics research artifact, but the margin-based 2.5% gate is no longer part of the user's final strategy.
 
 ### Phase 7 empirical result — superseded proxy
 
@@ -88,9 +86,9 @@ Calibration data: [results/phase7a/margin_calibration_2026-09-25.json](results/p
 Intraday comparison: [results/phase7a/margin_calibration_versions_2026-09-25.json](results/phase7a/margin_calibration_versions_2026-09-25.json)
 
 Historical SPAN coverage is 100% across the 891 entry dates. The exact primary ledger and settlement-file sensitivity ledger are committed under `results/phase7a/`.
-### Phase 7A exact historical result
+### Phase 7A exact historical result — superseded
 
-The 2.5% denominator is now reconstructed as margin required using NSE/NSCCL SPAN risk data. With the requested ATM-400..ATM+400 grid, 50-point steps and a >2.5% margin-based gate, the primary i1 begin-day SPAN interpretation produces **4 trades**:
+The earlier exact-margin result used a >2.5% gate and produced **4 qualifying observations**. This is retained only as historical evidence because the user subsequently removed the 2.5% rule and margin gate.
 
 - **₹42,680.17 net P&L**
 - **75.0% win rate**
