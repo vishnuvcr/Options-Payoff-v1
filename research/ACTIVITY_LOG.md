@@ -157,3 +157,7 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9G | H2/H3 source-coverage audit | Dedicated audits 36317177731 and 36317271416 sampled 152 entry timestamps for far-rank 2 and 3. Every sample had zero same-day rows for the far expiry, zero common CE/PE strikes, and zero exact 17-shift surfaces. The finding is a source-coverage limitation, not a strategy result. |
 | 2026-09-27 | 9G | Interim yearly reconstruction | Run 27 completed 2024 and 2026. H1: 2024 had 26 realized trades and ₹20,656.83 net; 2026 had 14 realized trades and ₹21,014.63 net under the primary cost model. These remain interim until all years complete. |
+
+
+| 2026-09-27 | 9G | Interim H1 audit | Recomputed completed ledgers for 2021, 2024 and 2026: 54 realized trades, ₹51,403.50 net, PF 5.32, max drawdown ₹2,299.68, realized win rate 72.22%. This subset is descriptive only until remaining years and predeclared sensitivity/statistics complete. |
+| 2026-09-27 | 9G-Rissin | Parity correction | Added the frozen 30-day near/far expiry separation guard to the independent Rissin extractor; earlier Rissin reconstruction attempts are superseded. |
