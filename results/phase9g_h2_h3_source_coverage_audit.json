@@ -1,0 +1,45 @@
+{
+  "phase": "9G",
+  "audit_run_1": 36317177731,
+  "audit_run_2": 36317271416,
+  "dataset": "thetrademarkk/india-index-options-1m",
+  "sample": {
+    "far_rank_2": {
+      "samples": 152,
+      "far_same_day_rows_max": 0,
+      "samples_with_any_far_same_day_rows": 0,
+      "samples_with_common_ce_pe_strikes": 0,
+      "samples_with_all_17_shifts": 0
+    },
+    "far_rank_3": {
+      "samples": 152,
+      "far_same_day_rows_max": 0,
+      "samples_with_any_far_same_day_rows": 0,
+      "samples_with_common_ce_pe_strikes": 0,
+      "samples_with_all_17_shifts": 0
+    }
+  },
+  "expiry_file_window_observation": {
+    "typical_preexpiry_window_days": 8,
+    "examples": [
+      {
+        "expiry": "2026-01-13",
+        "min_date": "2026-01-05"
+      },
+      {
+        "expiry": "2026-01-20",
+        "min_date": "2026-01-12"
+      },
+      {
+        "expiry": "2026-01-27",
+        "min_date": "2026-01-19"
+      },
+      {
+        "expiry": "2026-02-03",
+        "min_date": "2026-01-27"
+      }
+    ],
+    "interpretation": "The option file begins roughly one weekly cycle before its own expiry. Therefore H2/H3 far-expiry contracts are not present on the near-week entry dates needed by the strategy."
+  },
+  "conclusion": "H2/H3 cannot be inferred from this Hugging Face source. The zero H2/H3 opportunity counts are a source-coverage diagnostic, not evidence that exchange-listed far weekly contracts did not exist."
+}
