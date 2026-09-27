@@ -116,3 +116,5 @@
 | 2026-09-27 | 9G | Pipeline defect | The sensitivity stage passed `H*_realized_trades.csv` to a backtest script that previously called `pd.read_parquet()` unconditionally. This would have caused a false sensitivity-stage failure. The reader now detects CSV vs Parquet input. |
 
 | 2026-09-27 | 9G | Workflow defect | H1 completeness audit step was emitted with doubled shell continuation backslashes, causing argparse to receive no parameters and fail before reading the artifact. Fixed to single continuations. The failure is tooling-only and no research data were interpreted. |
+
+| 2026-09-27 | 9G | Audit schema defect | H1 completeness audit assumed the selected ledger also used `timestamp`; authoritative selected data use `entry_timestamp`. The audit now renames `entry_timestamp` to `timestamp` for the keyed comparison with the scan audit. |
