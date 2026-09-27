@@ -1,0 +1,42 @@
+name: Phase 9G - Rissin Source Validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: Years to validate
+        required: true
+        default: '2024,2025,2026'
+      cycles_per_year:
+        description: Near-expiry cycles to sample per year
+        required: true
+        default: '8'
+  push:
+    branches:
+      - phase-9G-rissin-source-validation
+    paths:
+      - .github/workflows/phase-9G-rissin-source-validation.yml
+      - scripts/audit_rissin_source_coverage.py
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas numpy pyarrow huggingface_hub
+      - name: Validate Rissin H2/H3 source coverage
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python scripts/audit_rissin_source_coverage.py             --years "${{ github.event.inputs.years || '2024,2025,2026' }}"             --cycles-per-year "${{ github.event.inputs.cycles_per_year || '8' }}"             --out-dir results/phase9g_rissin_source_validation
+      - name: Upload Rissin validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9g-rissin-source-validation
+          path: results/phase9g_rissin_source_validation
