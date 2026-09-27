@@ -44,3 +44,5 @@ jobs:
         with:
           name: phase9g-h2-h3-data-coverage-audit
           path: results/phase9g_h2_h3_data_audit
+
+# Audit workflow retained as a manual rerunnable data-quality diagnostic.
