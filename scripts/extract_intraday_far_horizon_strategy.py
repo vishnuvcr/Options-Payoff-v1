@@ -159,11 +159,16 @@ def main():
         aud=all_times.merge(aud,on='timestamp',how='left').merge(pos,on='timestamp',how='left').merge(pmax,on='timestamp',how='left')
         aud[['candidate_count','positive_count']]=aud[['candidate_count','positive_count']].fillna(0).astype(int)
         aud['near_expiry']=near_expiry
-        aud['decision']=aud['positive_count']>0
-        aud['reason']=aud['decision'].map({True:'positive_candidate_found',False:'no_positive_candidate'})
+        # The strategy requires evaluating all 17 common strikes at a timestamp.
+        # A partial quote set is therefore not a valid decision opportunity.
+        aud['decision']=(aud['candidate_count']==17) & (aud['positive_count']>0)
+        aud['reason']='no_positive_candidate'
+        aud.loc[(aud['candidate_count']<17) & (aud['positive_count']>0),'reason']='incomplete_17_strike_set'
+        aud.loc[aud['decision'],'reason']='positive_candidate_found'
         scan_audit.append(aud[['near_expiry','timestamp','candidate_count','positive_count','max_flatline_inr','max_positive_flatline_inr','decision','reason']])
 
-        positive=surf[surf['flatline_inr']>0].sort_values(['timestamp','flatline_inr','shift_points'],ascending=[True,False,True])
+        valid_times=set(aud.loc[aud['decision'],'timestamp'])
+        positive=surf[(surf['flatline_inr']>0) & (surf['timestamp'].isin(valid_times))].sort_values(['timestamp','flatline_inr','shift_points'],ascending=[True,False,True])
         if positive.empty:
             continue
         win=positive.iloc[0].copy()
@@ -212,6 +217,8 @@ def main():
         'selected_trades':int(len(selected_df)),
         'selected_chart_positive_pct':float(100*(selected_df['flatline_inr']>0).mean()),'horizon_label':f'H{args.far_rank}',
         'scan_rows':int(len(audit_df)),'decision_surface_rows':int(len(surface_df)),
+        'complete_17_strike_timestamp_count':int((audit_df['candidate_count']==17).sum()) if not audit_df.empty else 0,
+        'incomplete_positive_timestamp_count':int(((audit_df['candidate_count']<17)&(audit_df['positive_count']>0)).sum()) if not audit_df.empty else 0,
     }
     Path(args.out_selected).with_suffix('.metadata.json').write_text(json.dumps(meta,indent=2,default=str),encoding='utf-8')
     print(json.dumps(meta,indent=2,default=str))
