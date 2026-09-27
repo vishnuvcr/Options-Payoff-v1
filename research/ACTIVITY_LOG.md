@@ -103,3 +103,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Sixth workflow failure | Run **36303653009** failed on repeated context-join helper columns (`date_ctx`). No statistical output accepted. |
 | 2026-09-27 | 9F | Context merge stabilized | Reworked point-in-time as-of joins to drop prior helper keys and namespace right-side context columns before each merge. Rerun triggered. |
+
+| 2026-09-27 | 9F | Data-quality audit of provisional results | Provisional FII/DII joins were found too sparse (7 FII, 1 DII rows) to support point-in-time regime inference. Those subgroup results are treated as invalid and will be regenerated with strict recency controls. |
+| 2026-09-27 | 9F | Cross-market scope expanded | Added BSE Sensex via the documented fallback source and a predeclared NIFTY-vs-Sensex relative-return descriptive regime. |
