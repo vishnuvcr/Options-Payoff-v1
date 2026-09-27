@@ -40,7 +40,7 @@ jobs:
           key: hf-nifty-options-horizons-${{ inputs.start }}-${{ inputs.end }}
           restore-keys: hf-nifty-options-horizons- hf-nifty-options-near-exit-
       - name: Unit tests
-        run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
+        run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py tests/test_near_exit_extractor.py
       - name: Build H2 inputs
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
