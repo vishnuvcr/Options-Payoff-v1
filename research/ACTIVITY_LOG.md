@@ -51,3 +51,4 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 7B | Final positive-only weekly backtest | 63 weekly cycles, 63 trades, 0 skips, ₹-9,627.90 net P&L, ₹233.25 gross, ₹9,861.15 costs, 57.14% win rate, PF 0.98. |
 | 2026-09-27 | 7B | Final economic decomposition | Positive static chart contribution ₹20,213.00; realized S2-S1 contribution ₹-19,979.75; costs drive gross near-zero to negative net. |
 | 2026-09-27 | 7B | Final uncertainty | IID and block bootstrap intervals for mean weekly P&L both include zero. |
+| 2026-09-27 | 7C | Phase started | Created `phase-7C-entry-features-greeks`, added entry-feature/Greek analysis script and manual GitHub Actions workflow; analysis targets 63 primary weekly trades plus all positive candidates at their decision timestamps. |\n
