@@ -395,3 +395,24 @@ Only if the internal-information baseline gives evidence of useful predictabilit
 ### Phase 8 stop rule
 
 Do not declare (S_2-S_1) useful unless the walk-forward predictor improves the existing weekly strategy after costs and remains stable across time blocks. If it does not, the research should document the negative result and stop this branch rather than endlessly searching for predictors.
+
+
+## Phase 8A completion rule and result
+
+Phase 8A is complete when:
+- the future (S_2-S_1) target is defined without ambiguity;
+- entry-only predictors are constructed;
+- expanding walk-forward prediction is performed;
+- the resulting trade filter is evaluated after transaction costs;
+- chronological stability and bootstrap uncertainty are reported.
+
+These criteria were met in workflow 36293974453.
+
+Result:
+- the all-timestamp design used 905 historical entry timestamps from 255 weekly cycles for training and produced 43 strictly out-of-sample weekly decision cycles after the initial 31-cycle training window;
+- out-of-sample sign accuracy was only 44.2% (Ridge), 51.2% (Random Forest), and 53.5% (Histogram Gradient Boosting);
+- the best model AUC was about 0.541;
+- the Random Forest filter's apparent +₹102,022 OOS improvement versus the negative baseline was unstable across chronological blocks and its paired bootstrap 95% CI included zero;
+- therefore **no S2-S1 predictor/filter is adopted**.
+
+Per the predefined stop rule, Phase 8B external-variable expansion is not promoted unless a materially larger independent dataset or a new predeclared information source becomes available. The current branch is therefore treated as a completed negative/insufficient-evidence result rather than an invitation to keep optimizing predictors.
