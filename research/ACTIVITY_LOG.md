@@ -187,3 +187,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9H | Accounting correction | Fixed entry STT to use only the four entry-leg sell turnover and retained far-call STT as the separate exit transaction. Added a hard baseline-P&L regression gate before any result is accepted. |
 
 | 2026-09-27 | 9H-A | Phase completed | All 54 frozen H1 loss cycles were reconstructed. Baseline P&L matched the accepted Phase 9G ledger within 1e-6 INR. Practical bounded entry counterfactuals rescued 14/54 losses in union; no entry rule adopted. |
+
+| 2026-09-27 | 9H-A | Frozen strategy specification documented | Added docs/CURRENT_STRATEGY_SPEC.md defining the accepted Phase 9G H1 operational rule: first valid positive timestamp, complete 17-strike surface, maximum positive flatline, H1 next-week expiry pairing, near-expiry manual close, and primary execution-cost assumptions. Phase 9H-A remains diagnostic; no entry modification adopted. |
