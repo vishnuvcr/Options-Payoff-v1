@@ -20,3 +20,4 @@ Add a row whenever a reproducible mistake, failed assumption, data-quality issue
 
 
 | 2026-09-26 | 3 | Earlier results used an incomplete ATM/-400/+400 fallback and were not faithful to the clarified strategy. | Prior empirical conclusions were conditional on the wrong selection rule. | Superseded them with full 50-point ±500 strike-grid runs 36262958536, 36263760476 and 36263974629. |
+| 2026-09-27 | Tooling | Local artifact inspection | The model runtime lacked a Parquet reader and package installation was unavailable due disabled network. No research result was inferred from the failed local read; GitHub Actions explicitly installs `pyarrow` for authoritative processing. |
