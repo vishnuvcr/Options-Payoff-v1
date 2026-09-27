@@ -525,3 +525,61 @@ Descriptively, medium-volatility observations produced the strongest subgroup re
 The new selection rule has a positive historical point estimate under the stated proxy and execution assumptions, but the payoff graph itself is not the economic source of the result. The dominant realized contribution is the movement between the two expiries. The statistical uncertainty intervals include zero, and the result is concentrated in particular periods and regimes.
 
 The unresolved item is the exact historical margin-required denominator used by the user's chart. Until that denominator is reconstructed or the original platform can be replicated directly, the 2.5% gate should be treated as a proxy rather than an exact reproduction of the displayed percentage.
+
+## Phase 7A — exact historical margin-denominator result
+
+### Objective
+
+The 2.5% threshold was redefined from the earlier buy-premium proxy to the platform-style percentage using margin required. The screenshot calibration and historical SPAN archive coverage were then used to reconstruct the denominator for every candidate capable of exceeding 2.5%.
+
+### Methodological correction
+
+The strategy grid is strictly ATM-400 through ATM+400 in 50-point increments. An earlier intermediate exact-margin artifact allowed ±500 because the cached Phase 3 dataset was wider; those extra candidates were removed before the final result. The exact historical workflow now enforces ±400.
+
+For the two short NIFTY index-option legs, the calibrated/documented index-option ELM rate of 2% per short leg supplies a 4% spot-notional lower bound before SPAN scan risk. Therefore candidates that cannot exceed 2.5% against this lower bound cannot reach 2.5% of actual margin required and can be safely excluded from expensive exact SPAN reconstruction.
+
+### Historical denominator calibration
+
+The user's screenshot showed ₹88,076 standalone margin. The exact four-leg position reconstructed from NSE/NSCCL SPAN produced ₹87,812.40 at the closest same-day intraday revision, a 0.2993% discrepancy. This calibrates the historical denominator to margin required.
+
+### Exact result
+
+Using the i1 begin-day SPAN snapshot as the no-look-ahead primary denominator, four timestamps pass the 2.5% gate:
+
+- 2021-08-04, shift +100, max-profit % 4.5728%, net P&L ₹5,609.49.
+- 2022-04-04, shift +300, max-profit % 5.1319%, net P&L -₹5,791.42.
+- 2022-05-25, shift -250, max-profit % 2.6441%, net P&L ₹23,853.19.
+- 2022-06-30, shift -400, max-profit % 2.6564%, net P&L ₹19,008.91.
+
+Aggregate:
+
+- 4 trades;
+- net P&L ₹42,680.17;
+- mean ₹10,670.04;
+- median ₹12,309.20;
+- win rate 75%;
+- profit factor 8.37;
+- maximum drawdown -₹5,791.42;
+- modeled costs ₹647.48.
+
+Maximum estimated INR flatline-value selection and maximum margin-based percentage selection are identical on all four qualifying timestamps.
+
+### Sensitivity to the settlement-file SPAN snapshot
+
+Using the settlement/sensitivity SPAN file gives three qualifying timestamps and ₹23,671.26 net P&L. The selected shifts are +100, +300 and -250.
+
+### Interpretation
+
+The earlier 48-trade/₹166,866.51 result should not be used as the primary estimate of the user's stated 2.5% rule because it used the buy-premium proxy. Under the reconstructed margin denominator and the user's current ±400 strike range, the historical sample is only four primary trades.
+
+The small sample precludes a meaningful claim of statistical robustness. The exact reconstruction is useful because it resolves the denominator and selection mechanics; it does not establish that the strategy has a persistent trading edge.
+
+### Reproducibility
+
+Exact trade ledger: `results/phase7a/exact_margin_selected_i1.csv`
+
+Sensitivity ledger: `results/phase7a/exact_margin_selected_s.csv`
+
+Summary: `results/phase7a/exact_margin_summary.json`
+
+Historical SPAN coverage: `results/phase7a/span_coverage_summary.json`
