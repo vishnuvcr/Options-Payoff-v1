@@ -97,3 +97,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Fourth workflow failure | Run **36303568973** still failed in NSE context normalization with duplicate-key date assembly. No statistical output accepted. |
 | 2026-09-27 | 9F | NSE ingestion path simplified | Switched the runnable audit to yfinance for schema stability; official NSE remains registered as the primary verification source and the fallback is explicitly labeled. |
+
+| 2026-09-27 | 9F | Fifth workflow failure | Run 36303608447 failed because the yfinance fallback generated duplicate Date/date columns. No statistical output accepted. |
+| 2026-09-27 | 9F | yfinance fallback corrected | Fallback now constructs explicit date/OHLC columns and drops duplicate dates before merging. Rerun triggered. |
