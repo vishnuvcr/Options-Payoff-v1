@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-7A-margin-reconstruction  
-**Overall status:** Phase 7A — exact historical margin-denominator selection COMPLETE; primary result is 4 trades
+**Overall status:** Phase 7B — weekly trade-cadence interpretation OPEN; Phase 7A margin calibration remains complete
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -160,3 +160,6 @@ The remaining Phase 7A task is historical margin reconstruction for all backtest
 Settlement-file sensitivity produced 3 qualifying trades and ₹23,671.26 net P&L.
 
 The earlier 48-trade/₹166,866.51 Phase 7 result used the superseded buy-premium percentage proxy and must now be treated only as a sensitivity/comparator.
+## Phase 7B status
+
+User clarification: the intended operation is one weekly scan across all 17 strikes (ATM-400..ATM+400) and, when at least one candidate exceeds 2.5%, trade the maximum candidate for that weekly cycle. The prior 4-trade number is not a count of weekly scans; it is the count of qualifying historical observations in the exact-margin dataset. Weekly-cycle mapping remains to be implemented without look-ahead.
