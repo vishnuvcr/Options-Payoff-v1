@@ -6,13 +6,13 @@ on:
       - 'Phase 9A - Correct Near-Expiry Manual Close Baseline (v13 chunked + exit-date fix)'
     types: [completed]
   workflow_dispatch:
-  push:
-    branches:
-      - phase-9B-near-exit-validation:
     inputs:
       phase9a_run_id:
         description: 'Successful Phase 9A run ID whose artifact should be validated'
         required: true
+  push:
+    branches:
+      - phase-9B-near-exit-validation
 
 permissions:
   actions: read
@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   validate:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
