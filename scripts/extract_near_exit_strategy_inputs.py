@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -59,9 +60,16 @@ def load_index():
     df['close'] = pd.to_numeric(df['close'], errors='coerce')
     return df.dropna(subset=['timestamp','close']).sort_values('timestamp')
 
-def load_option_file(expiry, filename):
+def load_option_file(expiry, filename, timestamp_min=None, timestamp_max=None):
     local = hf_hub_download(repo_id=DATASET, filename=filename, repo_type='dataset')
-    df = pd.read_parquet(local)
+    columns = ['timestamp', 'strike', 'close', 'option_type']
+    filters = None
+    if timestamp_min is not None and timestamp_max is not None:
+        filters = [('timestamp', '>=', timestamp_min), ('timestamp', '<=', timestamp_max)]
+    try:
+        df = pd.read_parquet(local, columns=columns, filters=filters)
+    except Exception:
+        df = pd.read_parquet(local, columns=columns)
     df['timestamp'] = normalize_timestamp(df['timestamp'])
     df['trading_date'] = df['timestamp'].dt.date
     df['strike'] = pd.to_numeric(df['strike'], errors='coerce')
