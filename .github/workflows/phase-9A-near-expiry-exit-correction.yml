@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v11 chunked)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v12 chunked)
 
 on:
   workflow_dispatch:
@@ -68,13 +68,6 @@ jobs:
           if [[ "$YEAR_START" < "$INPUT_START" ]]; then YEAR_START="$INPUT_START"; fi
           if [[ "$YEAR_END" > "$INPUT_END" ]]; then YEAR_END="$INPUT_END"; fi
           mkdir -p data/derived
-            python - <<'PY'
-import pandas as pd
-pd.DataFrame(columns=['entry_timestamp','status']).to_parquet('data/derived/strategy_inputs_${{ matrix.year }}.parquet', index=False)
-PY
-            exit 0
-          fi
-          mkdir -p data/derived
           python scripts/extract_near_exit_strategy_inputs.py \
             --start "$YEAR_START" \
             --end "$YEAR_END" \
@@ -123,13 +116,13 @@ PY
       - name: Validate corrected output
         run: |
           python - <<'PY'
-import json
-from pathlib import Path
-x=json.loads(Path('results/phase9a_near_exit/summary_near_exit.json').read_text())
-print(json.dumps(x, indent=2))
-assert x['selected_trades'] > 0
-assert x['positive_weeks'] == x['selected_trades']
-PY
+          import json
+          from pathlib import Path
+          x=json.loads(Path('results/phase9a_near_exit/summary_near_exit.json').read_text())
+          print(json.dumps(x, indent=2))
+          assert x['selected_trades'] > 0
+          assert x['positive_weeks'] == x['selected_trades']
+          PY
       - name: Upload corrected baseline
         uses: actions/upload-artifact@v4
         with:
