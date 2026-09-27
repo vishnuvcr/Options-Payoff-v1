@@ -144,3 +144,14 @@ Primary corrected H1:
 Research interpretation: the corrected H1 result is not robust enough to be treated as a validated standalone trading edge under realistic execution uncertainty. This supersedes all previous realized-P&L conclusions based on holding the far legs to their own expiry.
 
 Phase 9C H2/H3 corrected-horizon workflow is queued in GitHub Actions run **36297960485**. No H2/H3 result is treated as available until that run completes.
+
+
+## Critical Phase 9D correction — intraday recheck
+
+**The previously reported Phase 9A/9B H1 results are superseded.** The implementation incorrectly treated 09:20 as the only entry observation of each trading day. The actual strategy uses 09:20 as the first check, then keeps checking later intraday timestamps on the same day and subsequent trading days of that weekly cycle until a positive/all-green opportunity appears.
+
+The corrected Phase 9D implementation scans every available 1-minute timestamp from 09:20 to 15:29, evaluates ATM-400..ATM+400, chooses the maximum positive flatline at the first positive timestamp, and records an auditable scan history.
+
+Important distinction: the selected **chart flatline win rate is expected to be 100% by construction**, because the strategy only enters when the flatline is positive. That does not automatically imply a 100% realized trading P&L win rate for a mixed-expiry position whose far legs are later liquidated at market prices. The new research reports both metrics separately.
+
+Current workflow: **Phase 9D — Intraday Recheck Near-Expiry Strategy**.
