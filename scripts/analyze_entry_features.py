@@ -13,6 +13,7 @@ from scipy.stats import mannwhitneyu, spearmanr, ttest_ind
 from statsmodels.stats.multitest import multipletests
 from statsmodels.api import Logit, add_constant
 from scipy.special import ndtr
+from src.costs import CostModel, four_leg_entry_cashflow, transaction_costs
 
 
 SIGNS = {"near_call": -1.0, "near_put": 1.0, "next_call": 1.0, "next_put": -1.0}
@@ -69,22 +70,35 @@ def bs_greeks(S, K, T, r, sigma, cp):
     return {"delta": delta, "gamma": gamma, "vega": vega, "theta_day": theta/365.0}
 
 
+def intrinsic(cp, spot, strike):
+    if cp == "C":
+        return max(spot-strike, 0.0)
+    return max(strike-spot, 0.0)
+
+
 def candidate_payoff_and_cost(row, slippage_pct=0.0025):
     premiums = [row.near_call_close, row.near_put_close, row.next_call_close, row.next_put_close]
     if any(pd.isna(x) for x in premiums):
         return None
-    K = float(row.strike)
-    lot = float(row.near_lot_size)
-    # Same one-dimensional terminal-spot chart: intrinsic terms cancel.
+    lot = int(row.near_lot_size)
+    execs = four_leg_entry_cashflow(*premiums, slippage_pct=slippage_pct)
     flatline = float(row.near_call_close - row.near_put_close - row.next_call_close + row.next_put_close) * lot
-    # Execution cashflow with symmetric percentage slippage.
-    short_call = float(row.near_call_close) * (1-slippage_pct)
-    long_put = float(row.near_put_close) * (1+slippage_pct)
-    long_call = float(row.next_call_close) * (1+slippage_pct)
-    short_put = float(row.next_put_close) * (1-slippage_pct)
-    entry_cash_per_unit = -short_call + long_put - long_call + short_put
-    gross = (entry_cash_per_unit + float(row.next_settlement) - float(row.near_settlement)) * lot
-    return flatline, gross
+    gross = (float(execs["entry_cashflow_per_unit"]) + float(row.next_settlement) - float(row.near_settlement)) * lot
+    next_call_intrinsic = intrinsic("C", float(row.next_settlement), float(row.strike))
+    near_put_intrinsic = intrinsic("P", float(row.near_settlement), float(row.strike))
+    model = CostModel(slippage_pct=slippage_pct)
+    costs = transaction_costs(
+        pd.Timestamp(row.entry_timestamp).date(),
+        execs["premium_turnover"],
+        execs["sell_premium_turnover"],
+        execs["buy_premium_turnover"],
+        next_call_intrinsic,
+        near_put_intrinsic,
+        lot,
+        model,
+    )
+    net = gross - costs["total_costs"]
+    return flatline, gross, net, costs["total_costs"]
 
 
 def add_greek_features(df: pd.DataFrame, r=0.0, expiry_hour=15, expiry_minute=30):
@@ -265,15 +279,12 @@ def main():
         # Approximate the repository's costs are already represented by its selected result.
         # For candidates, use the same flatline + cross-expiry settlement then subtract a conservative fixed cost proxy.
         return gross
-    eligible["gross_pnl_proxy_inr"]=eligible.apply(row_pnl,axis=1)
-    eligible["gross_pnl_proxy_inr_per_lot"]=eligible.gross_pnl_proxy_inr
+    eligible["candidate_net_pnl_inr"]=eligible.apply(row_pnl,axis=1)
 
-    # Join exact selected net P&L for selected rows; candidate-level comparisons use gross P&L to avoid
-    # implying broker fees are feature-dependent. The primary trade-level analysis remains on exact net P&L.
     selected_cols=["entry_timestamp","weekly_cycle","shift_points","net_pnl_inr","estimated_equal_max_profit_loss_inr"]
     s2=selected[selected_cols].rename(columns={"net_pnl_inr":"selected_net_pnl_inr","estimated_equal_max_profit_loss_inr":"selected_flatline_inr"})
     eligible=eligible.merge(s2,on=["entry_timestamp","weekly_cycle","shift_points"],how="left")
-    eligible["candidate_outcome_label"]=np.where(eligible.selected, eligible.selected_net_pnl_inr>0, eligible.gross_pnl_proxy_inr>0)
+    eligible["candidate_outcome_label"]=eligible.candidate_net_pnl_inr>0
 
     feat=add_greek_features(eligible)
     out=Path(args.out_dir); out.mkdir(parents=True,exist_ok=True)
@@ -299,6 +310,7 @@ def main():
     baseline=sel_df[(sel_df.feature=="estimated_equal_max_profit_loss_inr")&(sel_df.direction=="max")]
     sel_df.to_csv(out/"candidate_feature_selection_tests.csv",index=False)
 
+    baseline_selector = sel_df[(sel_df.feature=="estimated_equal_max_profit_loss_inr")&(sel_df.direction=="max")] if not sel_df.empty else pd.DataFrame()
     summary={
         "selected_trades":int(len(selected_feat)),
         "selected_winners":int((selected_feat.net_pnl_inr>0).sum()),
@@ -309,7 +321,8 @@ def main():
         "greeks_method":"Black-Scholes implied-volatility inversion from observed option close, r=0, q=0; T measured to 15:30 IST expiry. These are entry-Greek proxies, not proprietary Sensibull Greeks.",
         "positive_candidate_definition":"static one-dimensional flatline > 0 at the decision timestamp",
         "primary_rule":"first positive weekly observation; among positive candidates maximize estimated equal max-profit=max-loss flatline",
-        "selector_test_note":"Each alternative feature selects one candidate per week by max/min. These are exploratory univariate tests and must not be treated as an optimized final strategy without out-of-sample validation."
+        "selector_test_note":"Each alternative feature selects one positive candidate per week by max/min. These are exploratory univariate tests and must not be treated as an optimized final strategy without out-of-sample validation.",
+        "baseline_selector_total_net_pnl_inr": float(baseline_selector.total_net_pnl_inr.iloc[0]) if not baseline_selector.empty else None
     }
     (out/"summary.json").write_text(json.dumps(summary,indent=2),encoding="utf-8")
     print(json.dumps(summary,indent=2))
