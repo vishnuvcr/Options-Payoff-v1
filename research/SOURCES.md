@@ -59,3 +59,14 @@ These Phase 7 platform sources are used to separate (a) the static payoff-chart 
 ### Literature implications for Phase 9G
 
 The literature does not justify treating a positive static cross-expiry payoff chart as a guaranteed arbitrage. Empirical work on NIFTY box spreads indicates that transaction-cost-adjusted mispricing can exist but may disappear rapidly, while broader option research shows that maturity-dependent volatility, risk premia, and cross-maturity dependence materially affect option prices. Phase 9G therefore treats the static flatline as a **selection metric**, evaluates realized near-expiry P&L separately, and compares fixed far-expiry horizons with explicit execution costs and paired statistical inference.
+
+
+## Additional literature — 2026-09-27
+
+6. **Vipul (2008), “Cross-market efficiency in the Indian derivatives market: A test of put-call parity,” Journal of Futures Markets 28(9), 889–910, DOI 10.1002/fut.20325.** Using 35 months of time-stamped NIFTY transactions data, the paper reports frequent put-call parity violations and arbitrage opportunities after transaction costs that vanish quickly; patterns vary with intraday time, moneyness, volatility and days to expiry. This is directly relevant to the present study's emphasis on intraday timing, execution costs and maturity selection. Source: https://ideas.repec.org/a/wly/jfutmk/v28y2008i9p889-910.html
+
+7. **Fournier (2024), “Modeling Conditional Factor Risk Premia Implied by Index Option Returns,” Journal of Finance, DOI 10.1111/jofi.13324.** The paper models option-return exposures and conditional risk premia across moneyness and maturity, using market return, variance-change, gamma and additional tail/volatility factors. It reinforces that cross-maturity option returns contain systematic risk-premium components and should not automatically be interpreted as pure arbitrage. Source: https://onlinelibrary.wiley.com/doi/10.1111/jofi.13324
+
+8. **Hu, Li & Zhuo, “The Term Structure of Index Option Returns” (working paper; revised August 2026).** The study directly examines the maturity structure of index-option realized returns and finds that the term structure of option returns contains risk-premium components that differ by maturity. This is a particularly relevant conceptual reference for fixed H1/H2/H3 horizon comparison. Source: https://papers.ssrn.com/sol3/Delivery.cfm/5944594.pdf?abstractid=5944594&mirid=1
+
+9. **Kumar, Sarva & Kumaresan (2025), “Behavioral Dynamics in Testing Markets: A Methodological Analogy to Trader and Investor Efficiency.”** Using Nifty50 spot/futures/options data from April 2018 to March 2024, the paper reports that transaction costs materially reduce the subset of apparent put-call parity violations that are exploitable. This supports explicit friction sensitivity in the present research. Source: https://doi.org/10.5281/zenodo.17567987

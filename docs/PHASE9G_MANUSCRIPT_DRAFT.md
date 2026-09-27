@@ -211,3 +211,10 @@ Potential extensions after the predefined Phase 9G decision include:
 - independent replication on additional index-option datasets.
 
 These are future directions, not components of the current acceptance decision.
+
+
+## 15. Legacy-control supersession note
+
+The authoritative Phase 9D H1 artifact was independently audited against the current exact 17-strike specification. Of 172 historical selected timestamps in that legacy artifact, only 45 contained the exact prescribed 17 unique strike shifts; 127 were missing at least one prescribed shift. No conflicting quote values were found among the audited decision surfaces. The legacy 169-trade H1 result is therefore retained only as historical diagnostic evidence and is **not** the control for Phase 9G inference. The corrected H1 control is reconstructed from the raw option data under the current exact rule and is compared with H2/H3 on matched weekly opportunities.
+
+This distinction is essential because simply filtering the legacy trades down to the 45 complete timestamps would not reconstruct the first qualifying timestamp under the corrected rule: a later timestamp within the same weekly cycle could become the valid first qualifying opportunity after incomplete timestamps are rejected.
