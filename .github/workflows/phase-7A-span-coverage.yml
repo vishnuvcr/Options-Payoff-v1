@@ -1,0 +1,53 @@
+name: Phase 7A - Historical SPAN Coverage Probe
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Phase 3 run containing expanded strategy inputs
+        required: true
+        default: '36262958536'
+  push:
+    branches:
+      - phase-7A-margin-reconstruction
+
+concurrency:
+  group: phase-7A-span-coverage-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install probe dependencies
+        run: pip install 'pandas>=2.2' 'pyarrow>=18' 'requests>=2.31'
+      - name: Download Phase 3 candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/phase3_source
+          gh run download '${{ inputs.source_run_id || '36262958536' }}' \
+            --repo '${{ github.repository }}' \
+            --name phase-3-backtest-results \
+            --dir data/phase3_source
+          test -s data/phase3_source/candidate_results.parquet
+      - name: Probe all historical SPAN variants
+        run: |
+          python scripts/probe_historical_span_coverage.py \
+            --candidates data/phase3_source/candidate_results.parquet \
+            --out results/phase7a_span_coverage.csv
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-7A-span-coverage
+          path: |
+            results/phase7a_span_coverage.csv
+            results/phase7a_span_coverage.summary.json
