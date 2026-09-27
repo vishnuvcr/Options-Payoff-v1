@@ -1,0 +1,4 @@
+entry_timestamp,entry_date,candidate_label,shift_points,strike,spot_at_entry,lot_size,chart_pnl_inr,margin_required_inr,max_profit_pct_margin,gross_pnl_inr,net_pnl_inr,total_costs_inr,source_spn_version
+2021-08-04 09:20:00+05:30,2021-08-04,SHIFT_PLUS_100,100,16350,16228.20,50,2305.00,51327.10,4.490805,5732.6625,5609.492652,123.169848,nsccl.20210804.s.spn
+2022-04-04 09:20:00+05:30,2022-04-04,SHIFT_PLUS_300,300,18150,17854.75,50,2675.00,53357.30,5.013372,-5624.7000,-5791.419441,166.719441,nsccl.20220404.s.spn
+2022-05-25 09:20:00+05:30,2022-05-25,SHIFT_MINUS_250,-250,15950,16215.80,50,1242.50,46183.60,2.690349,24029.85625,23853.190522,176.665728,nsccl.20220525.s.spn
