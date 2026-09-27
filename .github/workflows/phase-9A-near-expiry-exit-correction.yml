@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v5)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v6)
 
 on:
   workflow_dispatch:
