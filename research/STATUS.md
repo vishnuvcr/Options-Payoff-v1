@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-7A-margin-reconstruction  
-**Overall status:** Phase 7B — weekly trade-cadence interpretation OPEN; Phase 7A margin calibration remains complete
+**Overall status:** Phase 7B — positive-only weekly selection in progress
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -163,3 +163,7 @@ The earlier 48-trade/₹166,866.51 Phase 7 result used the superseded buy-premiu
 ## Phase 7B status
 
 User clarification: the intended operation is one weekly scan across all 17 strikes (ATM-400..ATM+400) and, when at least one candidate exceeds 2.5%, trade the maximum candidate for that weekly cycle. The prior 4-trade number is not a count of weekly scans; it is the count of qualifying historical observations in the exact-margin dataset. Weekly-cycle mapping remains to be implemented without look-ahead.
+
+## Phase 7B rule correction
+
+The 2.5% rule is removed. Margin is no longer a trade-entry denominator. Every weekly cycle is scanned across ATM-400..ATM+400; the maximum positive/all-green flatline candidate is traded. No threshold-based skipping is used.
