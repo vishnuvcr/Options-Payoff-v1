@@ -120,3 +120,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Pre-rerun hardening | Fixed duplicate workflow `env` keys and made the result merger recursively locate yearly H1/H2/H3 trade files, avoiding the brittle nested-directory assumption. |
 
 | 2026-09-27 | 9G | Sensitivity-schema audit | Audited the execution-cost sensitivity path before accepting any horizon comparison. Identified the realized-vs-raw schema mismatch; no sensitivity result accepted. |
+
+| 2026-09-27 | 9G | Paytm Money pricing-source verification | Current public Paytm pages show inconsistent brokerage figures (₹20 flat-order material versus a ₹10 F&O FAQ). The Phase 9G predeclared ₹20 primary and ₹10/₹40 sensitivity framework is retained; no strategy result is altered. |
