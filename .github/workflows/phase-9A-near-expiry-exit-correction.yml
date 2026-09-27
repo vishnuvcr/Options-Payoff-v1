@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v12 chunked)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v13 chunked + exit-date fix)
 
 on:
   workflow_dispatch:
@@ -55,7 +55,7 @@ jobs:
           key: hf-nifty-options-near-exit-${{ matrix.year }}-${{ github.event.inputs.start || '2021-06-01' }}-${{ github.event.inputs.end || '2026-08-31' }}
           restore-keys: hf-nifty-options-near-exit-${{ matrix.year }}-
       - name: Unit tests
-        run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
+        run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py tests/test_near_exit_extractor.py
       - name: Build yearly corrected inputs
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
