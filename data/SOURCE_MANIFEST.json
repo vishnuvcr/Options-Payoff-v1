@@ -9,9 +9,18 @@
     "index_file": "index/NIFTY.parquet",
     "option_pattern": "options/NIFTY/YYYY-MM-DD.parquet",
     "schema": [
-      "timestamp", "open", "high", "low", "close", "volume",
-      "open_interest", "trading_day", "symbol", "strike",
-      "option_type", "expiry"
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "open_interest",
+      "trading_day",
+      "symbol",
+      "strike",
+      "option_type",
+      "expiry"
     ]
   },
   "cross_check_source": {
@@ -30,5 +39,25 @@
     "raw_data": "not committed by default",
     "cache": "GitHub Actions cache keyed by source revision and date window",
     "derived": "compact strategy-relevant inputs may be committed only after confirming redistribution terms"
+  },
+  "phase9f_context_sources": {
+    "official": [
+      "NSE historical index/India VIX",
+      "NSE FII/FPI and DII trading activity",
+      "BSE Sensex/index data",
+      "RBI/FBIL USD/INR reference-rate documentation",
+      "Cboe VIX historical data",
+      "LBMA gold price information",
+      "NSE corporate filings/actions"
+    ],
+    "fallback": [
+      "Federal Reserve Bank of St. Louis FRED",
+      "yfinance",
+      "Hareeshkesavan/Stock-Market-Dataset",
+      "chirag127/fii-dii-activity-api",
+      "skamalj/nseindiapy"
+    ],
+    "point_in_time_rule": "Only observations known by entry timestamp are joined; daily global/institutional data use prior completed sessions unless a documented earlier availability timestamp exists.",
+    "phase9f_scope": "descriptive cross-market/regime audit; no optimization or new entry filter"
   }
 }
