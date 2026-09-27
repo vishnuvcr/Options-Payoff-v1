@@ -209,3 +209,15 @@ Hypothesis: the cross-expiry settlement difference can be predicted sufficiently
 ## Phase 8A result
 
 The economically important cross-expiry S2-S1 term is not predicted robustly enough to use as an entry filter. Across 43 strictly OOS weekly decision cycles, model sign accuracy was 44.2% (Ridge), 51.2% (Random Forest), and 53.5% (HGB). The strongest OOS filter uplift was Random Forest (+₹102,022.80 versus the same-test baseline), but chronological block results were +₹140,877, -₹58,226, and +₹19,372, and the paired bootstrap 95% CI was ₹-2,740.68 to ₹7,993.14. No filter adopted.
+
+## Current phase matrix
+
+| Phase | Current status | Key conclusion |
+|---|---|---|
+| 7A Margin reconstruction | COMPLETE / superseded | 2.5% margin denominator reconstructed but later removed from user's final rule. |
+| 7B Weekly positive-only rule | COMPLETE | 63 weekly trades; net ₹-9,627.90 after modeled costs. |
+| 7C Greeks / entry features | COMPLETE | No single Greek/IV/moneyness feature robust enough to adopt. |
+| 8A S2-S1 predictability | COMPLETE | No sufficiently stable OOS S2-S1 filter; no predictor adopted. |
+| 8B External variables | NOT PROMOTED | Predeclared stop rule prevents open-ended predictor search without stronger independent data. |
+
+Current consolidated conclusion: **the final positive-flatline weekly strategy is not validated as a deployable edge under the cached historical implementation.** See `docs/PHASE8_S2_S1_RESULTS.md` and `docs/FINAL_CONCLUSION.md`.
