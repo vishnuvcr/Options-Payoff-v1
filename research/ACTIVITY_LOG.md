@@ -180,3 +180,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9H | Performance correction committed | Phase 9H now precomputes far-leg exit quotes once per expiry cycle before candidate P&L evaluation. |
 
 | 2026-09-27 | 9H | Vectorized execution committed | Candidate economics are now calculated in vectorized form after the exact 17-strike validity gate; no economic formula or selection criterion changed. |
+
+| 2026-09-27 | 9H-A | Scope correction | Phase 9H was narrowed from full-sample recomputation to targeted reconstruction of the 54 realized loss cycles. This avoids spending compute on unaffected winners while preserving the exact entry and cost rules. |
