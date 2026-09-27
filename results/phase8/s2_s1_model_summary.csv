@@ -1,0 +1,4 @@
+model,test_weeks,mae_points,rmse_points,sign_accuracy_pct,auc,filter_rule,traded_weeks,filter_net_pnl_inr,baseline_net_pnl_inr,delta_vs_baseline_inr,bootstrap_mean_delta_inr,bootstrap_ci_low_inr,bootstrap_ci_high_inr
+ridge,43,416.196063,501.542941,44.186047,0.486425,pred_positive,18,-5022.626851,-10634.753420,5612.126569,130.514571,-4710.562273,5446.226635
+random_forest,43,382.083360,477.433577,51.162791,0.513575,pred_positive,23,91388.051294,-10634.753420,102022.804714,2372.623365,-2740.683748,7993.136306
+hist_gradient_boost,43,393.337155,489.958856,53.488372,0.540724,pred_positive,20,64981.672890,-10634.753420,75616.426310,1758.521542,-3680.812538,7624.206341
