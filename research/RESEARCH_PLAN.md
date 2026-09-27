@@ -514,3 +514,16 @@ H2/H3 far-expiry selection remains frozen until Phase 9E concludes.
 Phase 9F is a non-optimizing descriptive audit of the corrected H1 trade ledger. It will join point-in-time market context from NSE/India VIX, FII/FPI and DII, BSE/Sensex, USD/INR, gold, global equity indices and global volatility. Any subgroup association remains hypothesis-generating and cannot change the trade rule inside this phase.
 
 Exit criteria: reproducible context join for the 169 complete trades, source/coverage audit, predeclared regime summaries, dependence-aware uncertainty, explicit limitations, and no strategy-rule changes. H2/H3 remains frozen until Phase 9F completes.
+
+
+## Phase 9F exit record
+
+Phase 9F is complete. The 169-trade H1 ledger was joined to point-in-time NIFTY/India VIX, Sensex and global cross-market context without changing the trading rule. Sparse FII/DII data were excluded from inference. No continuous association survived BH correction at 5%. The only material robustness observations were descriptive: weaker economics in the highest India-VIX quartile and a difference by NIFTY-vs-Sensex relative performance. No filter adopted.
+
+## Phase 9G — H2/H3 far-expiry selection research
+
+**Status:** next planned phase; branch to be created from `phase-9F-regime-crossmarket-audit` after documentation is committed.
+
+The H1 entry rule, first-positive timestamp logic, 17-strike ATM-400..ATM+400 grid, near-expiry manual-close exit convention, 0.25% premium slippage, broker-cost sensitivity and statutory cost model remain fixed. Phase 9G will test the research question left frozen by earlier corrections: whether the choice of the far expiry beyond the near weekly expiry changes realized economics when the far CE/PE are manually closed at near expiry.
+
+The phase must be run as a preregistered comparison of predefined H2/H3 candidate expiry horizons, with no future-data selection, separate yearly/chronological diagnostics, execution-cost sensitivity and multiple-testing correction where candidate selectors are compared. No regime insight from Phase 9F can become an entry filter inside Phase 9G.
