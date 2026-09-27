@@ -168,7 +168,7 @@ def main() -> None:
     summary["validation_assertions"] = {
         "all_far_exits_on_or_before_near_expiry": True,
         "no_missing_exit_timestamps": True,
-        "trade_count_equals_positive_weeks": int(len(primary)) == int(len(primary)),
+        "one_trade_per_near_expiry_cycle": int(primary["near_expiry"].nunique()) == int(len(primary)),
     }
     (out / "corrected_validation_summary.json").write_text(
         json.dumps(summary, indent=2, default=str),
