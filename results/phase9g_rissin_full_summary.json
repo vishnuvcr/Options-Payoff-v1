@@ -1,0 +1,169 @@
+{
+  "phase": "9G",
+  "source": "rissin/nse-options-intraday",
+  "years": [
+    2024,
+    2025,
+    2026
+  ],
+  "primary_cost_model": {
+    "slippage_pct": 0.0025,
+    "brokerage_per_order_inr": 20
+  },
+  "horizon_summary": [
+    {
+      "horizon": "H1",
+      "trades": 66,
+      "net_pnl_inr": 166247.9682007773,
+      "gross_pnl_inr": 184134.55124999947,
+      "total_costs_inr": 17886.583049222172,
+      "mean_net_pnl_inr": 2518.9086091026866,
+      "median_net_pnl_inr": 1990.3879683661407,
+      "win_rate_pct": 81.81818181818181,
+      "profit_factor": 8.400922504692899,
+      "max_drawdown_inr": 14662.566517358158,
+      "incomplete_selected_trades": 2
+    },
+    {
+      "horizon": "H2",
+      "trades": 37,
+      "net_pnl_inr": 148974.37156686082,
+      "gross_pnl_inr": 159616.62062499954,
+      "total_costs_inr": 10642.249058138726,
+      "mean_net_pnl_inr": 4026.3343666719143,
+      "median_net_pnl_inr": 4028.696131345465,
+      "win_rate_pct": 94.5945945945946,
+      "profit_factor": 12.191030034912906,
+      "max_drawdown_inr": 7800.894754440804,
+      "incomplete_selected_trades": 5
+    },
+    {
+      "horizon": "H3",
+      "trades": 16,
+      "net_pnl_inr": 120194.26327675575,
+      "gross_pnl_inr": 125147.50937499947,
+      "total_costs_inr": 4953.246098243711,
+      "mean_net_pnl_inr": 7512.1414547972345,
+      "median_net_pnl_inr": 7031.121377665308,
+      "win_rate_pct": 93.75,
+      "profit_factor": 38.7095382350604,
+      "max_drawdown_inr": 3187.3703286296222,
+      "incomplete_selected_trades": 0
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "comparison": "H2-H1",
+      "paired_cycles": 34,
+      "mean_delta_inr": 1820.8817924441307,
+      "median_delta_inr": 2543.765549750152,
+      "positive_delta_pct": 91.17647058823529,
+      "block4_bootstrap_ci_low_inr": 560.3713866568197,
+      "block4_bootstrap_ci_high_inr": 2749.4560389670983,
+      "paired_sign_permutation_p": 0.005699715014249288,
+      "bh_q_value": 0.011399430028498577
+    },
+    {
+      "comparison": "H3-H1",
+      "paired_cycles": 16,
+      "mean_delta_inr": 4804.1022414139425,
+      "median_delta_inr": 5484.710901909,
+      "positive_delta_pct": 87.5,
+      "block4_bootstrap_ci_low_inr": 328.62326646950714,
+      "block4_bootstrap_ci_high_inr": 8870.46359694647,
+      "paired_sign_permutation_p": 0.018249087545622718,
+      "bh_q_value": 0.018249087545622718
+    }
+  ],
+  "exploratory_h3_minus_h2": {
+    "matched_cycles": 11,
+    "mean_delta_inr": 4522.856764851123,
+    "median_delta_inr": 3725.6492609371726,
+    "positive_delta_pct": 90.9090909090909,
+    "block4_bootstrap_ci_low_inr": 1724.1785643411783,
+    "block4_bootstrap_ci_high_inr": 7932.382177687733,
+    "sign_permutation_p": 0.004699765011749413
+  },
+  "selection_behaviour": [
+    {
+      "horizon": "H1",
+      "trades": 66,
+      "mean_first_positive_minutes_after_0920": 92.60606060606061,
+      "median_first_positive_minutes_after_0920": 61.5,
+      "p90_first_positive_minutes_after_0920": 214,
+      "mean_selected_shift_points": -156.06060606060606,
+      "median_selected_shift_points": -350,
+      "abs_shift_mean_points": 372.72727272727275,
+      "atm_selection_pct": 0
+    },
+    {
+      "horizon": "H2",
+      "trades": 37,
+      "mean_first_positive_minutes_after_0920": 186.78378378378378,
+      "median_first_positive_minutes_after_0920": 186,
+      "p90_first_positive_minutes_after_0920": 329.2,
+      "mean_selected_shift_points": 74.32432432432432,
+      "median_selected_shift_points": 250,
+      "abs_shift_mean_points": 339.1891891891892,
+      "atm_selection_pct": 0
+    },
+    {
+      "horizon": "H3",
+      "trades": 16,
+      "mean_first_positive_minutes_after_0920": 240.1875,
+      "median_first_positive_minutes_after_0920": 262.5,
+      "p90_first_positive_minutes_after_0920": 337,
+      "mean_selected_shift_points": 25,
+      "median_selected_shift_points": 250,
+      "abs_shift_mean_points": 356.25,
+      "atm_selection_pct": 0
+    }
+  ],
+  "sensitivity": [
+    {
+      "slippage_pct": 0,
+      "brokerage_per_order_inr": 20,
+      "H1_net_pnl_inr": 185227.19021318035,
+      "H2_net_pnl_inr": 160615.64985026463,
+      "H3_net_pnl_inr": 126008.28155201684
+    },
+    {
+      "slippage_pct": 0.0025,
+      "brokerage_per_order_inr": 20,
+      "H1_net_pnl_inr": 166247.9682007773,
+      "H2_net_pnl_inr": 148974.37156686082,
+      "H3_net_pnl_inr": 120194.26327675575
+    },
+    {
+      "slippage_pct": 0.005,
+      "brokerage_per_order_inr": 20,
+      "H1_net_pnl_inr": 147268.7461883742,
+      "H2_net_pnl_inr": 137333.09187009718,
+      "H3_net_pnl_inr": 114380.24069254391
+    },
+    {
+      "slippage_pct": 0.01,
+      "brokerage_per_order_inr": 20,
+      "H1_net_pnl_inr": 109310.30216356783,
+      "H2_net_pnl_inr": 114050.523442144,
+      "H3_net_pnl_inr": 102752.19977869705
+    },
+    {
+      "slippage_pct": 0.0025,
+      "brokerage_per_order_inr": 10,
+      "H1_net_pnl_inr": 170920.7741359192,
+      "H2_net_pnl_inr": 151593.9708545728,
+      "H3_net_pnl_inr": 121327.05990475573
+    },
+    {
+      "slippage_pct": 0.0025,
+      "brokerage_per_order_inr": 40,
+      "H1_net_pnl_inr": 156902.3723317499,
+      "H2_net_pnl_inr": 143735.1692517308,
+      "H3_net_pnl_inr": 117928.66342475574
+    }
+  ],
+  "candidate_state": "Both H2 and H3 pass the preregistered paired comparison against H1 on this 2024-2026 Rissin sample. This is a candidate-horizon finding, not an untouched future-holdout result.",
+  "holdout_caution": "The 2026-only H2-H1 and H3-H1 block-bootstrap intervals cross zero. Pooled significance is therefore not sufficient for production deployment.",
+  "note": "No dynamic horizon switching is adopted. A production candidate requires independent untouched future validation."
+}
