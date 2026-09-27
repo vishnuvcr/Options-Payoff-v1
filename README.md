@@ -66,30 +66,11 @@ Phase 7 workflow: [.github/workflows/phase-7-max-equal-selection.yml](.github/wo
 
 The exact Sensibull-style percentage uses margin required as its denominator; the current historical dataset does not contain that margin series. Phase 7 therefore uses the reproducible INR flatline value as the primary score and keeps the old 2.5% proxy only as a sensitivity.
 
-### Phase 7 empirical result
+### Phase 7 empirical result — superseded proxy
 
-The requested rule was evaluated on the cached 09:20 NIFTY candidate dataset:
+The earlier 48-trade Phase 7 result used the legacy buy-premium denominator only. It is retained as a historical sensitivity and is **not** the final interpretation of the user's 2.5% platform rule.
 
-- every 50-point common strike from ATM-400 through ATM+400;
-- require the legacy 2.5% chart-percentage proxy to be >2.5%;
-- select the single eligible strike with the maximum estimated equal max-profit=max-loss value.
-
-At 0.25% premium slippage and ₹20/order brokerage:
-
-- 905 grid timestamps
-- 48 selected timestamps/trades
-- ₹166,866.51 net P&L
-- ₹3,476.39 mean trade P&L
-- 60.42% win rate
-- 1.56 profit factor
-- -₹124,060.72 maximum drawdown
-- 19 losing trades
-
-The static chart component contributed ₹36,138.75; realized S2-S1 contributed ₹142,545.00 before entry slippage and fees. All 19 losing trades were already negative before modeled fees.
-
-Full Phase 7 results: [docs/PHASE7_RESULTS.md](docs/PHASE7_RESULTS.md) and [results/phase7/summary.json](results/phase7/summary.json).
-
-The exact Sensibull percentage denominator remains unresolved because its public formula uses margin required, while the historical margin series is not in the cached dataset. The 2.5% gate above is therefore an explicit proxy, not a claimed exact Sensibull reconstruction.
+Proxy result: 48 trades, ₹166,866.51 net P&L, 60.42% win rate, PF 1.56, max drawdown -₹124,060.72.
 
 ### Phase 7A margin calibration
 
@@ -105,3 +86,18 @@ Calibration data: [results/phase7a/margin_calibration_2026-09-25.json](results/p
 Intraday comparison: [results/phase7a/margin_calibration_versions_2026-09-25.json](results/phase7a/margin_calibration_versions_2026-09-25.json)
 
 The historical backtest still requires a per-entry-date margin cache before the proxy 2.5% gate can be replaced for all trades.
+### Phase 7A exact historical result
+
+The 2.5% denominator is now reconstructed as margin required using NSE/NSCCL SPAN risk data. With the requested ATM-400..ATM+400 grid, 50-point steps and a >2.5% margin-based gate, the primary i1 begin-day SPAN interpretation produces **4 trades**:
+
+- **₹42,680.17 net P&L**
+- **75.0% win rate**
+- **8.37 profit factor**
+- **-₹5,791.42 maximum drawdown**
+- **₹647.48 modeled costs**
+
+Maximum estimated INR flatline value and maximum margin-based percentage select the same candidate on all four qualifying timestamps.
+
+Settlement-file sensitivity produces 3 qualifying trades and ₹23,671.26 net P&L.
+
+Full Phase 7A results: [docs/PHASE7A_RESULTS.md](docs/PHASE7A_RESULTS.md).
