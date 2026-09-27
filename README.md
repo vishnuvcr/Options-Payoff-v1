@@ -381,3 +381,18 @@ Detailed analysis: [docs/PHASE9H_LOSS_ENTRY_ANALYSIS.md](docs/PHASE9H_LOSS_ENTRY
 Machine-readable summary: [results/phase9h/loss_entry_rescue_summary.csv](results/phase9h/loss_entry_rescue_summary.csv)  
 Full loss ledger: [results/phase9h/loss_trade_entry_detail.csv](results/phase9h/loss_trade_entry_detail.csv)  
 Workflow: [36325328644](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36325328644)
+
+
+### Frozen current strategy specification — 2026-09-27
+
+The accepted Phase 9G H1 control is now documented as a single operational specification: [docs/CURRENT_STRATEGY_SPEC.md](docs/CURRENT_STRATEGY_SPEC.md).
+
+It defines the exact live/research procedure:
+- scan every available 1-minute timestamp from 09:20–15:29 and continue across later trading days in the weekly cycle;
+- require the complete **17 unique strikes** from ATM-400 through ATM+400;
+- at the **first valid timestamp** with any positive flatline, evaluate all 17 and select the maximum positive equal-Max-Profit=Max-Loss value;
+- no 2.5% threshold, no ATM-first fallback ordering, and no additional filter;
+- enter the same-strike four-leg H1 cross-expiry position;
+- close all four legs at the near weekly expiry, manually squaring the far CE/PE at observed near-expiry prices.
+
+Phase 9H-A did not adopt any entry modification. This specification is documentation of the frozen control, not a new backtest result.
