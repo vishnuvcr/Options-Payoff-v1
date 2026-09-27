@@ -65,7 +65,7 @@ jobs:
             python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_slip_${tag} --slippage-pct $slip --brokerage-per-order 20
           done
           python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker10 --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}' --brokerage-per-order 10
-          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker40 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 40
+          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker40 --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}' --brokerage-per-order 40
       - name: Build H3 inputs
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
