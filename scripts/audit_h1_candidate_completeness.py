@@ -43,7 +43,7 @@ summary={
     'max_candidate_count':int(audit['candidate_count'].max()),
     'min_candidate_count_positive_timestamps':int(positive_incomplete['candidate_count'].min()) if not positive_incomplete.empty else None,
 }
-out=Path(a.out); out.parent.mkdir(parents=True,exist_ok=True)
+out=Path(a.out); out.mkdir(parents=True,exist_ok=True)
 (out/'h1_17_strike_completeness.json').write_text(json.dumps(summary,indent=2))
 joined.to_csv(out/'h1_selected_timestamp_completeness.csv',index=False)
 positive_incomplete.to_csv(out/'h1_positive_incomplete_scan_timestamps.csv',index=False)
