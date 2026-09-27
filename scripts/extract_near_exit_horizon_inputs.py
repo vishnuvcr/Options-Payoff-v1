@@ -169,7 +169,7 @@ def main():
     expiry_entry_times = defaultdict(list)
     expiry_exit_ts = {}
     for entry in entry_df[['timestamp', 'trading_date']].itertuples(index=False):
-        pair = expiry_pair(entry.trading_date, expiry_dates)
+        pair = expiry_horizon_pair(entry.trading_date, expiry_dates, args.horizon_steps)
         if pair is None:
             continue
         near_expiry, far_expiry = pair
@@ -219,7 +219,7 @@ def main():
     for entry in entry_df.sort_values('timestamp').itertuples(index=False):
         entry_ts = entry.timestamp
         entry_date = entry.trading_date
-        pair = expiry_pair(entry_date, expiry_dates)
+        pair = expiry_horizon_pair(entry_date, expiry_dates, args.horizon_steps)
         if pair is None:
             continue
         near_expiry, far_expiry = pair
