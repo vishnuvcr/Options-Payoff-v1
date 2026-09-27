@@ -61,3 +61,5 @@
 | 2026-09-27 | 9A | v8 indexed extractor completed its full ~30-second reconstruction pass but ended on an obsolete `for stale in list(cache)` cleanup block after the DataFrame cache had been replaced by `prepared` lookup dictionaries. | H1 workflow stopped after data extraction before producing the ledger. | Removed the obsolete cleanup block; v9 reruns the same optimized extractor. |
 
 | 2026-09-27 | 9A | v10 chunked workflow was rejected at workflow-parse time because a Python heredoc inside a YAML block scalar was not indented as YAML. | Six-year parallel reconstruction did not start. | Removed the unnecessary sentinel heredoc branch and promoted the workflow to v11. |
+
+| 2026-09-27 | 9A | Deeper exit-date audit: one cached exit lookup per contract expiry cannot represent a contract used as the far leg at the prior expiry and as the near leg at its own expiry. | Such a cache can attach the wrong or missing far-leg exit price. The current v12 chunk run is superseded before acceptance. | Replaced the single lookup with exit-date keyed lookup dictionaries; added regression tests that the same contract supports two exit dates. v13 is authoritative. |
