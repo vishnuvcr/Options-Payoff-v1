@@ -167,3 +167,19 @@ The current research does not validate a deployable trading edge for the final p
 **No Greek filter and no S2-S1 filter has been added.**
 
 Consolidated conclusion: [docs/FINAL_CONCLUSION.md](docs/FINAL_CONCLUSION.md).
+
+
+## Phase 9 — Far-expiry selection grid
+
+A new predeclared research extension is staged on branch phase-9-far-expiry-selection-grid.
+
+The experiment keeps the near weekly expiry unchanged but lets the far leg expiry be chosen from:
+- next week (H=1);
+- next-next week (H=2);
+- next-next-next week (H=3).
+
+For each weekly decision, all 17 common strikes and all three far-expiry horizons are evaluated. The primary experimental selector is the maximum positive estimated equal max-profit=max-loss flatline.
+
+A critical implementation issue is overlap: H=2/H=3 positions remain open after the near expiry, so the new backtest must use a portfolio-level chronological ledger with overlapping positions, transaction costs, slippage and capital/margin usage.
+
+Phase 9 is currently design/staging only; no new trading conclusion has been accepted yet.
