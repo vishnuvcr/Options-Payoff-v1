@@ -95,15 +95,21 @@ def fetch_nse():
         idx=client.historical.price_history('NIFTY 50',pd.Timestamp('2020-12-20').date(),pd.Timestamp('2026-09-27').date()).to_pandas()
         vix=client.historical.vix_history(pd.Timestamp('2020-12-20').date(),pd.Timestamp('2026-09-27').date()).to_pandas()
         def norm(x):
-            x=x.copy(); x.columns=[str(c).strip().lower().replace(' ','_') for c in x.columns]
-            datecol=next((c for c in x.columns if c in ['date','index_date','trading_date']),None)
-            if datecol is None: datecol=x.columns[0]
-            x['date']=pd.to_datetime(x[datecol]).dt.date
-            ren={}
-            for c in x.columns:
-                if 'open'==c or c.endswith('_open'): ren[c]='open'
-                if 'close'==c or c.endswith('_close'): ren[c]='close'
-            return x.rename(columns=ren)
+            x=x.copy()
+            raw_cols=[str(col).strip() for col in x.columns]
+            lower={col:col.lower().replace(' ','_') for col in raw_cols}
+            def pick(predicate):
+                for col in raw_cols:
+                    if predicate(lower[col]): return col
+                return None
+            date_src=pick(lambda s: s in {'date','index_date','trading_date'} or s.endswith('_date'))
+            open_src=pick(lambda s: s=='open' or s.endswith('_open'))
+            close_src=pick(lambda s: s=='close' or s.endswith('_close'))
+            out=pd.DataFrame(index=x.index)
+            if date_src is not None: out['date']=pd.to_datetime(x[date_src],errors='coerce').dt.date
+            if open_src is not None: out['open']=pd.to_numeric(x[open_src],errors='coerce')
+            if close_src is not None: out['close']=pd.to_numeric(x[close_src],errors='coerce')
+            return out.drop_duplicates(subset=['date']) if 'date' in out.columns else out
         return norm(idx), norm(vix), 'nseindiapy'
     except Exception:
         return pd.DataFrame(), pd.DataFrame(), 'unavailable'
