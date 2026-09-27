@@ -4,14 +4,16 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 7 — payoff-platform semantics and maximum equal-flatline selection: ACTIVE**
+**Phase 7A — exact historical margin-denominator selection: COMPLETE**
 
-The previous full-grid study is now a historical comparator. The user has changed the selection rule again:
+The current research rule is now the exact platform-calibrated version. The superseded proxy studies remain in the repository only as comparators:
 
 - evaluate every 50-point strike from ATM-400 through ATM+400, including ATM;
 - compute the estimated positive flatline max-profit=max-loss value for each candidate;
 - select exactly one candidate per timestamp: the maximum estimated equal max-profit=max-loss value;
-- keep the historical 2.5% percentage as a separately labeled sensitivity until the platform's exact historical margin denominator is reconstructed;
+- require reconstructed margin-based max-profit=max-loss percentage > 2.5%;
+- select the maximum estimated equal max-profit=max-loss value in INR;
+- compare maximum margin-based percentage as a sensitivity;
 - exit at expiry.
 
 The earlier ATM/-400/+400 analysis is superseded.
@@ -64,7 +66,7 @@ Platform review: [Streak and Sensibull payoff semantics](docs/PAYOFF_PLATFORM_RE
 
 Phase 7 workflow: [.github/workflows/phase-7-max-equal-selection.yml](.github/workflows/phase-7-max-equal-selection.yml).
 
-The exact Sensibull-style percentage uses margin required as its denominator; the current historical dataset does not contain that margin series. Phase 7 therefore uses the reproducible INR flatline value as the primary score and keeps the old 2.5% proxy only as a sensitivity.
+The exact platform denominator is now reconstructed from NSE/NSCCL SPAN margin data. The buy-premium percentage is no longer the primary gate.
 
 ### Phase 7 empirical result — superseded proxy
 
@@ -85,7 +87,7 @@ Calibration report: [docs/MARGIN_RECONSTRUCTION.md](docs/MARGIN_RECONSTRUCTION.m
 Calibration data: [results/phase7a/margin_calibration_2026-09-25.json](results/phase7a/margin_calibration_2026-09-25.json)
 Intraday comparison: [results/phase7a/margin_calibration_versions_2026-09-25.json](results/phase7a/margin_calibration_versions_2026-09-25.json)
 
-The historical backtest still requires a per-entry-date margin cache before the proxy 2.5% gate can be replaced for all trades.
+Historical SPAN coverage is 100% across the 891 entry dates. The exact primary ledger and settlement-file sensitivity ledger are committed under `results/phase7a/`.
 ### Phase 7A exact historical result
 
 The 2.5% denominator is now reconstructed as margin required using NSE/NSCCL SPAN risk data. With the requested ATM-400..ATM+400 grid, 50-point steps and a >2.5% margin-based gate, the primary i1 begin-day SPAN interpretation produces **4 trades**:
