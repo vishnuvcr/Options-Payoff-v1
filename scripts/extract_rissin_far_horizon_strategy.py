@@ -42,6 +42,8 @@ def expiry_pair(d, expiries, rank):
     if len(xs)<=rank:
         return None
     near,far=xs[0],xs[rank]
+    if (far-near).days > 30:
+        return None
     return near,far
 
 def normalize(df):
