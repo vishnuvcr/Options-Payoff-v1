@@ -271,3 +271,7 @@ The Phase 9G pipeline has been corrected before accepting results: quote-level f
 
 ### H1 control behavioural baseline — 2026-09-27
 The authoritative H1 control artifact (run 36302077730) shows materially non-ATM selection: among 169 complete realized trades, ATM was selected only once; the largest groups were -400 (35), -350 (28), -300 (18), +400 (19), and +350 (15). First-positive timing also extends well beyond the opening minute: 39 decisions occurred at 09:20, while 40 occurred after 13:20. See [Phase 9G H1 control selection analysis](docs/PHASE9G_H1_CONTROL_SELECTION.md) and [machine-readable strike distribution](results/phase9g_h1_control_shift_distribution.csv).
+
+
+### Phase 9G execution checkpoint — run 10
+Run **36307233038** is the accepted Phase 9G execution candidate. It includes the strict all-17-strike decision rule and the independent H1 completeness gate. Older run 36305850007 is obsolete and its output is excluded from final inference.
