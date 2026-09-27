@@ -230,8 +230,8 @@ Selection protocol:
 4. Record estimated max profit, estimated min/max chart P&L, and the equal max-profit=max-loss value in INR.
 5. Select exactly one strike per entry timestamp: the candidate with the highest estimated equal max-profit=max-loss value.
 6. Do not use the old ATM-first/fallback ordering.
-7. Report the historical 2.5% proxy separately until the exact historical margin denominator required for the Sensibull-style percentage can be reconstructed.
-8. Re-run the full validation/regime/manuscript outputs after Phase 7 if the new selection materially changes the selected ledger.
+7. Use the reconstructed margin-required denominator for the primary backtest; retain the buy-premium result only as a historical sensitivity.
+8. Re-run downstream validation only to the extent statistically meaningful; with four exact qualifying i1 trades, treat inferential statistics as exploratory and report the exact ledger instead.
 
 Primary Phase 7 score:
 - `equal_max_profit_loss_inr` — the positive static flatline value per lot.
@@ -257,7 +257,7 @@ The research must not declare a strategy successful based on a single backtest o
 - Entry observation: 09:20 IST.
 - Candidate strikes: ATM, ATM-400, ATM+400.
 - Holding: settlement/expiry as specified, with near and next expiry tracked separately.
-- Threshold: 2.5%, configurable denominator.
+- Threshold: 2.5% of reconstructed margin required.
 - Position size: 1 lot by default for reporting; scale tests later.
 
 ## Phase 7A — Historical margin reconstruction and platform-percentage calibration
@@ -286,3 +286,6 @@ Exit criteria:
 - reproducible margin calculation code and manual workflow committed;
 - exact historical margin denominator used for any rerun is documented;
 - downstream performance results are either rerun with the calibrated denominator or explicitly marked as proxy results.
+## Phase 7A completion rule
+
+Phase 7A is complete when the platform denominator is calibrated, historical SPAN coverage is demonstrated, all candidates capable of exceeding 2.5% are reconstructed, the ±400 rule is enforced, and an exact qualifying trade ledger is produced. This has now been achieved: 4 i1 primary trades, 3 settlement-file sensitivity trades.
