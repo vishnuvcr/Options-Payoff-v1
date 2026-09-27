@@ -37,14 +37,13 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_RUN_ID: ${{ github.event.workflow_run.id }}
           INPUT_RUN_ID: ${{ inputs.phase9a_run_id }}
-          POINTER_RUN_ID: ${{ vars.PHASE9A_RUN_ID || '' }}
         run: |
           if [ "$EVENT_NAME" = "workflow_run" ]; then
             echo "run_id=$EVENT_RUN_ID" >> "$GITHUB_OUTPUT"
           elif [ -n "$INPUT_RUN_ID" ]; then
             echo "run_id=$INPUT_RUN_ID" >> "$GITHUB_OUTPUT"
           else
-            echo "run_id=$POINTER_RUN_ID" >> "$GITHUB_OUTPUT"
+            echo "run_id=$(cat research/PHASE9A_RUN_POINTER.txt)" >> "$GITHUB_OUTPUT"
           fi
       - name: Download corrected Phase 9A artifact
         env:
@@ -56,7 +55,7 @@ jobs:
           test -s input_artifact/data/derived/strategy_inputs_near_exit.parquet
       - name: Unit tests
         run: |
-          PYTHONPATH=. python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
+          PYTHONPATH=. python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py tests/test_near_exit_extractor.py
       - name: Primary corrected H1
         env:
           PYTHONPATH: .
