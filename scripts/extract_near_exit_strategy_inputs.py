@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import pandas as pd
@@ -17,6 +18,7 @@ def parse_args():
     p.add_argument('--end', required=True)
     p.add_argument('--entry-time', default='09:20')
     p.add_argument('--out', default='data/derived/strategy_inputs_near_exit.parquet')
+    p.add_argument('--download-workers', type=int, default=6)
     return p.parse_args()
 
 def normalize_timestamp(s):
@@ -123,6 +125,29 @@ def main():
     expiry_files = list_nifty_expiry_files(start, end)
     expiry_dates = [x[0] for x in expiry_files]
     filename_by_expiry = dict(expiry_files)
+    needed_expiries = set()
+    for entry in entry_df[['trading_date']].itertuples(index=False):
+        pair = expiry_pair(entry.trading_date, expiry_dates)
+        if pair is not None:
+            needed_expiries.update(pair)
+    needed_expiries = sorted(needed_expiries)
+
+    option_local_paths = {}
+
+    def download_one(expiry):
+        return expiry, hf_hub_download(
+            repo_id=DATASET,
+            filename=filename_by_expiry[expiry],
+            repo_type='dataset',
+        )
+
+    max_workers = max(1, min(args.download_workers, 8))
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        futures = [ex.submit(download_one, expiry) for expiry in needed_expiries]
+        for fut in as_completed(futures):
+            expiry, local = fut.result()
+            option_local_paths[expiry] = local
+
     cache = {}
 
     def get_option(expiry):
