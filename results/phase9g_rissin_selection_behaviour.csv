@@ -1,0 +1,4 @@
+horizon,trades,mean_first_positive_minutes_after_0920,median_first_positive_minutes_after_0920,p90_first_positive_minutes_after_0920,mean_selected_shift_points,median_selected_shift_points,abs_shift_mean_points,atm_selection_pct
+H1,66,92.60606060606061,61.5,214,-156.06060606060606,-350,372.72727272727275,0
+H2,37,186.78378378378378,186,329.2,74.32432432432432,250,339.1891891891892,0
+H3,16,240.1875,262.5,337,25,250,356.25,0
