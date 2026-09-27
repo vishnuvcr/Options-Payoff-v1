@@ -114,90 +114,127 @@ Published work on NIFTY option arbitrage and broader option markets shows that a
 
 The repository’s literature register includes work on NIFTY box-spread efficiency, implied-volatility term structure, volatility risk premia and calendar-spread dependence.
 
-## 8. Frozen H1 Control Evidence
+## 8. Frozen H1 Control Evidence — Corrected Phase 9G
 
-The authoritative corrected H1 control contains:
-- 169 complete realized trades;
-- ₹125,688.82 net P&L;
-- 63.91% realized win rate;
-- profit factor 2.94;
-- ₹16,200.65 maximum drawdown;
-- mean net P&L ₹743.72 per trade.
+The authoritative corrected Phase 9G H1 reconstruction contains **131 complete realized trades** and 2 incomplete selected rows under the exact 17-unique-shift/no-conflicting-duplicate rule.
 
-The H1 selection behaviour is materially non-ATM:
-- ATM was selected once in the 169 complete realized trades;
-- -400 was selected 35 times;
-- -350 was selected 28 times;
-- -300 was selected 18 times;
-- +400 was selected 19 times;
-- +350 was selected 15 times.
+Primary cost model:
+- 0.25% premium slippage per execution;
+- ₹20 brokerage per executed order;
+- six transactions per completed trade;
+- date-dependent STT/exercise STT plus exchange, SEBI, stamp duty and GST.
 
-First-positive timing was also distributed through the trading day rather than concentrated at 09:20. The median delay was 25 minutes after 09:20, while the P90 delay was 340.2 minutes.
+Primary H1 results:
+- gross P&L: **₹100,816.81**;
+- modeled costs: **₹28,948.05**;
+- net P&L: **₹71,868.76**;
+- mean net P&L/trade: **₹548.62**;
+- median: **₹352.69**;
+- realized win rate: **58.78%**;
+- Wilson 95% CI: **50.22%–66.84%**;
+- profit factor: **2.29**;
+- maximum drawdown: **₹15,704.24**;
+- IID bootstrap 95% CI for mean: **₹212.77–₹867.02**;
+- circular four-trade block bootstrap 95% CI: **₹199.66–₹872.13**.
 
-Annual H1 cohorts were historically net-positive across 2021–2026, but the 2025 cohort was much weaker than the other years. This is retained as a temporal-stability stress observation.
+The static chart-positive rate is 100%, but this is a property of the selection criterion and is not a realized 100% win rate.
+
+Selection behaviour:
+- median first-positive delay: 210 minutes after 09:20;
+- P90 delay: 357 minutes;
+- ATM selection: 0%;
+- median selected shift: -250 points;
+- mean absolute selected shift: 329.4 points.
+
+The annual H1 cohort table is persisted in results/phase9g/annual_summary.csv. The 2025 cohort is negative (-₹2,596.87; 31.25% wins), so the result is not uniformly positive across calendar years.
 
 ## 9. Results — H2/H3
 
-**Pending corrected Phase 9G reconstruction.**
+### 9.1 Primary source
 
-This section will be populated only from the authoritative run that passes the strict 17-strike completeness gate and H1 control reproduction.
+The primary Hugging Face source produced no qualifying H2 or H3 trades. These zeros are **not interpreted as economic zero performance**.
 
-Required tables:
-1. H1/H2/H3 aggregate performance.
-2. H1/H2/H3 annual cohorts.
-3. Paired H2-H1 and H3-H1 differences.
-4. Execution-cost sensitivity.
-5. First-positive decision-time distribution.
-6. Selected-strike distribution.
-7. Completeness and exclusion audit.
+A dedicated source-coverage audit sampled 152 representative entry timestamps for each far-rank. Every sample had zero same-day rows in the corresponding far-expiry partition, zero common CE/PE strikes and zero exact 17-shift surfaces. The partition windows generally begin roughly one weekly cycle before their own expiry. Thus the source lacks the pre-entry observations required to evaluate H2/H3 without look-ahead.
 
-Required figures:
-1. Equity curves.
-2. Drawdowns.
-3. Annual net P&L.
-4. Paired-delta distribution.
-5. Decision-time distribution.
-6. Strike-selection heatmap/distribution.
-7. Cost-sensitivity curves.
+Therefore:
+- H2 is **not adjudicated** on the primary source.
+- H3 is **not adjudicated** on the primary source.
+- No zero-P&L comparison is performed.
+- No dynamic horizon switching is introduced.
 
-## 10. Discussion
+### 9.2 Independent source sensitivity
 
-The interpretation will distinguish:
-- static chart geometry;
-- entry-time selection;
-- realized economic P&L;
-- execution costs;
-- statistical evidence;
-- data completeness;
-- temporal stability.
+The independent Rissin reconstruction for 2024–2026 produced:
+- H1: 66 trades, ₹166,247.97 net, 81.82% realized wins, PF 8.40;
+- H2: 37 trades, ₹148,974.37 net, 94.59% realized wins, PF 12.19;
+- H3: 16 trades, ₹120,194.26 net, 93.75% realized wins, PF 38.71.
 
-A positive H1 or H2/H3 result will not be described as a guaranteed 100% win-rate strategy. The 100% quantity relevant to the static chart is the positivity of the selected chart condition; realized trade outcomes are evaluated independently.
+Matched same-source paired comparisons were:
+- H2-H1: 34 paired cycles, mean delta ₹1,820.88, block-bootstrap 95% CI ₹560.37–₹2,749.46, sign-permutation p=0.00570, BH q=0.01140.
+- H3-H1: 16 paired cycles, mean delta ₹4,804.10, block-bootstrap 95% CI ₹328.62–₹8,870.46, sign-permutation p=0.01825, BH q=0.01825.
 
-## 11. Strengths
+These are source-sensitivity findings only. They do not establish that H2 or H3 is the production horizon because the source construction differs from the primary dataset, the history is partial, and the comparison is not an untouched future holdout.
 
-- Exact chronological rule is explicitly encoded.
-- All 17 strike candidates are required.
-- No separate 09:20 skip gate.
-- Far-expiry legs are marked using observed near-expiry prices.
-- Transaction costs are explicit and stress-tested.
-- H2/H3 are fixed variants rather than dynamically selected after observing results.
-- Paired inference controls for common weekly opportunities.
-- Repository logs preserve corrections and methodological changes.
+## 10. Execution-Cost Sensitivity
 
-## 12. Limitations
+For the primary H1 source, net P&L was:
 
-1. The 2021–2026 period is historical data already observed during research development and therefore is not a pristine untouched future holdout.
-2. One-minute close prices are used as execution proxies rather than full order-book bid/ask histories.
-3. Some historical option strikes may have incomplete quote availability; incomplete 17-strike timestamps are now excluded from qualification and audited.
-4. Broker pricing can change; live execution should use the actual contract-note economics in force at deployment.
-5. Slippage is modeled parametrically rather than reconstructed from complete historical order-book depth.
-6. The strategy may have capacity/liquidity constraints that are not fully represented by one-lot historical simulation.
+| Slippage | Brokerage | Net P&L |
+|---:|---:|---:|
+| 0.00% | ₹10 | ₹104,571.86 |
+| 0.00% | ₹20 | ₹95,297.06 |
+| 0.00% | ₹40 | ₹76,747.46 |
+| 0.25% | ₹10 | ₹81,143.56 |
+| 0.25% | ₹20 | ₹71,868.76 |
+| 0.25% | ₹40 | ₹53,319.16 |
+| 0.50% | ₹10 | ₹57,715.25 |
+| 0.50% | ₹20 | ₹48,440.45 |
+| 0.50% | ₹40 | ₹29,890.85 |
+| 1.00% | ₹10 | ₹10,858.64 |
+| 1.00% | ₹20 | ₹1,583.84 |
+| 1.00% | ₹40 | -₹16,965.76 |
 
-## 13. Conclusion
+The result is therefore sensitive to execution quality, becoming negative in the most adverse tested combination.
 
-**Pending H2/H3 acceptance tests.**
+## 11. Discussion
 
-The study is designed to answer whether the cross-expiry positive-flatline selection rule corresponds to robust realized profitability after costs, not merely whether the static payoff chart appears positive.
+The central distinction is between static payoff-chart geometry and realized cross-expiry economics. For this four-leg structure, the one-dimensional same-spot chart collapses to the entry premium cashflow. A positive flatline therefore guarantees only that the selected chart metric is positive.
+
+The realized trade, however, experiences different settlement dates and manual exit prices for the far-expiry legs. Consequently the positive chart metric is not a risk-free arbitrage certificate. In the corrected H1 sample, all selected charts were positive while only 58.78% of realized trades were profitable.
+
+The chronology also matters. The median first-positive observation occurred 210 minutes after 09:20, so an implementation that checks only the opening observation is a materially different strategy.
+
+## 12. Strengths
+
+- Exact 17 unique shifts are enforced.
+- Conflicting duplicate quotes are rejected.
+- The no-skip chronological rule is explicit.
+- All 17 strike shifts are evaluated before selecting the maximum.
+- Far-expiry legs are manually closed at near expiry using observed option prices.
+- Six transaction costs and date-dependent statutory charges are modeled.
+- Execution sensitivity is explicit.
+- H2/H3 source coverage is audited before inference.
+- Heterogeneous data sources are not silently pooled.
+- Errors and corrections are retained in the repository.
+
+## 13. Limitations
+
+1. 2021–2026 is historical data already observed during research development, not a pristine future holdout.
+2. One-minute closes are execution proxies rather than complete bid/ask/order-book histories.
+3. Missing historical option quotes can prevent a timestamp from satisfying the exact 17-strike requirement.
+4. The primary source lacks valid pre-entry H2/H3 coverage.
+5. Rissin source sensitivity is not an independent future holdout.
+6. Brokerage schedules may change; deployment should use current contract-note economics.
+7. One-lot historical simulation does not establish capacity or market-impact tolerance.
+8. The strategy does not have a guaranteed 100% realized win rate.
+
+## 14. Conclusion
+
+The final Phase 9G evidence supports a narrow historical conclusion:
+
+**The exact current H1 rule produced positive net P&L after modeled costs on the primary 2021–2026 dataset, but its realized win rate was 58.78%, not 100%. The static chart-positive condition was 100%. H2/H3 could not be adjudicated on the primary source because the required pre-entry far-expiry observations were absent.**
+
+No dynamic horizon selector is adopted. No H2/H3 horizon is promoted. The result is a historical research finding rather than a deployment guarantee.
 
 ## 14. Future Research
 
