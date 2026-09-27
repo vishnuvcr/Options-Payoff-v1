@@ -94,3 +94,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Third workflow failure | Run **36303520586** failed on duplicate `date`/`close` columns from the NSE source normalizer; no statistical output was accepted. |
 | 2026-09-27 | 9F | NSE normalizer rewritten | Constructed explicit date/open/close output columns from the source schema to eliminate duplicate-key ambiguity. Rerun triggered by the correction. |
+
+| 2026-09-27 | 9F | Fourth workflow failure | Run **36303568973** still failed in NSE context normalization with duplicate-key date assembly. No statistical output accepted. |
+| 2026-09-27 | 9F | NSE ingestion path simplified | Switched the runnable audit to yfinance for schema stability; official NSE remains registered as the primary verification source and the fallback is explicitly labeled. |
