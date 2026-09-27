@@ -5,18 +5,13 @@ import argparse
 import datetime as dt
 import json
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import pandas as pd
-from huggingface_hub import HfApi, hf_hub_download
-
-from src.intraday_selection import max_positive_candidate
 
 from scripts.extract_near_exit_strategy_inputs import (
     DATASET,
-    build_entry_lookup,
-    build_exit_lookups,
-    common_from_lookup,
     expiry_pair,
     last_index_bar_on_date,
     list_nifty_expiry_files,
@@ -41,150 +36,154 @@ def parse_hm(value):
     h,m=[int(x) for x in value.split(':')]
     return h,m
 
+def _last_option_quote(df,strike,option_type,exit_ts):
+    x=df[(df['trading_date']==exit_ts.date())&(df['timestamp']<=exit_ts)&(df['strike']==float(strike))&(df['option_type']==option_type)]
+    if x.empty:
+        return None,None
+    r=x.sort_values('timestamp').iloc[-1]
+    return float(r['close']),r['timestamp']
+
+def _prepare_expiry(expiry,filename,timestamps):
+    vals=list(timestamps)
+    if not vals:
+        return expiry,None
+    return expiry,load_option_file(expiry,filename,timestamp_min=min(vals),timestamp_max=max(vals))
+
 def main():
     args=parse_args()
     start=dt.date.fromisoformat(args.start)
     end=dt.date.fromisoformat(args.end)
     sh,sm=parse_hm(args.entry_start_time)
     eh,em=parse_hm(args.entry_end_time)
-    if (eh,em) < (sh,sm):
+    if (eh,em)<(sh,sm):
         raise ValueError('entry-end-time must be >= entry-start-time')
 
     index_df=load_index()
     entry_df=index_df[
-        (index_df['trading_date']>=start)
-        &(index_df['trading_date']<=end)
-        &(
-            (index_df['timestamp'].dt.hour>sh)
-            |((index_df['timestamp'].dt.hour==sh)&(index_df['timestamp'].dt.minute>=sm))
-        )
-        &(
-            (index_df['timestamp'].dt.hour<eh)
-            |((index_df['timestamp'].dt.hour==eh)&(index_df['timestamp'].dt.minute<=em))
-        )
-    ].copy().sort_values('timestamp')
+        (index_df['trading_date']>=start)&
+        (index_df['trading_date']<=end)&
+        ((index_df['timestamp'].dt.hour>sh)|((index_df['timestamp'].dt.hour==sh)&(index_df['timestamp'].dt.minute>=sm)))&
+        ((index_df['timestamp'].dt.hour<eh)|((index_df['timestamp'].dt.hour==eh)&(index_df['timestamp'].dt.minute<=em)))
+    ][['timestamp','trading_date','close']].sort_values('timestamp').copy()
+    if entry_df.empty:
+        raise RuntimeError('No intraday index timestamps found')
+
     expiry_files=list_nifty_expiry_files(start,end)
     expiry_dates=[x[0] for x in expiry_files]
     filename_by_expiry=dict(expiry_files)
 
-    spot_lookup=dict(zip(index_df['timestamp'],index_df['close']))
-    day_pairs={}
-    cycle_entries=defaultdict(list)
-    expiry_entry_times=defaultdict(list)
-    expiry_exit_timestamps=defaultdict(list)
-    expiry_exit_info={}
-    needed_expiries=set()
-    for row in entry_df[['timestamp','trading_date']].itertuples(index=False):
-        pair=expiry_pair(row.trading_date,expiry_dates)
+    day_pair={}
+    cycle_timestamps=defaultdict(list)
+    expiry_needed_timestamps=defaultdict(list)
+    expiry_exit_ts=defaultdict(list)
+    cycle_exit_info={}
+
+    for r in entry_df.itertuples(index=False):
+        pair=expiry_pair(r.trading_date,expiry_dates)
         if pair is None:
             continue
         near_expiry,far_expiry=pair
-        exit_ts,_=last_index_bar_on_date(index_df,near_expiry)
+        exit_ts,settlement=last_index_bar_on_date(index_df,near_expiry)
         if exit_ts is None:
             continue
-        day_pairs[row.trading_date]=pair
-        cycle_entries[near_expiry].append(row.timestamp)
-        expiry_entry_times[near_expiry].append(row.timestamp)
-        expiry_entry_times[far_expiry].append(row.timestamp)
-        expiry_exit_timestamps[near_expiry].append(exit_ts)
-        expiry_exit_timestamps[far_expiry].append(exit_ts)
-        if near_expiry not in expiry_exit_info:
-            _, settlement=last_index_bar_on_date(index_df,near_expiry)
-            expiry_exit_info[near_expiry]=(exit_ts,settlement)
-        needed_expiries.update(pair)
+        day_pair[r.trading_date]=pair
+        cycle_timestamps[near_expiry].append(r.timestamp)
+        expiry_needed_timestamps[near_expiry].append(r.timestamp)
+        expiry_needed_timestamps[far_expiry].append(r.timestamp)
+        expiry_exit_ts[near_expiry].append(exit_ts)
+        expiry_exit_ts[far_expiry].append(exit_ts)
+        cycle_exit_info[near_expiry]=(exit_ts,settlement)
 
+    needed=sorted(set(expiry_needed_timestamps)|set(expiry_exit_ts))
     prepared={}
-    for expiry in sorted(needed_expiries):
-        ts_list=expiry_entry_times.get(expiry,[])
-        exit_list=expiry_exit_timestamps.get(expiry,[])
-        all_ts=list(ts_list)+list(exit_list)
-        tmin=min(all_ts) if all_ts else None
-        tmax=max(all_ts) if all_ts else None
-        df=load_option_file(expiry,filename_by_expiry[expiry],timestamp_min=tmin,timestamp_max=tmax)
-        prepared[expiry]={
-            'entry':build_entry_lookup(df),
-            'exit':build_exit_lookups(df,exit_list),
-        }
+    workers=max(1,min(args.download_workers,8))
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        futures=[ex.submit(_prepare_expiry,expiry,filename_by_expiry[expiry],expiry_needed_timestamps[expiry]+expiry_exit_ts[expiry]) for expiry in needed]
+        for f in as_completed(futures):
+            expiry,df=f.result()
+            prepared[expiry]=df
 
+    spot_lookup=entry_df.set_index('timestamp')['close']
     selected=[]
     scan_audit=[]
     decision_surface=[]
 
-    for near_expiry in sorted(cycle_entries):
-        far_candidates={}
-        for ts in sorted(cycle_entries[near_expiry]):
-            pair=day_pairs[pd.Timestamp(ts).date()]
-            _,far_expiry=pair
-            far_candidates[ts]=far_expiry
-        decided=False
-        for ts in sorted(cycle_entries[near_expiry]):
-            far_expiry=far_candidates[ts]
-            near_lookup=prepared[near_expiry]['entry']
-            far_lookup=prepared[far_expiry]['entry']
-            near_exit_ts,near_settlement=expiry_exit_info.get(near_expiry,(None,None))
-            if near_exit_ts is None:
-                continue
-            far_exit_lookup=prepared[far_expiry]['exit'].get(near_expiry,{})
-            common=common_from_lookup(near_lookup,far_lookup,ts)
-            spot_value=spot_lookup.get(ts)
-            if spot_value is None or not common:
-                scan_audit.append({'near_expiry':near_expiry,'timestamp':ts,'candidate_count':0,'positive_count':0,'max_positive_flatline_inr':None,'decision':False,'reason':'no_complete_common_strike_surface'})
-                continue
-            spot=float(spot_value)
-            atm=min(common,key=lambda k:abs(k-spot))
-            candidates=[]
-            for shift in range(-400,401,50):
-                strike=atm+shift
-                if strike not in common:
-                    continue
-                nrow=near_lookup.get(ts,{}).get(float(strike),{})
-                frow=far_lookup.get(ts,{}).get(float(strike),{})
-                if not {'CE','PE'}.issubset(nrow) or not {'CE','PE'}.issubset(frow):
-                    continue
-                flat=float(nrow['CE'])-float(nrow['PE'])-float(frow['CE'])+float(frow['PE'])
-                lot=nifty_lot_size(near_expiry)
-                candidates.append({
-                    'timestamp':ts,'near_expiry':near_expiry,'far_expiry':far_expiry,
-                    'strike':float(strike),'shift_points':int(shift),'spot_at_entry':spot,
-                    'near_call_close':float(nrow['CE']),'near_put_close':float(nrow['PE']),
-                    'far_call_close':float(frow['CE']),'far_put_close':float(frow['PE']),
-                    'near_settlement':near_settlement,'near_exit_timestamp':near_exit_ts,
-                    'far_call_exit_close':far_exit_lookup.get((float(strike),'CE'),(None,None))[0],
-                    'far_call_exit_timestamp':far_exit_lookup.get((float(strike),'CE'),(None,None))[1],
-                    'far_put_exit_close':far_exit_lookup.get((float(strike),'PE'),(None,None))[0],
-                    'far_put_exit_timestamp':far_exit_lookup.get((float(strike),'PE'),(None,None))[1],
-                    'flatline_per_unit':flat,'flatline_inr':flat*lot,
-                })
-            positive=[x for x in candidates if x['flatline_inr']>0]
-            max_flat=max([x['flatline_inr'] for x in candidates],default=None)
-            scan_audit.append({
-                'near_expiry':near_expiry,'timestamp':ts,
-                'candidate_count':len(candidates),'positive_count':len(positive),
-                'max_flatline_inr':max_flat,
-                'max_positive_flatline_inr':max([x['flatline_inr'] for x in positive],default=None),
-                'decision':bool(positive),'reason':'positive_candidate_found' if positive else 'no_positive_candidate',
-            })
-            if not positive:
-                continue
-            winner=max_positive_candidate(candidates)
-            if winner is None:
-                continue
-            # Record the full 17-strike decision surface at the actual decision timestamp.
-            for x in candidates:
-                x['selected']=bool(x is winner)
-                decision_surface.append(x)
-            selected.append(winner)
-            decided=True
-            break
+    for near_expiry in sorted(cycle_timestamps):
+        timestamps=pd.DatetimeIndex(sorted(set(cycle_timestamps[near_expiry])))
+        far_expiry=expiry_pair(timestamps[0].date(),expiry_dates)[1]
+        near_df=prepared.get(near_expiry)
+        far_df=prepared.get(far_expiry)
+        if near_df is None or far_df is None:
+            continue
 
-        if not decided:
-            # This is not a 09:20 skip. It means the entire available intraday window
-            # for the weekly cycle contained no positive candidate.
-            pass
+        nce=near_df[near_df['option_type'].eq('CE')][['timestamp','strike','close']].rename(columns={'close':'near_call'})
+        npe=near_df[near_df['option_type'].eq('PE')][['timestamp','strike','close']].rename(columns={'close':'near_put'})
+        fce=far_df[far_df['option_type'].eq('CE')][['timestamp','strike','close']].rename(columns={'close':'far_call'})
+        fpe=far_df[far_df['option_type'].eq('PE')][['timestamp','strike','close']].rename(columns={'close':'far_put'})
 
-    selected_df=pd.DataFrame(selected)
-    audit_df=pd.DataFrame(scan_audit)
-    surface_df=pd.DataFrame(decision_surface)
+        surf=nce.merge(npe,on=['timestamp','strike'],how='inner').merge(fce,on=['timestamp','strike'],how='inner').merge(fpe,on=['timestamp','strike'],how='inner')
+        surf=surf[surf['timestamp'].isin(timestamps)].copy()
+        if surf.empty:
+            continue
+        surf['spot']=surf['timestamp'].map(spot_lookup)
+        surf=surf.dropna(subset=['spot'])
+        if surf.empty:
+            continue
+
+        surf['absdiff']=(surf['strike']-surf['spot']).abs()
+        atm=surf.sort_values(['timestamp','absdiff','strike']).drop_duplicates('timestamp')[['timestamp','strike']].rename(columns={'strike':'atm'})
+        surf=surf.merge(atm,on='timestamp',how='left')
+        surf['shift_points']=surf['strike']-surf['atm']
+        surf=surf[(surf['shift_points']>=-400)&(surf['shift_points']<=400)&(surf['shift_points']%50==0)].copy()
+        lot=nifty_lot_size(near_expiry)
+        surf['flatline_per_unit']=surf['near_call']-surf['near_put']-surf['far_call']+surf['far_put']
+        surf['flatline_inr']=surf['flatline_per_unit']*lot
+
+        all_times=pd.DataFrame({'timestamp':timestamps})
+        aud=surf.groupby('timestamp').agg(candidate_count=('strike','size'),max_flatline_inr=('flatline_inr','max')).reset_index()
+        pos=surf[surf['flatline_inr']>0].groupby('timestamp').size().rename('positive_count')
+        pmax=surf[surf['flatline_inr']>0].groupby('timestamp')['flatline_inr'].max().rename('max_positive_flatline_inr')
+        aud=all_times.merge(aud,on='timestamp',how='left').merge(pos,on='timestamp',how='left').merge(pmax,on='timestamp',how='left')
+        aud[['candidate_count','positive_count']]=aud[['candidate_count','positive_count']].fillna(0).astype(int)
+        aud['near_expiry']=near_expiry
+        aud['decision']=aud['positive_count']>0
+        aud['reason']=aud['decision'].map({True:'positive_candidate_found',False:'no_positive_candidate'})
+        scan_audit.append(aud[['near_expiry','timestamp','candidate_count','positive_count','max_flatline_inr','max_positive_flatline_inr','decision','reason']])
+
+        positive=surf[surf['flatline_inr']>0].sort_values(['timestamp','flatline_inr','shift_points'],ascending=[True,False,True])
+        if positive.empty:
+            continue
+        win=positive.iloc[0].copy()
+        decision_ts=win['timestamp']
+        surf_dec=surf[surf['timestamp'].eq(decision_ts)].copy()
+        surf_dec['near_expiry']=near_expiry
+        surf_dec['far_expiry']=far_expiry
+        surf_dec['selected']=False
+        surf_dec.loc[(surf_dec['strike']==win['strike'])&(surf_dec['shift_points']==win['shift_points']),'selected']=True
+        decision_surface.append(surf_dec[['timestamp','near_expiry','far_expiry','spot','atm','shift_points','strike','near_call','near_put','far_call','far_put','flatline_per_unit','flatline_inr','selected']])
+
+        exit_ts,near_settlement=cycle_exit_info[near_expiry]
+        fc,fc_ts=_last_option_quote(far_df,win['strike'],'CE',exit_ts)
+        fp,fp_ts=_last_option_quote(far_df,win['strike'],'PE',exit_ts)
+        selected.append({
+            'entry_timestamp':decision_ts,'entry_date':pd.Timestamp(decision_ts).date(),'spot_at_entry':float(win['spot']),
+            'near_expiry':near_expiry,'far_expiry':far_expiry,'near_exit_timestamp':exit_ts,
+            'far_call_exit_timestamp':fc_ts,'far_put_exit_timestamp':fp_ts,
+            'candidate_label':'ATM' if int(win['shift_points'])==0 else ('ATM_PLUS_%d'%abs(int(win['shift_points'])) if int(win['shift_points'])>0 else 'ATM_MINUS_%d'%abs(int(win['shift_points']))),
+            'shift_points':int(win['shift_points']),'strike':float(win['strike']),
+            'near_call_close':float(win['near_call']),'near_put_close':float(win['near_put']),
+            'far_call_close':float(win['far_call']),'far_put_close':float(win['far_put']),
+            'near_settlement':float(near_settlement),'far_call_exit_close':fc,'far_put_exit_close':fp,
+            'execution_fidelity':'1-minute historical close proxy; selection checked every available timestamp from 09:20 through 15:29',
+            'near_lot_size':lot,'far_lot_size':nifty_lot_size(far_expiry),
+            'net_entry_cashflow_per_unit':float(win['flatline_per_unit']),
+            'flatline_per_unit':float(win['flatline_per_unit']),'flatline_inr':float(win['flatline_inr']),
+        })
+        # Do not check later timestamps in this weekly cycle after the first positive timestamp.
+
+    selected_df=pd.DataFrame(selected).sort_values('entry_timestamp').reset_index(drop=True)
+    audit_df=pd.concat(scan_audit,ignore_index=True) if scan_audit else pd.DataFrame()
+    surface_df=pd.concat(decision_surface,ignore_index=True) if decision_surface else pd.DataFrame()
     if selected_df.empty:
         raise RuntimeError('No intraday positive opportunities were found')
     Path(args.out_selected).parent.mkdir(parents=True,exist_ok=True)
@@ -194,13 +193,12 @@ def main():
     meta={
         'dataset':DATASET,'start':args.start,'end':args.end,
         'entry_start_time_ist':args.entry_start_time,'entry_end_time_ist':args.entry_end_time,
-        'scan_frequency':'every available NIFTY index timestamp (1-minute source data), beginning at 09:20 IST',
-        'skipping_rule':'none based on 09:20; continue intraday and then next trading day within the same weekly cycle until a positive candidate appears',
-        'weekly_cycles_scanned':int(audit_df['near_expiry'].nunique()),
+        'scan_frequency':'every available NIFTY 1-minute timestamp',
+        'skipping_rule':'none based on 09:20; continue intraday and across following trading days until first positive candidate in each weekly cycle',
+        'weekly_cycles_with_opportunity':int(selected_df['near_expiry'].nunique()),
         'selected_trades':int(len(selected_df)),
         'selected_chart_positive_pct':float(100*(selected_df['flatline_inr']>0).mean()),
-        'scan_rows':int(len(audit_df)),
-        'decision_surface_rows':int(len(surface_df)),
+        'scan_rows':int(len(audit_df)),'decision_surface_rows':int(len(surface_df)),
     }
     Path(args.out_selected).with_suffix('.metadata.json').write_text(json.dumps(meta,indent=2,default=str),encoding='utf-8')
     print(json.dumps(meta,indent=2,default=str))
