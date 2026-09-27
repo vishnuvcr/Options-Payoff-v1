@@ -471,3 +471,24 @@ Do not run far-expiry H=2/H=3 selection yet. First reproduce the corrected H=1 s
 ## Phase 9A execution-cost calibration amendment
 
 Because the user explicitly requires Paytm Money costs, the corrected H1 validation must distinguish the strategy P&L from a broker-specific implementation layer. The current Paytm Money F&O FAQ states ₹10 brokerage per executed unique F&O order (checked 27-Sep-2026). Paytm Money also has older published material showing a ₹20 flat brokerage regime for newer accounts from 15-Jan-2025. Therefore the primary corrected ledger retains the repository's ₹20/order conservative assumption for continuity, but Phase 9B must run a broker-cost sensitivity at ₹10/order and document the account-era ambiguity rather than silently treating either rate as universal. Official/current Paytm Money source: https://www.paytmmoney.com/stocks/customer/fno-faq/onboarding-and-kyc/account-segment-activation/how-to-activate-fo-from-mobile-app-web
+
+
+## Phase 9B — Corrected H1 statistical validation and execution-cost audit
+
+**Branch:** phase-9B-near-exit-validation
+
+Objective: regenerate all empirical evidence that was contaminated by the superseded far-expiry holding convention, using the corrected H1 near-expiry manual-close ledger only.
+
+Predeclared analyses:
+1. Primary corrected ledger at 0.25% premium slippage and ₹20/order brokerage for continuity with the historical repository baseline.
+2. Slippage sensitivity at 0%, 0.25%, 0.50% and 1.00%.
+3. Paytm Money brokerage sensitivity at ₹10, ₹20 and ₹40 per executed order; current Paytm Money F&O FAQ states ₹10/order while older published pricing material documents a ₹20 regime, so the account-era ambiguity is retained as a sensitivity rather than inferred away.
+4. IID bootstrap and weekly-block bootstrap 95% confidence intervals for mean weekly net P&L.
+5. Chronological 70/30 train/test descriptive split, with no optimization on the test period.
+6. Complete loss ledger: pre-fee losses, cost-only flips, loss concentration by strike shift/date and chart-to-realized drag.
+7. Exit-timestamp integrity audit: far-leg exit timestamps must be on or before near-expiry close and must be present for every selected trade.
+8. Retain the entry-chart metric as a selection variable only; do not reinterpret it as the corrected economic worst-case P&L.
+
+No feature mining or external-variable prediction is promoted before this corrected baseline is established. If the corrected H1 baseline does not survive costs/uncertainty, record the negative result before any H2/H3 comparison; if it is materially informative, H2/H3 are tested under the identical near-expiry exit convention.
+
+**Automatic execution:** the Phase 9B GitHub Actions workflow listens for successful Phase 9A completion and consumes its cached artifact rather than downloading the historical market dataset again.
