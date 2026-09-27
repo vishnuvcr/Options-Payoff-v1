@@ -153,19 +153,27 @@ def main():
         surf['flatline_inr']=surf['flatline_per_unit']*lot
 
         all_times=pd.DataFrame({'timestamp':timestamps})
-        aud=surf.groupby('timestamp').agg(candidate_count=('strike','size'),max_flatline_inr=('flatline_inr','max')).reset_index()
+        aud=surf.groupby('timestamp').agg(
+            candidate_row_count=('strike','size'),
+            candidate_shift_count=('shift_points','nunique'),
+            max_flatline_inr=('flatline_inr','max')
+        ).reset_index()
+        quote_nuniq=surf.groupby(['timestamp','shift_points'])[['near_call','near_put','far_call','far_put']].nunique()
+        conflicting_shift_count=quote_nuniq.gt(1).any(axis=1).groupby(level=0).sum().rename('conflicting_shift_count').reset_index()
+        aud=aud.merge(conflicting_shift_count,on='timestamp',how='left')
         pos=surf[surf['flatline_inr']>0].groupby('timestamp').size().rename('positive_count')
         pmax=surf[surf['flatline_inr']>0].groupby('timestamp')['flatline_inr'].max().rename('max_positive_flatline_inr')
         aud=all_times.merge(aud,on='timestamp',how='left').merge(pos,on='timestamp',how='left').merge(pmax,on='timestamp',how='left')
-        aud[['candidate_count','positive_count']]=aud[['candidate_count','positive_count']].fillna(0).astype(int)
+        for col in ['candidate_row_count','candidate_shift_count','conflicting_shift_count','positive_count']:
+            aud[col]=aud[col].fillna(0).astype(int)
         aud['near_expiry']=near_expiry
-        # The strategy requires evaluating all 17 common strikes at a timestamp.
-        # A partial quote set is therefore not a valid decision opportunity.
-        aud['decision']=(aud['candidate_count']==17) & (aud['positive_count']>0)
+        # The strategy requires all 17 unique strike shifts and unambiguous quotes.
+        aud['decision']=(aud['candidate_shift_count']==17) & (aud['conflicting_shift_count']==0) & (aud['positive_count']>0)
         aud['reason']='no_positive_candidate'
-        aud.loc[(aud['candidate_count']<17) & (aud['positive_count']>0),'reason']='incomplete_17_strike_set'
+        aud.loc[(aud['candidate_shift_count']!=17) & (aud['positive_count']>0),'reason']='incomplete_17_strike_set'
+        aud.loc[(aud['candidate_shift_count']==17) & (aud['conflicting_shift_count']>0) & (aud['positive_count']>0),'reason']='conflicting_duplicate_quotes'
         aud.loc[aud['decision'],'reason']='positive_candidate_found'
-        scan_audit.append(aud[['near_expiry','timestamp','candidate_count','positive_count','max_flatline_inr','max_positive_flatline_inr','decision','reason']])
+        scan_audit.append(aud[['near_expiry','timestamp','candidate_row_count','candidate_shift_count','conflicting_shift_count','positive_count','max_flatline_inr','max_positive_flatline_inr','decision','reason']])
 
         valid_times=set(aud.loc[aud['decision'],'timestamp'])
         positive=surf[(surf['flatline_inr']>0) & (surf['timestamp'].isin(valid_times))].sort_values(['timestamp','flatline_inr','shift_points'],ascending=[True,False,True])
@@ -217,8 +225,9 @@ def main():
         'selected_trades':int(len(selected_df)),
         'selected_chart_positive_pct':float(100*(selected_df['flatline_inr']>0).mean()),'horizon_label':f'H{args.far_rank}',
         'scan_rows':int(len(audit_df)),'decision_surface_rows':int(len(surface_df)),
-        'complete_17_strike_timestamp_count':int((audit_df['candidate_count']==17).sum()) if not audit_df.empty else 0,
-        'incomplete_positive_timestamp_count':int(((audit_df['candidate_count']<17)&(audit_df['positive_count']>0)).sum()) if not audit_df.empty else 0,
+        'complete_17_unique_shift_timestamp_count':int((audit_df['candidate_shift_count']==17).sum()) if not audit_df.empty else 0,
+        'incomplete_positive_timestamp_count':int(((audit_df['candidate_shift_count']!=17)&(audit_df['positive_count']>0)).sum()) if not audit_df.empty else 0,
+        'conflicting_duplicate_quote_timestamp_count':int(((audit_df['conflicting_shift_count']>0)&(audit_df['positive_count']>0)).sum()) if not audit_df.empty else 0,
     }
     Path(args.out_selected).with_suffix('.metadata.json').write_text(json.dumps(meta,indent=2,default=str),encoding='utf-8')
     print(json.dumps(meta,indent=2,default=str))
