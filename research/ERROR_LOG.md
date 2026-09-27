@@ -114,3 +114,5 @@
 | 2026-09-27 | 9G | Execution issue | A pre-concurrency Phase 9G run (36305850007) remained active while newer corrected runs queued. Concurrency was added so future corrections supersede obsolete running attempts; no output from the stale run will be accepted. |
 
 | 2026-09-27 | 9G | Pipeline defect | The sensitivity stage passed `H*_realized_trades.csv` to a backtest script that previously called `pd.read_parquet()` unconditionally. This would have caused a false sensitivity-stage failure. The reader now detects CSV vs Parquet input. |
+
+| 2026-09-27 | 9G | Workflow defect | H1 completeness audit step was emitted with doubled shell continuation backslashes, causing argparse to receive no parameters and fail before reading the artifact. Fixed to single continuations. The failure is tooling-only and no research data were interpreted. |
