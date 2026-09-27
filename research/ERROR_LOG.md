@@ -148,3 +148,5 @@
 | 2026-09-27 | 9H | Local fallback attempt confirmed pyarrow cannot be installed because this execution environment has no outbound package-network access. | Repository GitHub Actions remains the execution environment for Parquet-dependent Phase 9H analysis; no market-data inference was produced locally. |
 
 | 2026-09-27 | 9H | Performance correction | The first cache-reused run remained dominated by repeated per-candidate scans of the far-expiry DataFrame to recover the same near-expiry exit quotes. | Precomputed one exit-quote lookup per far-expiry/near-expiry cycle; this changes no economic formula and only removes redundant scans. |
+
+| 2026-09-27 | 9H | Second performance correction | Even after precomputing exit quotes, candidate-level cost/P&L was evaluated row-by-row across every valid timestamp and every strike. | Replaced that calculation with a vectorized implementation that preserves the exact manual-close P&L and six-transaction cost equations; the selector and predeclared entry tests are unchanged. |
