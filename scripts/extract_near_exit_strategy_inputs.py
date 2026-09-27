@@ -266,9 +266,6 @@ def main():
                 'net_entry_cashflow_per_unit': None if any(x is None for x in vals) else near_call - near_put - far_call + far_put,
                 'status': status
             })
-        for stale in list(cache):
-            if stale not in {near_expiry, far_expiry}:
-                del cache[stale]
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     result = pd.DataFrame(rows)
