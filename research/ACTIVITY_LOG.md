@@ -81,3 +81,7 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9E | Validation phase opened | Created `phase-9E-h1-validation` with a frozen-rule temporal validation plan, manual workflow and validation script sourced only from authoritative Phase 9D run 36302077730. |
 | 2026-09-27 | 9E | First workflow attempt failed | Run 36303004660 failed on a Python report-writer syntax error before statistical output; no research result was accepted. |
 | 2026-09-27 | 9E | Script correction committed | Corrected the newline-generation bug; the next push triggers the validation rerun. |
+
+| 2026-09-27 | 9E | Frozen-rule validation completed | Workflow **36303117489** successfully validated the 169 complete realized trades from authoritative Phase 9D run 36302077730. Annual and anchored cohorts were positive; IID and circular block bootstrap lower bounds were positive; no strategy parameter was changed. |
+| 2026-09-27 | 9E | Phase 9E outputs committed | Added docs/PHASE9E_VALIDATION.md and the complete results/phase9e machine-readable set. Result persistence commit: **7b2e41d3e8ac0501206857764a108091834e3464**. |
+| 2026-09-27 | 9E | Phase completed | Corrected H1 passes the predefined historical validation checks but remains non-prospective because the 2021–2026 sample was observed during development. No new filter adopted. Next: descriptive cross-market/regime audit before H2/H3 reopening. |
