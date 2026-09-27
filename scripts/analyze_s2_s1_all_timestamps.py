@@ -102,10 +102,12 @@ def walk_forward(t,decision,min_train_cycles=31):
             continue
         y=train[TARGET]
         for name,m in models.items():
-            try:
-                m.fit(train[feature_cols],y,sample_weight=weights)
-            except TypeError:
-                m.fit(train[feature_cols],y)
+            if name=="ridge":
+                m.fit(train[feature_cols],y,ridge__sample_weight=weights)
+            elif name=="random_forest":
+                m.fit(train[feature_cols],y,randomforestregressor__sample_weight=weights)
+            else:
+                m.fit(train[feature_cols],y,histgradientboostingregressor__sample_weight=weights)
             p=float(m.predict(test_feat[feature_cols].iloc[[0]])[0])
             row=test.iloc[0].to_dict()
             row["predicted_target"]=p
