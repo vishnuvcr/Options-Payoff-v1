@@ -27,10 +27,10 @@ def main():
     for row in df.itertuples(index=False):
         m=candidate_metrics(row,model)
         if m is None:
-            raise RuntimeError(f'Incomplete selected trade at {row.timestamp}')
+            raise RuntimeError(f'Incomplete selected trade at {row.entry_timestamp}')
         rows.append({
-            'entry_timestamp':row.timestamp,
-            'entry_date':pd.Timestamp(row.timestamp).date(),
+            'entry_timestamp':row.entry_timestamp,
+            'entry_date':pd.Timestamp(row.entry_timestamp).date(),
             'candidate_label':'ATM' if int(row.shift_points)==0 else ('ATM_PLUS_%d'%abs(int(row.shift_points)) if int(row.shift_points)>0 else 'ATM_MINUS_%d'%abs(int(row.shift_points))),
             'shift_points':int(row.shift_points),'strike':float(row.strike),
             'near_expiry':row.near_expiry,'far_expiry':row.far_expiry,
