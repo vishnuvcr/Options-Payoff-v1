@@ -360,26 +360,24 @@ Strike distribution: [results/phase9g/H1_strike_shift_distribution.csv](results/
 Merged workflow artifact: [GitHub Actions run 36320697995](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36320697995)
 
 
-## Phase 9H — Loss-trade entry analysis — OPEN
+## Phase 9H-A — Loss-trade entry analysis — COMPLETE
 
-The frozen Phase 9G H1 strategy is now being stress-tested specifically through its realized losing trades. The objective is not to optimize the strategy freely, but to answer a bounded question: could an observed loss have been turned profitable by changing only the entry strike or entry time?
+The frozen Phase 9G H1 rule was audited specifically through its **54 realized losing trades**.
 
-Predeclared tests:
-- same-timestamp alternative strike across all 17 shifts;
-- second valid exact-17 timestamp;
-- 15/30/60/120-minute entry delays;
-- ex-post later-entry upper bounds, clearly labeled non-deployable.
+Key accepted findings:
+- Same-timestamp alternative strike rescued **6/54 (11.1%)**.
+- Second valid timestamp rescued **8/54** when available.
+- Fixed 15/30/60/120-minute delays rescued **8/54, 7/54, 6/54 and 4/54** respectively.
+- The union of the bounded, non-hindsight entry tests rescued **14/54 losses (25.9%)**.
+- An ex-post later-entry selector rescued **31/54**.
+- An ex-post later-entry plus any-strike selector rescued **38/54**, but this is a hindsight upper bound and is not deployable evidence.
+- **16/54 losses remained negative even under that strongest tested ex-post entry-only upper bound.**
 
-No exit optimization or new market filter is introduced. Results will be compared on the full sample before any candidate change can be considered.
+The audit also found that **9 of the 54 net losses were gross-nonnegative but turned negative by modeled transaction costs**, so not all losses are entry-timing problems.
 
-Plan: research/RESEARCH_PLAN.md
-Status: research/STATUS.md
-Error log: research/ERROR_LOG.md
-Workflow: .github/workflows/phase-9H-loss-entry-analysis.yml
+**Decision:** no entry rule is changed from Phase 9G. Any prospective entry modification must be tested on the full population and then an untouched holdout.
 
-
-## Phase 9H-A — targeted loss-cycle analysis — OPEN
-
-The first Phase 9H implementation was narrowed to the 54 realized losing H1 trades. For each loss, the research reconstructs exact-17 valid timestamps and all 17 candidate strikes needed to test whether changing only the entry could have produced a positive realized outcome.
-
-No exit rule, horizon, cost model, or market filter is being changed. Any rescue result is an ex-post diagnostic; it is not a trading rule until a separate prospective full-sample and untouched-holdout test supports it.
+Detailed analysis: [docs/PHASE9H_LOSS_ENTRY_ANALYSIS.md](docs/PHASE9H_LOSS_ENTRY_ANALYSIS.md)  
+Machine-readable summary: [results/phase9h/loss_entry_rescue_summary.csv](results/phase9h/loss_entry_rescue_summary.csv)  
+Full loss ledger: [results/phase9h/loss_trade_entry_detail.csv](results/phase9h/loss_trade_entry_detail.csv)  
+Workflow: [36325328644](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36325328644)
