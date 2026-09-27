@@ -1,6 +1,6 @@
 # Research plan — Options-Payoff-v1
 
-**Version:** 2.0  
+**Version:** 2.1  
 **Plan status:** Updated 2026-09-27 because the user materially changed the selection rule from ordered fallback selection to exhaustive maximum-flatline selection.
 
 ## Research questions
@@ -471,3 +471,37 @@ Do not run far-expiry H=2/H=3 selection yet. First reproduce the corrected H=1 s
 ## Phase 9A execution-cost calibration amendment
 
 Because the user explicitly requires Paytm Money costs, the corrected H1 validation must distinguish the strategy P&L from a broker-specific implementation layer. The current Paytm Money F&O FAQ states ₹10 brokerage per executed unique F&O order (checked 27-Sep-2026). Paytm Money also has older published material showing a ₹20 flat brokerage regime for newer accounts from 15-Jan-2025. Therefore the primary corrected ledger retains the repository's ₹20/order conservative assumption for continuity, but Phase 9B must run a broker-cost sensitivity at ₹10/order and document the account-era ambiguity rather than silently treating either rate as universal. Official/current Paytm Money source: https://www.paytmmoney.com/stocks/customer/fno-faq/onboarding-and-kyc/account-segment-activation/how-to-activate-fo-from-mobile-app-web
+
+
+## Phase 9E — Frozen-rule H1 validation
+
+**Branch:** phase-9E-h1-validation
+
+This phase is a rule-frozen validation layer on top of the authoritative Phase 9D corrected intraday H1 reconstruction. It does not alter the strategy.
+
+### Validation protocol
+
+1. Consume only the archived Phase 9D H1 evidence from run 36302077730.
+2. Verify the 169 complete realized trades and retain the 3 incompatible-lot selections only as audit exclusions.
+3. Recheck the frozen invariants: positive/all-green selected chart, chronological entry/exit ordering, and no far-leg exit after near expiry.
+4. Produce calendar-year cohorts for 2021–2026.
+5. Produce anchored chronological holdout diagnostics for 2022–2026 with no test-period parameter tuning.
+6. Estimate mean-P&L uncertainty with 20,000 IID and 20,000 circular four-trade block bootstrap resamples.
+7. Reproduce predefined slippage and brokerage sensitivity already evaluated in Phase 9D.
+8. Report descriptive entry-time and strike-shift diagnostics without adopting any new filter.
+9. Write the validation report, machine-readable outputs, workflow artifact, and phase logs.
+
+### Interpretation rule
+
+A positive historical point estimate with an uncertainty interval crossing zero is classified as historically positive but statistically uncertain. The 100% chart-positive selection-condition rate is never interpreted as realized win rate. Because the 2021–2026 sample was already observed during strategy development, these diagnostics are temporal/rule-frozen validation rather than a pristine future-data holdout. A genuinely independent holdout requires new untouched market data.
+
+### Exit criteria
+
+- validation results reproducibly generated from the Phase 9D artifact;
+- annual and anchored chronological outputs present;
+- bootstrap uncertainty reported;
+- execution sensitivity reported;
+- limitations and data-contamination caveat documented;
+- no strategy rule changes made during validation.
+
+H2/H3 far-expiry selection remains frozen until Phase 9E concludes.
