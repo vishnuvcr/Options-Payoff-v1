@@ -193,6 +193,10 @@ def main():
     joined=prior_merge(joined,global_ctx,'global',tolerance_days=7) if not global_ctx.empty else joined
     if not fii.empty: joined=prior_merge(joined,fii,'fii_dii',tolerance_days=3)
 
+    if {'nifty_nifty_prev_ret','global_sensex_ret'}.issubset(joined.columns):
+        joined['nse_bse_relative_return']=joined['nifty_nifty_prev_ret']-joined['global_sensex_ret']
+        joined['nse_bse_relative_regime']=np.where(joined['nse_bse_relative_return']>=0,'NIFTY_outperform','SENSEX_outperform')
+
     # Same-day opening gap is known by 09:20, and remains known for later entries.
     if not nifty.empty and {'open','close'}.issubset(nifty.columns):
         op=nifty[['date','open','close']].copy(); op['date']=pd.to_datetime(op['date']); op['prev_close']=op['close'].shift(1); op['nifty_same_day_open_gap']=op['open']/op['prev_close']-1; op=op.drop(columns=['open','close','prev_close'])
@@ -211,7 +215,7 @@ def main():
 
     joined.to_csv(out/'context_joined.csv',index=False)
 
-    regime_cols=[c for c in ['india_vix_regime','nifty_gap_regime','fii_regime','dii_regime','global_risk_regime'] if c in joined.columns]
+    regime_cols=[c for c in ['india_vix_regime','nifty_gap_regime','nse_bse_relative_regime','fii_regime','dii_regime','global_risk_regime'] if c in joined.columns]
     reg=[]
     for c in regime_cols:
         for label,g in joined.groupby(c,dropna=False):
