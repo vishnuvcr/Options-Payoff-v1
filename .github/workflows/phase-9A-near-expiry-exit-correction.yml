@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v6)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v7)
 
 on:
   workflow_dispatch:
@@ -48,7 +48,7 @@ jobs:
           restore-keys: hf-nifty-options-near-exit-
       - name: Unit tests
         run: |
-          python -m unittest tests/test_options_payoff.py
+          python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
       - name: Build corrected strategy inputs
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
