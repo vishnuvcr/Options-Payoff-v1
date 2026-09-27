@@ -146,3 +146,5 @@
 | 2026-09-27 | 9H | Actions run 36322209520 failed in all six yearly jobs at Python parse time: IndentationError in `scripts/analyze_phase9h_loss_entries.py` line 165. The same workflow also rendered escaped year placeholders (`\\2026`) because the YAML was generated with the wrong template escaping. | No economic output was produced or accepted. Corrected the indentation and rewrote the workflow using literal GitHub Actions expressions; rerun triggered automatically. |
 
 | 2026-09-27 | 9H | Local fallback attempt confirmed pyarrow cannot be installed because this execution environment has no outbound package-network access. | Repository GitHub Actions remains the execution environment for Parquet-dependent Phase 9H analysis; no market-data inference was produced locally. |
+
+| 2026-09-27 | 9H | Performance correction | The first cache-reused run remained dominated by repeated per-candidate scans of the far-expiry DataFrame to recover the same near-expiry exit quotes. | Precomputed one exit-quote lookup per far-expiry/near-expiry cycle; this changes no economic formula and only removes redundant scans. |
