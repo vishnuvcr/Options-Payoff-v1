@@ -70,3 +70,7 @@
 | 2026-09-27 | 9D | First intraday recheck workflow had the correct 15-test suite but the extraction step did not set `PYTHONPATH=.`. | Extraction stopped before reading market data. | Added `PYTHONPATH=.` to the extraction step; rerun required. |
 
 | 2026-09-27 | 9D | The first working intraday extractor repeatedly scanned the full index table for spot and near-expiry settlement on each minute. | Runtime was unnecessarily inflated for the multi-year 1-minute scan. | Replaced these with precomputed O(1) timestamp/expiry lookups before accepting any intraday result. |
+
+| 2026-09-27 | 9D | Initial corrected H1 wrapper expected `timestamp`, while the intraday ledger stores `entry_timestamp`. | Primary H1 stopped before calculating P&L. | Fixed the wrapper interface and reran using the verified six-year artifacts. |
+| 2026-09-27 | 9D | Three selected entries could not be passed to the realized-P&L cost engine because near/far expiry lot sizes were incompatible. | Treating them as ordinary one-lot trades would misstate the payoff and costs. | Retain all three in the selection/audit ledger, exclude them from realized P&L, and report 169 complete realized trades from 172 selections. |
+| 2026-09-27 | 9D | Incomplete-trade audit patch initially placed the `reason` variable at the wrong indentation. | The audit-only rerun failed with `NameError`; no P&L result was accepted from that run. | Corrected the audit code and reran the artifact-only H1 workflow successfully. |
