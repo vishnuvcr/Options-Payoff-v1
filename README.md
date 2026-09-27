@@ -263,3 +263,7 @@ A pre-analysis schema audit also found that the execution-sensitivity stage curr
 Plan: [docs/PHASE9G_H2_H3_PLAN.md](docs/PHASE9G_H2_H3_PLAN.md)  
 Phase status: [research/STATUS.md](research/STATUS.md)  
 Error log: [research/ERROR_LOG.md](research/ERROR_LOG.md)
+
+
+### Phase 9G correction checkpoint — 2026-09-27
+The Phase 9G pipeline has been corrected before accepting results: quote-level fields are preserved through the realized ledger, a hard sensitivity schema gate is added, and first-positive/strike-selection behaviour is now included in the merger outputs. Corrected workflow run **36305850007** is queued. No H2/H3 conclusion has been accepted.
