@@ -67,10 +67,12 @@ def main():
     expiry_dates=[x[0] for x in expiry_files]
     filename_by_expiry=dict(expiry_files)
 
+    spot_lookup=dict(zip(index_df['timestamp'],index_df['close']))
     day_pairs={}
     cycle_entries=defaultdict(list)
     expiry_entry_times=defaultdict(list)
     expiry_exit_timestamps=defaultdict(list)
+    expiry_exit_info={}
     needed_expiries=set()
     for row in entry_df[['timestamp','trading_date']].itertuples(index=False):
         pair=expiry_pair(row.trading_date,expiry_dates)
@@ -86,6 +88,9 @@ def main():
         expiry_entry_times[far_expiry].append(row.timestamp)
         expiry_exit_timestamps[near_expiry].append(exit_ts)
         expiry_exit_timestamps[far_expiry].append(exit_ts)
+        if near_expiry not in expiry_exit_info:
+            _, settlement=last_index_bar_on_date(index_df,near_expiry)
+            expiry_exit_info[near_expiry]=(exit_ts,settlement)
         needed_expiries.update(pair)
 
     prepared={}
@@ -109,8 +114,6 @@ def main():
         far_candidates={}
         for ts in sorted(cycle_entries[near_expiry]):
             pair=day_pairs[pd.Timestamp(ts).date()]
-            if pair!=(near_expiry,pair[1]):
-                pass
             _,far_expiry=pair
             far_candidates[ts]=far_expiry
         decided=False
@@ -118,16 +121,16 @@ def main():
             far_expiry=far_candidates[ts]
             near_lookup=prepared[near_expiry]['entry']
             far_lookup=prepared[far_expiry]['entry']
-            near_exit_ts,near_settlement=last_index_bar_on_date(index_df,near_expiry)
+            near_exit_ts,near_settlement=expiry_exit_info.get(near_expiry,(None,None))
             if near_exit_ts is None:
                 continue
             far_exit_lookup=prepared[far_expiry]['exit'].get(near_expiry,{})
             common=common_from_lookup(near_lookup,far_lookup,ts)
-            row_spot=index_df.loc[index_df['timestamp'].eq(ts),'close']
-            if row_spot.empty or not common:
+            spot_value=spot_lookup.get(ts)
+            if spot_value is None or not common:
                 scan_audit.append({'near_expiry':near_expiry,'timestamp':ts,'candidate_count':0,'positive_count':0,'max_positive_flatline_inr':None,'decision':False,'reason':'no_complete_common_strike_surface'})
                 continue
-            spot=float(row_spot.iloc[0])
+            spot=float(spot_value)
             atm=min(common,key=lambda k:abs(k-spot))
             candidates=[]
             for shift in range(-400,401,50):
