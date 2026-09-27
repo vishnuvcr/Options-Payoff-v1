@@ -155,3 +155,13 @@ The corrected Phase 9D implementation scans every available 1-minute timestamp f
 Important distinction: the selected **chart flatline win rate is expected to be 100% by construction**, because the strategy only enters when the flatline is positive. That does not automatically imply a 100% realized trading P&L win rate for a mixed-expiry position whose far legs are later liquidated at market prices. The new research reports both metrics separately.
 
 Current workflow: **Phase 9D — Intraday Recheck Near-Expiry Strategy**.
+
+
+## Phase 9G — H2/H3 far-expiry selection EXECUTING
+
+The corrected H1 control has passed the Phase 9E historical validation and the Phase 9F contextual audit without adopting a new filter. Phase 9G now evaluates fixed H1/H2/H3 far-expiry horizons under the same intraday first-positive rule and near-expiry manual-close convention. Dynamic horizon switching is not permitted.
+
+Active research branch: [phase-9G-h2-h3-far-expiry-selection](https://github.com/vishnuvcr/Options-Payoff-v1/tree/phase-9G-h2-h3-far-expiry-selection)  
+Plan: [docs/PHASE9G_H2_H3_PLAN.md](https://github.com/vishnuvcr/Options-Payoff-v1/blob/phase-9G-h2-h3-far-expiry-selection/docs/PHASE9G_H2_H3_PLAN.md)
+
+The current Actions reconstruction runs are **36304489832** and **36304477026**. Earlier setup failures are logged. A pre-analysis audit also identified a sensitivity-stage input-schema mismatch; no sensitivity result is being accepted until that is corrected and rerun.
