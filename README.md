@@ -119,3 +119,28 @@ Independent audit: 27/31 losers were already negative before fees; 4/31 net loss
 These results supersede all previous realized-P&L numbers based on holding the far legs to their own expiry. Full details: `docs/PHASE9A_RESULTS.md`.
 
 **Current state:** Phase 9A is complete. Phase 9B statistical validation is next; H2/H3 remain frozen until that validation is complete.
+
+
+## Phase 9B — Corrected H1 statistical validation
+
+Phase 9B run **36297884737** completed successfully against the authoritative Phase 9A artifact.
+
+Primary corrected H1:
+- 64 selected trades / 252 weekly cycles
+- net P&L ₹12,317.86
+- gross P&L ₹25,859.55
+- modeled costs ₹13,541.69
+- win rate 51.56%
+- profit factor 1.47
+- max drawdown -₹6,363.84
+- trade-level Sharpe-like 1.03; Sortino-like 0.23
+- IID bootstrap 95% CI for mean trade P&L: -₹164.65 to +₹556.90
+- weekly-block bootstrap 95% CI: -₹119.65 to +₹538.84
+- chronological 70/30: +₹11,280.49 train, +₹1,037.36 test
+- 50 bp slippage: +₹1,982.44 net
+- 100 bp slippage: -₹18,688.40 net
+- ₹40/order brokerage: +₹3,255.46 net
+
+Research interpretation: the corrected H1 result is not robust enough to be treated as a validated standalone trading edge under realistic execution uncertainty. This supersedes all previous realized-P&L conclusions based on holding the far legs to their own expiry.
+
+Phase 9C H2/H3 corrected-horizon workflow is queued in GitHub Actions run **36297960485**. No H2/H3 result is treated as available until that run completes.
