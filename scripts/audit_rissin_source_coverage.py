@@ -35,8 +35,7 @@ def expiry_pair(entry_date, expiries, rank):
     return xs[0], xs[rank]
 
 def day_slice(dataset, trading_day):
-    start_dt=dt.datetime.combine(trading_day,dt.time.min)
-    filt=(ds.field("date") == pa.scalar(start_dt))
+    filt=(ds.field("date") == trading_day.isoformat())
     table=dataset.to_table(filter=filt, columns=["timestamp","expiry","strike","option_type","close","underlying"])
     if table.num_rows==0:
         return pd.DataFrame(columns=["timestamp","expiry","strike","option_type","close","underlying"])
