@@ -1,78 +1,46 @@
 # Final Research Conclusion — Current State
 
-## Strategy under final user specification
+## Critical validity correction — 2026-09-27
 
-The current specification is:
+The user's actual exit rule is:
 
-1. Scan every weekly expiry cycle.
-2. At the first available entry observation where a positive/all-green payoff candidate exists, evaluate all 17 common strikes from ATM-400 to ATM+400 in 50-point increments.
-3. Select the strike with the maximum positive estimated equal max-profit=max-loss flatline.
-4. Trade one candidate for that weekly cycle.
-5. No 2.5% threshold, no margin percentage filter and no threshold-based skipping.
+- all four legs are closed at the near weekly expiry;
+- the near CE/PE expire/settle there;
+- the far CE/PE are manually closed at the same near-expiry close.
 
-## Evidence accumulated
+An audit of the authoritative backtest code found that the previous realized-P&L calculation used the far-expiry settlement for the far CE/PE legs. In `scripts/run_backtest.py`, the prior gross P&L was calculated from the entry cashflow plus `next_settlement - near_settlement`, and the far-leg exit costs were based on intrinsic values at the far settlement.
 
-### Phase 7B — baseline weekly strategy
+That is **not the user's strategy**. It models holding the far-expiry legs to their own expiry.
 
-In the cached historical sample:
+### Consequence
 
-- 63 weekly cycles;
-- 63 trades;
-- 0 threshold-based skips;
-- net P&L **₹-9,627.90**;
-- win rate **57.14%**;
-- profit factor approximately **0.98**;
-- modeled costs **₹9,861.15**;
-- maximum drawdown approximately **₹-174,083**.
+The following historical results are now **superseded and non-authoritative for the actual strategy**:
 
-The positive static chart contribution was approximately **₹20,213**, while the realized (S_2-S_1) contribution was approximately **₹-19,980** before costs.
+- Phase 7B realized net P&L, win rate, drawdown and economic decomposition;
+- Phase 7C winner/loser labels and Greek-selector performance, because those labels use the incorrect realized P&L;
+- Phase 8A S2-S1 target/predictor and economic-filter results, because they were built around the incorrect far-expiry-hold economics;
+- the prior final deployment conclusion insofar as it relied on those realized-P&L results.
 
-### Phase 7C — Greeks and entry features
+The entry-time static flatline computation remains valid as an algebraic/chart metric. It does **not** establish the corrected strategy's profitability.
 
-No tested single Greek, IV-term-structure, IV-skew or moneyness feature provided sufficient evidence to replace the maximum-positive-flatline selector.
+## Correct economic formula
 
-### Phase 8A — S2-S1 predictability
+For a selected common strike K, with near expiry at T1 and a far option pair that is manually closed at T1, let Q_C(T1) and Q_P(T1) be the actual executable far-call sale and far-put repurchase prices at the near-expiry close. Before transaction costs:
 
-The target (S_2-S_1) has:
+\[
+P\&L(T1)=C_1-P_1-C_f+P_f+(K-S_1)+Q_C(T1)-Q_P(T1).
+\]
 
-- mean about **+4.77 index points**;
-- standard deviation about **392.59 points**;
-- positive outcome in **57.14%** of the 63 current weekly cycles.
+Execution slippage, brokerage, exchange charges, STT, stamp duty, SEBI fee and GST must then be applied to the actual entry and four-leg exit transactions.
 
-An all-timestamp expanding walk-forward predictor used 905 prior entry timestamps across 255 weekly cycles for training, then evaluated 43 strictly OOS weekly decision cycles.
+## Corrective phase
 
-The best directional model, Histogram Gradient Boosting, achieved only **53.49%** sign accuracy and AUC about **0.541**. Random Forest achieved **51.16%** sign accuracy and AUC about **0.514**.
+**Phase 9A — near-expiry manual-close reconstruction** is now the authoritative research phase.
 
-The Random Forest predicted-positive trade filter increased the same-test P&L from **₹-10,634.75** to **₹91,388.05**, but:
+It will first rebuild the current H=1 strategy with the correct exit convention using point-in-time far-option prices at the near-expiry close. The 17-strike, positive-flatline, maximum-flatline selection rule is retained for this reconstruction so that the exit correction is isolated from other changes.
 
-- the improvement reversed in the middle chronological block;
-- paired bootstrap mean improvement was about **₹2,372.62/week**;
-- 95% bootstrap interval was **₹-2,740.68 to ₹7,993.14**.
+Only after the corrected H=1 baseline is established will H=2/H=3 far-expiry selection be researched.
 
-The evidence is therefore not stable enough to justify deployment.
+## Current conclusion
 
-## Scientific conclusion
-
-The current evidence does **not** establish a reliable positive trading edge for the final positive-flatline weekly strategy.
-
-The central finding is not that the green flatline is useless. It correctly identifies a useful static algebraic property of the position. The problem is that the actual economic result depends materially on the inter-expiry settlement movement (S_2-S_1), and that component has not proved predictably exploitable with the available entry information.
-
-Likewise, the current dataset does not support adding a simple Greek or IV filter to repair the strategy.
-
-## Trading-rule conclusion
-
-No new entry filter is adopted.
-
-The research therefore leaves the strategy in its current form rather than curve-fitting a rule to the historical sample.
-
-## Future research
-
-The next scientifically justified improvement would require a materially stronger information set rather than another arbitrary model search. Candidates include point-in-time futures basis, full option OI/volume/liquidity, India VIX and volatility term structure, global index futures, USD/INR, gold, FII/DII flows and news/event regime variables, together with substantially larger quote-level and independent out-of-sample data.
-
-Any such extension must be predeclared, cached, strictly point-in-time, transaction-cost aware, and validated on an untouched period before it can change the strategy.
-
-## Bottom line
-
-**Do not treat the current strategy as a validated live trading strategy.**
-
-The research has identified the key economic mechanism and tested both simple Greek-based and S2-S1-based improvements. Neither has yet produced sufficiently stable out-of-sample evidence to support deployment.
+There is currently **no valid realized-P&L conclusion for the actual trading strategy** from the prior backtests. The correct scientific position is to treat those results as superseded and rerun the baseline with the user's actual exit convention.
