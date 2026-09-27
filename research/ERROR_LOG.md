@@ -85,3 +85,5 @@
 | 2026-09-27 | 9F | NSEI/API normalizer still renamed multiple source fields to the same `date`/`close` target, causing pandas `ValueError: cannot assemble with duplicate keys` in workflow 36303520586. | Phase 9F stopped before joining context; no result accepted. | Rewrote the NSE normalizer to construct a clean target DataFrame from selected source fields instead of renaming the whole frame. |
 
 | 2026-09-27 | 9F | Repeated NSE-client normalization remained unstable across the installed `nseindiapy` response schema despite explicit column construction. | Workflow 36303568973 failed before context join; no statistical result accepted. | Disabled that unstable ingestion path for this audit and used the schema-stable yfinance fallback, while retaining the official NSE source in the source register for cross-check/reference. |
+
+| 2026-09-27 | 9F | yfinance fallback itself created duplicate date columns because Date and derived date were both renamed to the same target. | Workflow 36303608447 failed before context join; no result accepted. | Rewrote the fallback to construct explicit date/OHLC output columns without whole-frame renaming. |
