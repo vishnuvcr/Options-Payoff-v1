@@ -141,3 +141,6 @@
 
 | 2026-09-27 | 9H | Local validation environment did not have pyarrow and outbound package installation was unavailable, so Parquet analysis could not be run locally. | No market-data result was affected; local execution was deferred to the repository's GitHub Actions environment, which installs the required analysis dependencies. |
 | 2026-09-27 | 9H | Initial Phase 9H analysis draft would have retained only losing cycles in the entry-variant ledger, which would have prevented full-sample comparison. | Caught before workflow execution; the script was corrected so all complete cycles feed variant economics, while the loss-detail file remains loss-focused. No result from the defective version was accepted. |
+
+
+| 2026-09-27 | 9H | Actions run 36322209520 failed in all six yearly jobs at Python parse time: IndentationError in `scripts/analyze_phase9h_loss_entries.py` line 165. The same workflow also rendered escaped year placeholders (`\\2026`) because the YAML was generated with the wrong template escaping. | No economic output was produced or accepted. Corrected the indentation and rewrote the workflow using literal GitHub Actions expressions; rerun triggered automatically. |
