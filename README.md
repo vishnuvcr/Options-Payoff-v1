@@ -159,3 +159,11 @@ This is treated as an unstable research signal, not a usable trading rule.
 Detailed report: [Phase 8A S2-S1 results](docs/PHASE8_S2_S1_RESULTS.md)  
 Compact model summary: [results/phase8/s2_s1_model_summary.csv](results/phase8/s2_s1_model_summary.csv)  
 Chronological stability: [results/phase8/s2_s1_block_stability.csv](results/phase8/s2_s1_block_stability.csv)
+
+### Final research conclusion
+
+The current research does not validate a deployable trading edge for the final positive-flatline weekly strategy. The static green payoff chart is not sufficient because the actual cross-expiry economics are dominated by S2-S1. Phase 8A tested whether S2-S1 could be predicted from entry-time information, but out-of-sample directional accuracy remained close to chance and the apparent economic uplift was unstable across chronological blocks.
+
+**No Greek filter and no S2-S1 filter has been added.**
+
+Consolidated conclusion: [docs/FINAL_CONCLUSION.md](docs/FINAL_CONCLUSION.md).
