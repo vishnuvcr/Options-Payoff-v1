@@ -161,3 +161,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9G | Interim H1 audit | Recomputed completed ledgers for 2021, 2024 and 2026: 54 realized trades, ₹51,403.50 net, PF 5.32, max drawdown ₹2,299.68, realized win rate 72.22%. This subset is descriptive only until remaining years and predeclared sensitivity/statistics complete. |
 | 2026-09-27 | 9G-Rissin | Parity correction | Added the frozen 30-day near/far expiry separation guard to the independent Rissin extractor; earlier Rissin reconstruction attempts are superseded. |
+
+| 2026-09-27 | 9G | Run-27 yearly reconstruction completed | All six yearly jobs (2021–2026) in run 36313815542 completed successfully. The pooled merge alone failed on an empty incomplete CSV; no yearly reconstruction was rejected. |
+| 2026-09-27 | 9G | Merge repair | Promoting the validated empty-ledger handling from the Rissin merger into the dedicated run-27 merge branch. Only aggregation will be rerun against the frozen six artifacts. |
