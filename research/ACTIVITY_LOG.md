@@ -176,3 +176,5 @@ This is the observable research/repository activity log. It records completed ac
 
 
 | 2026-09-27 | 9H | First Actions run failed before analysis | Run 36322209520 failed during the analysis step in all six years. Job-log inspection identified one Python indentation defect and one workflow expression-escaping defect; no data result was accepted. |
+
+| 2026-09-27 | 9H | Performance correction committed | Phase 9H now precomputes far-leg exit quotes once per expiry cycle before candidate P&L evaluation. |
