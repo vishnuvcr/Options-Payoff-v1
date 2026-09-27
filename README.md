@@ -299,3 +299,9 @@ Interpretation: H2/H3 zero counts from this source are a data-coverage limitatio
 
 ### Phase 9G interim H1 control checkpoint — 2026-09-27
 Three yearly corrected H1 reconstructions are now complete: 2021 = 14 realized trades / ₹9,732.04 net; 2024 = 26 realized trades / ₹20,656.83 net; 2026 = 14 realized trades / ₹21,014.63 net. Combined interim H1 = **54 realized trades / ₹51,403.50 net / 72.22% realized win rate** under 0.25% slippage + ₹20/order. This is **not the final Phase 9G result** until 2022, 2023 and 2025 finish and the full sensitivity/statistical audit is accepted.
+
+
+### Phase 9G data-source and interim-control update — 2026-09-27
+The completed corrected H1 ledgers for 2021, 2024 and 2026 were independently recomputed: **54 realized trades, ₹51,403.50 net P&L, PF 5.32, max drawdown ₹2,299.68, 72.22% realized win rate** under 0.25% slippage + ₹20/order. These are interim only; 2022/2023/2025 remain in reconstruction.
+
+See [Phase 9G data-source decision matrix](docs/PHASE9G_DATA_SOURCE_DECISION_MATRIX.md).
