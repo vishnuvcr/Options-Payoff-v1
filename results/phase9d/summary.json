@@ -1,0 +1,31 @@
+{
+  "authoritative_run": 36302077730,
+  "selected_weekly_cycles": 172,
+  "checked_intraday_timestamps": 448280,
+  "decision_surface_rows": 17606,
+  "realized_trade_rows": 169,
+  "incomplete_selected_trades": 3,
+  "chart_positive_rate_pct": 100,
+  "realized_win_rate_pct": 63.905325443786985,
+  "gross_pnl_inr": 162953.840625,
+  "total_costs_inr": 37265.01577165842,
+  "net_pnl_inr": 125688.8248533415,
+  "mean_net_pnl_inr": 743.7208571203639,
+  "median_net_pnl_inr": 538.1730371995325,
+  "profit_factor": 2.9413005123068015,
+  "max_drawdown_inr": 16200.649895328374,
+  "largest_win_inr": 5825.602914892865,
+  "largest_loss_inr": -10052.106851599625,
+  "slippage_pct": 0.0025,
+  "brokerage_per_order_inr": 20,
+  "selection_rule": "first intraday timestamp from 09:20 onward with any positive flatline; at that timestamp choose maximum positive flatline across ATM-400..ATM+400",
+  "no_0920_skip_rule": true,
+  "iid_bootstrap_mean_pnl_95ci_inr": [
+    442.29640222,
+    1039.08137617
+  ],
+  "block4_bootstrap_mean_pnl_95ci_inr": [
+    444.08844051,
+    1068.79427798
+  ]
+}
