@@ -295,3 +295,7 @@ The corrected run has now completed 2024 and 2026 H1 reconstructions. Interim H1
 A dedicated H2/H3 data-coverage audit then found a source limitation in thetrademarkk/india-index-options-1m: across 152 sampled timestamps for each of far-rank 2 and far-rank 3, the far-expiry file had zero rows on the entry date, hence zero common CE/PE strikes and zero exact 17-shift surfaces. The expiry files typically start about eight calendar days before their own expiry, which is enough to cover H1 but not H2/H3 entry dates. This is documented in docs/PHASE9G_SOURCE_COVERAGE.md and results/phase9g_h2_h3_source_coverage_audit.json.
 
 Interpretation: H2/H3 zero counts from this source are a data-coverage limitation, not a strategy result. NSE currently specifies four weekly NIFTY 50 option expiries, so the absence of H2/H3 observations in this dataset cannot be interpreted as non-existence of the contracts. A source with pre-entry intraday quotes for every live expiry is required before H2/H3 inference is accepted.
+
+
+### Phase 9G interim H1 control checkpoint — 2026-09-27
+Three yearly corrected H1 reconstructions are now complete: 2021 = 14 realized trades / ₹9,732.04 net; 2024 = 26 realized trades / ₹20,656.83 net; 2026 = 14 realized trades / ₹21,014.63 net. Combined interim H1 = **54 realized trades / ₹51,403.50 net / 72.22% realized win rate** under 0.25% slippage + ₹20/order. This is **not the final Phase 9G result** until 2022, 2023 and 2025 finish and the full sensitivity/statistical audit is accepted.
