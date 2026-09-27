@@ -52,6 +52,15 @@ jobs:
               "$url" -o "/tmp/nsccl_i${v}.zip"
             unzip -jo "/tmp/nsccl_i${v}.zip" '*.spn' -d data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
           done
+          url="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${DATE}.s.zip"
+          echo "Downloading $url"
+          if curl --fail --silent --show-error --location \
+              -H 'User-Agent: Mozilla/5.0' \
+              -H 'Accept: application/octet-stream,*/*;q=0.8' \
+              -H 'Referer: https://www.nseindia.com/' \
+              "$url" -o "/tmp/nsccl_s.zip"; then
+            unzip -jo "/tmp/nsccl_s.zip" '*.spn' -d data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
+          fi
           ls -lh data/margin/span/${{ inputs.trade_date || '2026-09-25' }}
 
       - name: Reconstruct screenshot position margin
