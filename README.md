@@ -279,3 +279,7 @@ Run **36307233038** is the accepted Phase 9G execution candidate. It includes th
 
 ### Corrected execution trigger — 2026-09-27
 The Phase 9G branch has been reset to concurrency group **v2** after the stale reconstruction process occupied the original group. This status update intentionally triggers the corrected workflow definition.
+
+
+### Legacy H1 control superseded — 2026-09-27
+The authoritative Phase 9D audit found the old 169-trade control did not consistently evaluate the exact 17-strike universe: only 45/172 selected timestamps had the complete prescribed set. The historical 169-trade result is therefore diagnostic only. The corrected Phase 9G reconstruction is the operative control.

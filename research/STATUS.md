@@ -388,3 +388,7 @@ The authoritative H1 scan audit demonstrated that raw merged row counts were not
 
 ### Corrected execution reset — 2026-09-27
 The earlier Phase 9G run remained in the old concurrency group. The corrected pipeline is now isolated in **concurrency group v2** and will be the accepted execution candidate. The old run's outputs remain excluded.
+
+
+### Legacy H1 superseded — 2026-09-27
+The old Phase 9D H1 control is **not accepted under the exact current rule**: 127/172 selected timestamps lacked one or more prescribed strike shifts. No conflicting quote values were found. Phase 9G run 27 is reconstructing the corrected H1/H2/H3 horizons from raw data under the exact 17-strike rule.

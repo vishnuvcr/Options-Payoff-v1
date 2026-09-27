@@ -124,3 +124,5 @@
 | 2026-09-27 | 9G | Data-model defect identified | H1 audit showed `candidate_count` reached 264, proving it counted duplicate merged rows rather than unique strikes. The strict rule has been corrected to require 17 unique shift points and zero conflicting duplicate quote values. |
 
 | 2026-09-27 | 9G | Governance/data-model correction | The old Phase 9G concurrency group remained occupied by a stale reconstruction run. A v2 concurrency group is being used so the corrected exact-17-strike pipeline can execute independently; stale outputs remain excluded. |
+
+| 2026-09-27 | 9G | Legacy-control validity finding | Authoritative Phase 9D H1 audit: only 45/172 selected timestamps contained the exact prescribed 17-strike shift set; 127 did not. No conflicting quote values were found in the audited surfaces. The old 169-trade H1 result is therefore superseded for the current exact-strike research protocol. |
