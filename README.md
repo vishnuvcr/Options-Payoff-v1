@@ -180,3 +180,7 @@ Phase 9G now requires **all 17 common strikes** to be evaluable at a qualifying 
 
 ### Unique-strike completeness correction — 2026-09-27
 The authoritative H1 audit showed that merged row counts can exceed 17 because of duplicate quote rows. The research now defines the required 17-strike universe by **17 unique shift points**, with any conflicting duplicate quote values making the timestamp invalid. This supersedes the earlier raw-row completeness check.
+
+
+### Legacy H1 control audit result — 2026-09-27
+The authoritative Phase 9D H1 artifact contained 172 selected timestamps, but only 45 had the exact prescribed 17 unique strike shifts; 127 were missing one or more required shifts. No conflicting quote values were found in the audited decision surfaces. Therefore the old 169-trade H1 result is historical/diagnostic only. Phase 9G is reconstructing the H1 control directly from raw data under the exact current rule before comparing H2/H3.
