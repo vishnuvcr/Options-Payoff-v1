@@ -1,0 +1,29 @@
+{
+  "status": "interim",
+  "source": "rissin/nse-options-intraday",
+  "calendar_year": 2024,
+  "h1": {
+    "selected_trades": 11,
+    "realized_trades": 9,
+    "net_pnl_inr": 18690.30597339218,
+    "realized_win_rate_pct": 77.77777777777779
+  },
+  "h2": {
+    "selected_trades": 6,
+    "realized_trades": 4,
+    "net_pnl_inr": 5306.219649932629,
+    "realized_win_rate_pct": 75
+  },
+  "h3": {
+    "selected_trades": 0,
+    "realized_trades": 0,
+    "net_pnl_inr": 0
+  },
+  "paired_h2_minus_h1": {
+    "matched_completed_cycles": 4,
+    "mean_delta_inr": 757.8965074716202,
+    "median_delta_inr": 2584.471901567118,
+    "positive_delta_pct": 75
+  },
+  "note": "Interim same-source descriptive result only. H3 has no positive qualifying trade in 2024. No horizon selection is accepted until 2025-2026 corrected Rissin results and predeclared statistical tests complete."
+}
