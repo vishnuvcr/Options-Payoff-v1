@@ -89,3 +89,5 @@
 | 2026-09-27 | 9F | yfinance fallback itself created duplicate date columns because Date and derived date were both renamed to the same target. | Workflow 36303608447 failed before context join; no result accepted. | Rewrote the fallback to construct explicit date/OHLC output columns without whole-frame renaming. |
 
 | 2026-09-27 | 9F | Sequential context joins reused a helper `date` column, causing pandas `MergeError` when the next join attempted to create another `date_ctx`. | Workflow 36303653009 failed before statistical output; no result accepted. | Rewrote `prior_merge` to remove previous helper date columns before each as-of join and to namespace context columns before merging. |
+
+| 2026-09-27 | 9F | Successful provisional audit had only 7 FII and 1 DII source rows; as-of joining would have propagated stale institutional-flow values across long periods. | The provisional FII/DII regime output was not accepted as evidence. | Enforced a 3-day point-in-time tolerance and excluded sparse FII/DII context entirely when source coverage is below 60 rows. Added this as an explicit data-quality guard. |
