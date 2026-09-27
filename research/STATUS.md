@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-7C-entry-features-greeks  
-**Overall status:** Phase 7B — positive-only weekly maximum-flatline research COMPLETE
+**Active branch:** phase-8-s2-s1-predictor  
+**Overall status:** Phase 8A — S2-S1 predictability complete; no filter adopted
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -205,3 +205,7 @@ Reproducibility tables published under `results/phase7c/`; detailed methodology/
 ## Phase 8A — S2-S1 predictor analysis OPEN
 
 Hypothesis: the cross-expiry settlement difference can be predicted sufficiently well from information available at the first-positive entry observation to improve the weekly trade/no-trade decision. The first test is deliberately internal-data-only; external market variables are reserved for Phase 8B if justified by the internal baseline.
+
+## Phase 8A result
+
+The economically important cross-expiry S2-S1 term is not predicted robustly enough to use as an entry filter. Across 43 strictly OOS weekly decision cycles, model sign accuracy was 44.2% (Ridge), 51.2% (Random Forest), and 53.5% (HGB). The strongest OOS filter uplift was Random Forest (+₹102,022.80 versus the same-test baseline), but chronological block results were +₹140,877, -₹58,226, and +₹19,372, and the paired bootstrap 95% CI was ₹-2,740.68 to ₹7,993.14. No filter adopted.
