@@ -96,6 +96,19 @@ jobs:
         with:
           name: phase-9G-h2-h3-evidence-pre-sensitivity
           path: results/phase9g
+      - name: Validate raw quote fields before execution-cost sensitivity
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          from pathlib import Path
+          required = ['near_call_close','near_put_close','far_call_close','far_put_close','near_settlement','far_call_exit_close','far_put_exit_close','near_lot_size','far_lot_size']
+          for p in Path('results/phase9g').glob('H*_realized_trades.csv'):
+              df = pd.read_csv(p)
+              missing = [c for c in required if c not in df.columns]
+              if missing:
+                  raise SystemExit(f'{p}: missing raw quote fields: {missing}')
+          print('All realized ledgers retain required raw quote fields.')
+          PY
       - name: Execution-cost sensitivity
         run: |
           for h in 1 2 3; do
