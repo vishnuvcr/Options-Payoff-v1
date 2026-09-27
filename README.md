@@ -250,3 +250,16 @@ Machine-readable results: [results/phase9f/summary.json](results/phase9f/summary
 Workflow: [.github/workflows/phase-9F-regime-crossmarket-audit.yml](.github/workflows/phase-9F-regime-crossmarket-audit.yml)
 
 **Next:** H2/H3 far-expiry selection research is reopened on a separate preregistered branch; the H1 rule remains frozen while that research runs.
+
+
+## Phase 9G — H2/H3 far-expiry selection EXECUTING
+
+Phase 9G is reconstructing fixed H1/H2/H3 far-expiry horizons on the corrected intraday rule, using 1-minute observations from 09:20–15:29 and near-expiry manual closure of far CE/PE. The predeclared comparison does not allow dynamic horizon switching and retains H1 as the control.
+
+Active Actions runs: **36304489832** and **36304477026** (yearly H1/H2/H3 reconstruction). Earlier runs **36304359045** and **36304459132** failed before any accepted statistical result and are logged in the error register.
+
+A pre-analysis schema audit also found that the execution-sensitivity stage currently passes an already-realized CSV back into a raw-input recalculation function. No sensitivity output is being accepted. The raw fields will be retained/reused before Phase 9G is declared complete.
+
+Plan: [docs/PHASE9G_H2_H3_PLAN.md](docs/PHASE9G_H2_H3_PLAN.md)  
+Phase status: [research/STATUS.md](research/STATUS.md)  
+Error log: [research/ERROR_LOG.md](research/ERROR_LOG.md)
