@@ -74,11 +74,20 @@ def main():
         horizons[f'H{rank}']=df; incomplete[f'H{rank}']=int(inc_total)
         df.to_csv(out/f'H{rank}_realized_trades.csv',index=False)
 
-    h1=horizons['H1']; expected_trades=169; expected_net=125688.82485334152
-    observed_net=float(h1['net_pnl_inr'].sum()) if not h1.empty else None; err=abs(observed_net-expected_net) if observed_net is not None else None
-    check={'expected_complete_trades':expected_trades,'observed_complete_trades':int(len(h1)),'expected_net_pnl_inr':expected_net,'observed_net_pnl_inr':observed_net,'net_pnl_abs_error_inr':err,'pass':bool(len(h1)==expected_trades and err is not None and err<1e-6)}
-    (out/'h1_reproduction_check.json').write_text(json.dumps(check,indent=2))
-    if not check['pass']: raise SystemExit(f'H1 reproduction failed: {check}')
+    h1=horizons['H1']
+    legacy_expected_trades=169
+    legacy_expected_net=125688.82485334152
+    observed_net=float(h1['net_pnl_inr'].sum()) if not h1.empty else 0.0
+    legacy_reference={
+        'legacy_phase9D_complete_trades':legacy_expected_trades,
+        'legacy_phase9D_net_pnl_inr':legacy_expected_net,
+        'corrected_phase9G_H1_complete_trades':int(len(h1)),
+        'corrected_phase9G_H1_net_pnl_inr':observed_net,
+        'trade_count_difference_vs_legacy':int(len(h1)-legacy_expected_trades),
+        'net_pnl_difference_vs_legacy_inr':float(observed_net-legacy_expected_net),
+        'note':'Legacy H1 is retained only as a diagnostic reference because the current protocol now requires exact 17 unique strike shifts and rejects conflicting duplicate quotes.'
+    }
+    (out/'h1_legacy_reference_comparison.json').write_text(json.dumps(legacy_reference,indent=2))
 
     summaries=[]
     for h,df in horizons.items():
@@ -149,9 +158,9 @@ def main():
     if not paired_df.empty:
         candidate=bool(((paired_df['mean_delta_inr']>0)&(paired_df['block4_bootstrap_ci_low_inr']>0)&(paired_df['bh_q_value']<0.05)).any())
     state='candidate_horizon_identified' if candidate else 'no_horizon_passed_predeclared_paired_test'
-    summary={'phase':'9G','status':'complete','horizons':['H1','H2','H3'],'h1_reproduction':check,'incomplete_selected_trades':incomplete,'paired_state':state,'primary_rule':'fixed far-expiry rank; no dynamic horizon switching','note':'Historical comparison only; any later production candidate requires untouched holdout validation.'}
+    summary={'phase':'9G','status':'complete','horizons':['H1','H2','H3'],'h1_legacy_reference':legacy_reference,'incomplete_selected_trades':incomplete,'paired_state':state,'primary_rule':'fixed far-expiry rank; no dynamic horizon switching','note':'Historical comparison only; any later production candidate requires untouched holdout validation.'}
     (out/'summary.json').write_text(json.dumps(summary,indent=2))
-    report=['# Phase 9G — H2/H3 far-expiry selection research','','## H1 reproduction',f"H1 complete trades: **{check['observed_complete_trades']}**; net-P&L absolute reproduction error: **₹{check['net_pnl_abs_error_inr']:.10f}**.",'','## Horizon summary',summary_df.to_markdown(index=False),'','## Paired comparisons',paired_df.to_markdown(index=False) if not paired_df.empty else 'No paired comparisons available.','','## Interpretation','No dynamic far-expiry switching is allowed. A positive paired difference is a candidate for later independent holdout validation, not immediate deployment.']
+    report=['# Phase 9G — H2/H3 far-expiry selection research','','## Corrected H1 control vs legacy H1 reference',f"Corrected Phase 9G H1: **{legacy_reference['corrected_phase9G_H1_complete_trades']} complete trades**, **₹{legacy_reference['corrected_phase9G_H1_net_pnl_inr']:.2f} net P&L**.",f"Legacy Phase 9D reference: **{legacy_reference['legacy_phase9D_complete_trades']} complete trades**, **₹{legacy_reference['legacy_phase9D_net_pnl_inr']:.2f} net P&L**.",'','## Horizon summary',summary_df.to_markdown(index=False),'','## Paired comparisons',paired_df.to_markdown(index=False) if not paired_df.empty else 'No paired comparisons available.','','## Interpretation','No dynamic far-expiry switching is allowed. A positive paired difference is a candidate for later independent holdout validation, not immediate deployment.']
     (out/'PHASE9G_RESULTS.md').write_text(chr(10).join(report)+chr(10))
     print(json.dumps(summary,indent=2))
 
