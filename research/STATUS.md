@@ -380,3 +380,7 @@ The selector now requires candidate_count = 17 at a qualifying timestamp. This p
 
 ### Execution governance — 2026-09-27
 Run **36307233038 (Phase 9G run 10)** is the current accepted execution candidate. It includes the strict 17-strike completeness rule and H1 completeness gate. Older run 36305850007 remains an obsolete process and its outputs will not be used.
+
+
+### Critical duplicate-row correction — 2026-09-27
+The authoritative H1 scan audit demonstrated that raw merged row counts were not a valid measure of the 17-strike universe. The corrected rule now requires **17 unique strike shifts** and **no conflicting duplicate quotes** at a valid decision timestamp. Previous completeness failures are therefore superseded as diagnostic failures, not strategy results.
