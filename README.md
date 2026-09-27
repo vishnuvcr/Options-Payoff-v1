@@ -139,4 +139,6 @@ The current research is testing whether entry-time Greeks, IV term structure/ske
 
 The winner-versus-loser study and candidate-level tests are complete. Across 63 weekly trades (36 winners, 27 losers), reconstructed entry Greeks, IV term structure/skew and moneyness show descriptive differences but **no robust feature survives multiple-testing correction**. Simple feature-based strike selectors all underperform the maximum-positive-flatline baseline, and the best training-selected Greek/IV selector underperformed it in both expanding walk-forward test blocks. No Greek-based strike filter has been added to the strategy.
 
-Detailed report: `docs/ENTRY_FEATURE_GREEK_ANALYSIS.md` (workflow run 36291838252).
+Detailed report: [docs/ENTRY_FEATURE_GREEK_ANALYSIS.md](docs/ENTRY_FEATURE_GREEK_ANALYSIS.md) (workflow run 36291838252).
+
+Compact Phase 7C outputs: [winner/loser Greek summary](results/phase7c/winner_loser_greek_summary.csv), [selector bootstrap comparison](results/phase7c/selector_bootstrap_summary.csv), and [walk-forward feature selection](results/phase7c/walk_forward_feature_selection.csv).
