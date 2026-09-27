@@ -76,3 +76,5 @@
 | 2026-09-27 | 9D | Incomplete-trade audit patch initially placed the `reason` variable at the wrong indentation. | The audit-only rerun failed with `NameError`; no P&L result was accepted from that run. | Corrected the audit code and reran the artifact-only H1 workflow successfully. |
 
 | 2026-09-27 | 9E | Initial frozen-rule validation script contained an unterminated string literal in the Markdown report writer because newline escapes were interpreted while generating the repository file. | Phase 9E workflow 36303004660 failed during the validation script before any statistical result was accepted. | Replaced the report writer with `chr(10)` joins and reran from the same authoritative Phase 9D artifact. |
+
+| 2026-09-27 | 9E | Validation results were generated successfully, but workflow 36303040868 could not push its result commit because the branch had advanced before the push. | Statistical output was already uploaded as artifact 10926525963; no result was lost. | Removed the race-prone persist step, then reintroduced it with git fetch + git pull --rebase; authoritative workflow 36303117489 completed successfully and committed the results. |
