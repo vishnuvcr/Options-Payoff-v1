@@ -132,3 +132,7 @@ Result: **63 weekly cycles, 63 trades, 0 skipped weeks, ₹-9,627.90 net P&L** a
 The positive static chart component totaled ₹20,213.00, while realized cross-expiry S2-S1 contribution totaled ₹-19,979.75 before costs. IID 95% CI for mean weekly P&L: ₹-4,996 to ₹4,410; four-week block CI: ₹-4,024 to ₹4,739.
 
 See [docs/PHASE7B_RESULTS.md](docs/PHASE7B_RESULTS.md) and [results/phase7b/summary.json](results/phase7b/summary.json).
+
+### Phase 7C — Entry Greeks and feature discrimination
+
+The current research is testing whether entry-time Greeks, IV term structure/skew, moneyness, and Greek imbalance differ between winning and losing trades and whether they can improve strike selection within the same 17-strike weekly grid. Features are treated as hypotheses only; multiple-testing correction, paired weekly bootstrap and out-of-sample validation are required before adopting any new selector.
