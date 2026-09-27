@@ -95,6 +95,29 @@ def last_bar_on_or_before(df, exit_ts, strike, option_type):
     row = x.iloc[-1]
     return float(row['close']), row['timestamp']
 
+def build_entry_lookup(df):
+    out = defaultdict(dict)
+    for row in df.itertuples(index=False):
+        out[row.timestamp].setdefault(float(row.strike), {})[row.option_type] = float(row.close)
+    return dict(out)
+
+def build_expiry_exit_lookup(df, exit_ts):
+    if exit_ts is None:
+        return {}
+    out = {}
+    x = df[(df['trading_date'] == exit_ts.date()) & (df['timestamp'] <= exit_ts)]
+    for row in x.sort_values('timestamp').itertuples(index=False):
+        out[(float(row.strike), row.option_type)] = (float(row.close), row.timestamp)
+    return out
+
+def common_from_lookup(near_lookup, far_lookup, entry_ts):
+    a = near_lookup.get(entry_ts, {})
+    b = far_lookup.get(entry_ts, {})
+    out = []
+    for strike in set(a).intersection(b):
+        if {'CE', 'PE'}.issubset(a[strike]) and {'CE', 'PE'}.issubset(b[strike]):
+            out.append(float(strike))
+    return set(out)
 def common_strikes(near, far, entry_ts):
     def strikes(df):
         x = df[(df['timestamp'] == entry_ts) & (df['option_type'].isin(['CE','PE']))]
