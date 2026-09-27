@@ -63,11 +63,27 @@ def fetch_yf(symbol, start, end):
     try:
         x=yf.download(symbol,start=start,end=end,auto_adjust=False,progress=False,threads=False)
         if x is None or x.empty: return pd.DataFrame()
-        if isinstance(x.columns,pd.MultiIndex): x=x.xs(symbol,axis=1,level=1,drop_level=True)
-        x=x.reset_index(); x['date']=pd.to_datetime(x['Date']).dt.date
-        cols={c:str(c).lower() for c in x.columns}
-        out=x.rename(columns={v:k for k,v in cols.items() if k in ['open','high','low','close','adj close','volume']})
+        x=x.reset_index()
+        flat=[]
+        for col in x.columns:
+            if isinstance(col, tuple):
+                names=[str(v).strip() for v in col if str(v).strip() and str(v).strip().lower()!='nan']
+                if any(n in {'Open','High','Low','Close','Adj Close','Volume'} for n in names):
+                    flat.append(next(n for n in names if n in {'Open','High','Low','Close','Adj Close','Volume'}))
+                elif 'Date' in names or 'Datetime' in names:
+                    flat.append(next(n for n in names if n in {'Date','Datetime'}))
+                else:
+                    flat.append(names[0] if names else '')
+            else:
+                flat.append(str(col))
+        x.columns=flat
+        datecol='Date' if 'Date' in x.columns else ('Datetime' if 'Datetime' in x.columns else None)
+        if datecol is None: return pd.DataFrame()
+        x['date']=pd.to_datetime(x[datecol]).dt.date
+        ren={c:c.lower().replace(' ','_') for c in x.columns}
+        out=x.rename(columns=ren)
         keep=[c for c in ['date','open','high','low','close','volume'] if c in out.columns]
+        if 'close' not in out.columns: return pd.DataFrame()
         return out[keep].copy()
     except Exception:
         return pd.DataFrame()
