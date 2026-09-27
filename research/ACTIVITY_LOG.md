@@ -154,3 +154,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Legacy H1 audit completed | Exact 17-strike surface audit of the authoritative Phase 9D H1 artifact found 45/172 selected timestamps strictly complete. The 169-trade legacy H1 result is retained only as historical reference; corrected Phase 9G reconstruction is now the control. |
 
 | 2026-09-27 | 9G | Run 27 live checkpoint | Verified workflow 36313815542 remains in progress on frozen corrected commit 63b399a9a1d631316dd5233bc684a4ee0a197b25. H1 completeness job succeeded; all six yearly jobs are still in decision-surface reconstruction after successful setup/dependency/cache stages. No H2/H3 inference accepted. |
+
+| 2026-09-27 | 9G | H2/H3 source-coverage audit | Dedicated audits 36317177731 and 36317271416 sampled 152 entry timestamps for far-rank 2 and 3. Every sample had zero same-day rows for the far expiry, zero common CE/PE strikes, and zero exact 17-shift surfaces. The finding is a source-coverage limitation, not a strategy result. |
+| 2026-09-27 | 9G | Interim yearly reconstruction | Run 27 completed 2024 and 2026. H1: 2024 had 26 realized trades and ₹20,656.83 net; 2026 had 14 realized trades and ₹21,014.63 net under the primary cost model. These remain interim until all years complete. |
