@@ -66,3 +66,5 @@
 
 | 2026-09-27 | 9D | **Primary strategy-selection error:** the Phase 9A/9B extractor hard-coded one 09:20 observation per trading day. The user rule is to keep checking later intraday times on the same day when 09:20 has no positive estimate. | Weeks were effectively filtered by the 09:20 state, producing an invalid 64-trade/51.56%-win-rate result for the actual strategy. | Supersede all Phase 9A/9B performance conclusions; implement every available 1-minute observation from 09:20 through 15:29 and continue across subsequent trading days within the same weekly cycle until the first positive candidate. |
 | 2026-09-27 | 9D | The ongoing Phase 9C H2/H3 experiment inherited the same 09:20-only entry cadence. | Any H2/H3 output from Phase 9C would be answering the wrong strategy. | Mark Phase 9C non-authoritative and rebuild H2/H3 only after the corrected intraday H1 rule is validated. |
+
+| 2026-09-27 | 9D | First intraday recheck workflow had the correct 15-test suite but the extraction step did not set `PYTHONPATH=.`. | Extraction stopped before reading market data. | Added `PYTHONPATH=.` to the extraction step; rerun required. |
