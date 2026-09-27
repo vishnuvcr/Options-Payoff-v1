@@ -238,3 +238,16 @@ Accordingly, **the prior realized-P&L results must be treated as superseded/inva
 ## Phase 9A status — OPEN
 
 Primary task: rebuild the H=1 baseline using far-expiry option market prices at the near-expiry close, including manual exit slippage and all transaction costs. No H=2/H=3 research should be accepted until this corrected baseline is complete.
+
+
+## Phase 9A execution checkpoint
+
+The corrected code and regression tests are committed on `phase-9-near-expiry-exit-correction`.
+
+- Primary GitHub Actions run: **36296081746** (in progress)
+- Unit tests: passed before data reconstruction
+- Exit convention: near-expiry short CE/long PE settle; far-expiry long CE/short PE are manually closed at their last available option bar at or before the near-expiry index close
+- Slippage: 0.25% per premium leg
+- Costs: entry four-leg costs + two far-leg exit transactions + applicable exercise STT on the near long put
+- H=2/H=3 research: frozen until this H=1 corrected ledger is complete
+- Previous realized-P&L results: superseded for the actual strategy
