@@ -133,3 +133,5 @@
 
 | 2026-09-27 | 9G-Rissin | Reconstruction parity defect | The independent Rissin extractor initially lacked the frozen 30-day maximum near/far expiry separation guard. | The pre-correction Rissin run is superseded; the extractor was corrected before accepting any Rissin P&L. |
 | 2026-09-27 | 9G-Rissin | Validator tooling defects | Three source-validation attempts failed before valid data inference: Arrow timestamp/string mismatch; literal backslash-n syntax in an automated patch; Arrow string-date vs timestamp scalar mismatch. | Each failure was logged on the Rissin source-validation branch and corrected; no failed-run data were interpreted. |
+
+| 2026-09-27 | 9G | Merger robustness defect | A horizon with zero incomplete realized rows can emit a zero-byte incomplete-trades CSV; the merger previously called pandas.read_csv unconditionally and failed with EmptyDataError. | Added a file-size/EmptyDataError guard on the merge-hardening branch. Apply this fix to the authoritative Phase 9G branch after the frozen run completes or fails at merge. |
