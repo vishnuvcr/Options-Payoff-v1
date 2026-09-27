@@ -109,3 +109,17 @@ That historical series should use the exchange's contemporaneous SPAN archive fo
 The calibration used the official archive naming/pattern documented by an independent open-source NSE/NSCCL margin integration: `https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.20260925.i5.zip`. The extracted SPAN payload was `nsccl.20260925.i05.spn` with SHA-256 `b1d00132a6397e5b8d5b13524f89142605fefc8901cecabe370ff73509ba0f3f`.
 
 The complete calibration report is committed at `results/phase7a/margin_calibration_2026-09-25.json`.
+## Historical candidate reconstruction result
+
+The historical coverage probe found i1, i2, i3, i4, i5 and settlement/sensitivity s SPAN archives for all 891 entry dates in the Phase 3 sample.
+
+The exact primary workflow uses i1 as the no-look-ahead margin snapshot. The user's current ±400 grid and 2.5% rule reduce the exact margin reconstruction to 31 candidates across 11 timestamps after applying the 4% combined ELM lower bound of the two short index-option legs. All 31 were evaluated with full SPAN basket margin.
+
+Four i1 candidates pass the 2.5% margin-based gate, and maximum-INR and maximum-percentage selection are identical:
+
+- 2021-08-04, +100, 4.5728%
+- 2022-04-04, +300, 5.1319%
+- 2022-05-25, -250, 2.6441%
+- 2022-06-30, -400, 2.6564%
+
+The exact primary ledger and settlement-file sensitivity ledger are stored under `results/phase7a/`.
