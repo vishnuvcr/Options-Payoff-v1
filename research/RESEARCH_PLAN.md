@@ -416,3 +416,53 @@ Result:
 - therefore **no S2-S1 predictor/filter is adopted**.
 
 Per the predefined stop rule, Phase 8B external-variable expansion is not promoted unless a materially larger independent dataset or a new predeclared information source becomes available. The current branch is therefore treated as a completed negative/insufficient-evidence result rather than an invitation to keep optimizing predictors.
+
+
+## Phase 9A — Correct exit semantics: close all four legs at near expiry
+
+**Branch:** phase-9-near-expiry-exit-correction
+
+### Critical protocol correction
+
+The user's actual execution convention is now explicit: all four legs are closed at the near weekly expiry. The two near-expiry options expire/settle naturally; the two far-expiry options are manually squared off at the near-expiry close.
+
+The previous backtest implementation did not model this. It used the far-expiry settlement (`next_settlement`) to value the far CE/PE legs. That corresponds to holding the far options to their own expiry, not manually closing them at the near expiry.
+
+Therefore the previous realized-P&L ledgers and analyses that depend on them are **superseded/invalid for the user's actual execution rule** and must not be used to accept or reject the strategy.
+
+### Correct near-expiry-close P&L
+
+Let Q_C(T1) and Q_P(T1) be the observed market prices used to manually close the far-expiry call and put at the near-expiry close. Before costs:
+
+P&L(T1) = C1 - P1 - Cfar + Pfar + (K - S1) + Q_C(T1) - Q_P(T1)
+
+where K-S1 is the combined expiry payoff of the near short-call/long-put pair.
+
+This must replace the prior `C1-P1-C2+P2+(S2-S1)` formula for the operational strategy.
+
+### Required data
+
+The corrected backtest needs point-in-time far-expiry option prices at the near-expiry exit timestamp. Entry prices alone and far-expiry settlement prices are insufficient.
+
+The workflow must:
+- identify the exact near-expiry exit timestamp convention;
+- obtain/derive the far CE and far PE exit prices at that timestamp;
+- apply the same execution/slippage model to far-leg manual exits;
+- apply all exchange/broker/tax costs to the additional exit transactions;
+- preserve the entry-time positive-flatline selection rule without look-ahead;
+- independently audit all 63 historical weekly cycles before any new conclusion.
+
+### Impact assessment
+
+The following are frozen until the corrected exit backtest is complete:
+- Phase 7B net P&L and win/loss statistics;
+- Phase 7B economic decomposition based on S2-S1;
+- Phase 7C winner/loser and selector studies, because they use the old realized P&L labels;
+- Phase 8A S2-S1 prediction/filter study, because its target/economic evaluation was based on holding the far legs to far expiry;
+- any final deployment conclusion derived from those realized-P&L results.
+
+The entry-time static flatline calculation itself remains a valid description of the one-dimensional chart metric, but it is not evidence about the corrected near-expiry-exit P&L.
+
+### Phase 9A stop rule
+
+Do not run far-expiry H=2/H=3 selection yet. First reproduce the corrected H=1 strategy with the exact near-expiry manual-close convention. Only after the corrected H=1 baseline is established should H=2/H=3 be compared.
