@@ -163,6 +163,19 @@ def main():
             needed_expiries.update(pair)
     needed_expiries = sorted(needed_expiries)
 
+    expiry_entry_times = defaultdict(list)
+    expiry_exit_ts = {}
+    for entry in entry_df[['timestamp', 'trading_date']].itertuples(index=False):
+        pair = expiry_pair(entry.trading_date, expiry_dates)
+        if pair is None:
+            continue
+        near_expiry, far_expiry = pair
+        expiry_entry_times[near_expiry].append(entry.timestamp)
+        expiry_entry_times[far_expiry].append(entry.timestamp)
+        if near_expiry not in expiry_exit_ts:
+            exit_ts, _ = last_index_bar_on_date(index_df, near_expiry)
+            expiry_exit_ts[near_expiry] = exit_ts
+
     option_local_paths = {}
 
     def download_one(expiry):
@@ -179,12 +192,25 @@ def main():
             expiry, local = fut.result()
             option_local_paths[expiry] = local
 
-    cache = {}
+    prepared = {}
 
-    def get_option(expiry):
-        if expiry not in cache:
-            cache[expiry] = load_option_file(expiry, filename_by_expiry[expiry])
-        return cache[expiry]
+    def get_prepared(expiry):
+        if expiry in prepared:
+            return prepared[expiry]
+        ts_list = expiry_entry_times.get(expiry, [])
+        exit_ts = expiry_exit_ts.get(expiry)
+        if ts_list:
+            tmin = min(ts_list)
+            tmax = max([max(ts_list), exit_ts] if exit_ts is not None else ts_list)
+        else:
+            tmin = tmax = None
+        df = load_option_file(
+            expiry, filename_by_expiry[expiry], timestamp_min=tmin, timestamp_max=tmax
+        )
+        entry_lookup = build_entry_lookup(df)
+        exit_lookup = build_expiry_exit_lookup(df, exit_ts)
+        prepared[expiry] = (entry_lookup, exit_lookup)
+        return prepared[expiry]
 
     rows = []
     for entry in entry_df.sort_values('timestamp').itertuples(index=False):
@@ -194,12 +220,12 @@ def main():
         if pair is None:
             continue
         near_expiry, far_expiry = pair
-        near = get_option(near_expiry)
-        far = get_option(far_expiry)
+        near_lookup, near_exit_lookup = get_prepared(near_expiry)
+        far_lookup, far_exit_lookup = get_prepared(far_expiry)
         exit_ts, near_settlement = last_index_bar_on_date(index_df, near_expiry)
         if exit_ts is None:
             continue
-        common = common_strikes(near, far, entry_ts)
+        common = common_from_lookup(near_lookup, far_lookup, entry_ts)
         if not common:
             continue
         spot = float(entry.close)
@@ -214,15 +240,15 @@ def main():
                     'shift_points': shift, 'strike': strike, 'status': 'candidate_strike_unavailable'
                 })
                 continue
-            vals = [
-                exact_bar(near, entry_ts, strike, 'CE'),
-                exact_bar(near, entry_ts, strike, 'PE'),
-                exact_bar(far, entry_ts, strike, 'CE'),
-                exact_bar(far, entry_ts, strike, 'PE'),
-            ]
-            near_call, near_put, far_call, far_put = vals
-            far_call_exit, far_call_exit_ts = last_bar_on_or_before(far, exit_ts, strike, 'CE')
-            far_put_exit, far_put_exit_ts = last_bar_on_or_before(far, exit_ts, strike, 'PE')
+            nrow = near_lookup.get(entry_ts, {}).get(float(strike), {})
+            frow = far_lookup.get(entry_ts, {}).get(float(strike), {})
+            near_call = nrow.get('CE')
+            near_put = nrow.get('PE')
+            far_call = frow.get('CE')
+            far_put = frow.get('PE')
+            vals = [near_call, near_put, far_call, far_put]
+            far_call_exit, far_call_exit_ts = far_exit_lookup.get((float(strike), 'CE'), (None, None))
+            far_put_exit, far_put_exit_ts = far_exit_lookup.get((float(strike), 'PE'), (None, None))
             missing = any(x is None for x in vals) or near_settlement is None or far_call_exit is None or far_put_exit is None
             status = 'ok' if not missing else 'missing_near_exit_price'
             rows.append({
