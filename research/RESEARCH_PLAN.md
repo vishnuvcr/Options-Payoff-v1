@@ -258,3 +258,7 @@ Acceptance requires, at minimum: successful reproduction of the authoritative H1
 ### Supersession note
 
 The original plan's statements about a configurable 2.5% trade-entry threshold and ATM/-400/+400-only selection describe the earlier provisional implementation. They must not be used to interpret Phase 9D onward or the current Phase 9G research.
+
+
+### Strict strike-completeness safeguard — 2026-09-27
+For the all-17-strike rule, a timestamp is a valid decision observation only when all 17 common-strike candidates have the required four option quotes. A positive payoff from a partial strike universe is not a valid signal; such timestamps are logged as incomplete and skipped only because the required evaluation set is unavailable.
