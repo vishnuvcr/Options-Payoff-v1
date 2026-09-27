@@ -351,3 +351,8 @@ Results: `docs/PHASE9F_RESULTS.md`, `results/phase9f/summary.json`, `results/pha
 
 
 Phase 9G completeness audit also identified a predeclared analysis gap: the final report must compare first-positive decision-time and selected-strike distributions across H1/H2/H3, not only realized P&L. This is now a required correction before phase exit.
+
+
+## Phase 9G correction checkpoint — 2026-09-27
+
+The sensitivity path has been hardened: realized trade ledgers now retain the raw quote-level fields required to recompute execution costs, and the workflow refuses to proceed if those fields are absent. The merger also now produces the required first-positive decision-time and selected-strike distribution summaries. **No H2/H3 conclusion is accepted yet.** Fresh corrected workflow run: 36305850007.
