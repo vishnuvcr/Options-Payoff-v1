@@ -43,6 +43,17 @@ def main():
             })
             continue
         rows.append({
+            # Preserve raw quote-level inputs so sensitivity can recompute execution costs
+            # without feeding an already-realized ledger back into candidate_metrics().
+            'near_call_close':row.near_call_close,
+            'near_put_close':row.near_put_close,
+            'far_call_close':row.far_call_close,
+            'far_put_close':row.far_put_close,
+            'near_settlement':row.near_settlement,
+            'far_call_exit_close':row.far_call_exit_close,
+            'far_put_exit_close':row.far_put_exit_close,
+            'near_lot_size':row.near_lot_size,
+            'far_lot_size':row.far_lot_size,
             'entry_timestamp':row.entry_timestamp,
             'entry_date':pd.Timestamp(row.entry_timestamp).date(),
             'candidate_label':'ATM' if int(row.shift_points)==0 else ('ATM_PLUS_%d'%abs(int(row.shift_points)) if int(row.shift_points)>0 else 'ATM_MINUS_%d'%abs(int(row.shift_points))),
