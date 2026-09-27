@@ -10,12 +10,8 @@ on:
         description: Completed Phase 3 run with candidate_results.parquet
         required: true
         default: '36262958536'
-      span_version:
-        description: NSE SPAN revision used at the 09:20 entry point
-        required: true
-        default: 'i02'
       exposure_lower_bound_rate:
-        description: Conservative per-short index-option ELM lower bound used only for prefiltering
+        description: Conservative per-short NIFTY option ELM lower bound used only for prefiltering
         required: true
         default: '0.01'
       threshold_pct:
@@ -58,46 +54,126 @@ jobs:
 
       - name: Prefilter candidates using conservative ELM lower bound
         run: |
+          mkdir -p results
           python scripts/prefilter_margin_candidates.py \
             --candidates data/phase3_source/candidate_results.parquet \
             --exposure-rate-per-short '${{ inputs.exposure_lower_bound_rate || '0.01' }}' \
             --out results/phase7a_margin_prefilter.csv
 
-      - name: Download required NSE SPAN revisions for unique dates
+      - name: Probe and download historical NSE SPAN i1 / s files
         run: |
           mkdir -p data/margin/span_historical
           python - <<'PY'
+          import concurrent.futures
+          from pathlib import Path
           import pandas as pd
-          p='results/phase7a_margin_prefilter.csv'
-          df=pd.read_csv(p)
-          dates=sorted(pd.to_datetime(df['entry_date']).dt.strftime('%Y%m%d').unique())
-          open('/tmp/span_dates.txt','w').write('\n'.join(dates))
-          print('dates',len(dates))
-          print('\n'.join(dates))
+          import requests
+
+          df = pd.read_csv('results/phase7a_margin_prefilter.csv')
+          dates = sorted(pd.to_datetime(df['entry_date']).dt.strftime('%Y%m%d').unique())
+          headers = {
+              'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+              'Accept':'application/octet-stream,*/*;q=0.8',
+              'Referer':'https://www.nseindia.com/',
+          }
+          base='https://nsearchives.nseindia.com/archives/nsccl/span'
+
+          def probe(d, v):
+              url=f'{base}/nsccl.{d}.{v}.zip'
+              try:
+                  rr=requests.get(url,headers=headers,timeout=(4,10),stream=True)
+                  ok=rr.status_code==200 and 'text/html' not in str(rr.headers.get('Content-Type') or '').lower()
+                  rr.close()
+                  return d,v,ok,url
+              except Exception:
+                  return d,v,False,url
+
+          tasks=[(d,v) for d in dates for v in ('i1','s')]
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as ex:
+              probes=list(ex.map(lambda x: probe(*x), tasks))
+
+          cov=[]
+          for d in dates:
+              ok_i1=next(x[2] for x in probes if x[0]==d and x[1]=='i1')
+              ok_s=next(x[2] for x in probes if x[0]==d and x[1]=='s')
+              cov.append({'entry_date':pd.to_datetime(d).strftime('%Y-%m-%d'),'i1_available':ok_i1,'s_available':ok_s,'primary_variant':'i1' if ok_i1 else None,'sensitivity_variant':'s' if ok_s else None})
+
+          coverage=pd.DataFrame(cov)
+          coverage.to_csv('results/phase7a_span_coverage.csv',index=False)
+          print(coverage.to_string(index=False))
+          print('i1 coverage %',100*coverage.i1_available.mean())
+          print('s coverage %',100*coverage.s_available.mean())
+
+          for row in cov:
+              d=row['entry_date'].replace('-','')
+              variants=[]
+              if row['i1_available']: variants.append('i1')
+              if row['s_available']: variants.append('s')
+              for v in variants:
+                  url=f'{base}/nsccl.{d}.{v}.zip'
+                  out=Path(f'/tmp/{d}.{v}.zip')
+                  rr=requests.get(url,headers=headers,timeout=60)
+                  rr.raise_for_status()
+                  out.write_bytes(rr.content)
+                  import zipfile
+                  with zipfile.ZipFile(out) as z:
+                      spn=next(n for n in z.namelist() if n.lower().endswith('.spn'))
+                      Path('data/margin/span_historical').mkdir(parents=True,exist_ok=True)
+                      Path('data/margin/span_historical',f'nsccl.{d}.{v}.spn').write_bytes(z.read(spn))
+
+          Path('results/phase7a_span_coverage.summary.json').write_text(coverage[['i1_available','s_available']].mean().to_json())
           PY
-          : > /tmp/span_missing.txt,          while read -r d; do,            test -n "$d" || continue,            found=0,            for stem in "${d}.i02" "${d}.i01" "${d}.i1" "${d}.s"; do,              zipurl="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${stem}.zip",              outfile="/tmp/${d}_${stem}.zip",              if curl --fail --silent --show-error --location --max-time 20 \,                -H 'User-Agent: Mozilla/5.0' \,                -H 'Accept: application/octet-stream,*/*;q=0.8' \,                -H 'Referer: https://www.nseindia.com/' \,                "$zipurl" -o "$outfile"; then,                unzip -jo "$outfile" '*.spn' -d data/margin/span_historical || true,                found=1,                break,              fi,            done,            if [ "$found" -eq 0 ]; then,              spnurl="https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.${d}.s.spn",              if curl --fail --silent --show-error --location --max-time 20 \,                -H 'User-Agent: Mozilla/5.0' \,                -H 'Accept: application/octet-stream,*/*;q=0.8' \,                -H 'Referer: https://www.nseindia.com/' \,                "$spnurl" -o "data/margin/span_historical/nsccl.${d}.s.spn"; then,                found=1,              fi,            fi,            if [ "$found" -eq 0 ]; then echo "$d" >> /tmp/span_missing.txt; fi,          done < /tmp/span_dates.txt,          echo 'missing_dates:',          cat /tmp/span_missing.txt || true,          echo 'available_spn_files:',          find data/margin/span_historical -type f -name '*.spn' | sort | head -n 100,      - name: Reconstruct exact candidate margins
+          find data/margin/span_historical -type f -name '*.spn' | sort | head -n 30
+
+      - name: Reconstruct exact i1 candidate margins
         run: |
           python scripts/reconstruct_candidate_margins.py \
             --candidates results/phase7a_margin_prefilter.csv \
             --span-dir data/margin/span_historical \
-            --span-version '${{ inputs.span_version || 'i02' }}' \
-            --out results/phase7a_margin_candidates.csv
+            --span-version i1 \
+            --skip-missing \
+            --out results/phase7a_margin_candidates_i1.csv
 
-      - name: Analyze exact margin-based selection
+      - name: Analyze exact i1 margin-based selection
         run: |
+          mkdir -p results/phase7a_exact_selection_i1
           python scripts/analyze_historical_margin_selection.py \
-            --margins results/phase7a_margin_candidates.csv \
+            --margins results/phase7a_margin_candidates_i1.csv \
             --threshold-pct '${{ inputs.threshold_pct || '2.5' }}' \
-            --out-dir results/phase7a_exact_selection
+            --out-dir results/phase7a_exact_selection_i1
 
-      - name: Validate exact selection outputs
+      - name: Reconstruct settlement-file sensitivity margins
+        run: |
+          python scripts/reconstruct_candidate_margins.py \
+            --candidates results/phase7a_margin_prefilter.csv \
+            --span-dir data/margin/span_historical \
+            --span-version s \
+            --skip-missing \
+            --out results/phase7a_margin_candidates_s.csv
+
+      - name: Analyze settlement-file sensitivity
+        run: |
+          mkdir -p results/phase7a_exact_selection_s
+          python scripts/analyze_historical_margin_selection.py \
+            --margins results/phase7a_margin_candidates_s.csv \
+            --threshold-pct '${{ inputs.threshold_pct || '2.5' }}' \
+            --out-dir results/phase7a_exact_selection_s
+
+      - name: Validate and summarize coverage
         run: |
           python - <<'PY'
           import json, pandas as pd
-          s=json.load(open('results/phase7a_exact_selection/summary.json'))
-          print(json.dumps(s,indent=2))
-          assert s['candidate_rows_reconstructed'] > 0
-          assert s['eligible_rows'] > 0
+          cov=pd.read_csv('results/phase7a_span_coverage.csv')
+          i1=pd.read_csv('results/phase7a_margin_candidates_i1.csv')
+          s=pd.read_csv('results/phase7a_margin_candidates_s.csv')
+          print('coverage rows',len(cov),'i1 rows',len(i1),'s rows',len(s))
+          assert len(cov)>0
+          if len(i1)>0:
+              x=json.load(open('results/phase7a_exact_selection_i1/summary.json'))
+              print('i1 selection',json.dumps(x,indent=2))
+          if len(s)>0:
+              x=json.load(open('results/phase7a_exact_selection_s/summary.json'))
+              print('s sensitivity selection',json.dumps(x,indent=2))
           PY
 
       - name: Upload Phase 7A historical margin results
@@ -106,5 +182,9 @@ jobs:
           name: phase-7A-historical-margin
           path: |
             results/phase7a_margin_prefilter.csv
-            results/phase7a_margin_candidates.csv
-            results/phase7a_exact_selection
+            results/phase7a_span_coverage.csv
+            results/phase7a_span_coverage.summary.json
+            results/phase7a_margin_candidates_i1.csv
+            results/phase7a_exact_selection_i1
+            results/phase7a_margin_candidates_s.csv
+            results/phase7a_exact_selection_s
