@@ -1,0 +1,85 @@
+name: Phase 8A - S2-S1 Predictability
+
+on:
+  push:
+    branches:
+      - phase-8-s2-s1-predictor
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Cached Phase 3 run containing expanded strategy inputs
+        required: true
+        default: '36262958536'
+
+concurrency:
+  group: phase-8-s2-s1-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  s2-s1-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install analysis dependencies
+        run: |
+          pip install 'pandas>=2.2' 'pyarrow>=18' 'scipy>=1.14' 'scikit-learn>=1.5'
+
+      - name: Download cached Phase 3 expanded inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/phase3_source
+          gh run download '${{ inputs.source_run_id || '36262958536' }}'             --repo '${{ github.repository }}'             --name phase-3-expanded-strategy-inputs             --dir data/phase3_source
+          test -s data/phase3_source/strategy_inputs.parquet
+
+      - name: Compute current 17-strike positive-flatline metrics
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_backtest.py             --inputs data/phase3_source/strategy_inputs.parquet             --out-dir results/phase8_metrics             --selection-mode max_equal_flatline             --selection-score equal_max_profit_loss_inr             --selection-max-shift-points 400             --selection-step-points 50             --min-chart-return-pct 0.0             --slippage-pct 0.0025
+          test -s results/phase8_metrics/candidate_results.parquet
+
+      - name: Recreate the primary first-positive weekly rule
+        run: |
+          python scripts/weekly_positive_selection.py             --inputs results/phase8_metrics/candidate_results.parquet             --out-dir results/phase8_weekly             --observation first_positive
+          test -s results/phase8_weekly/weekly_selected_first_positive.csv
+
+      - name: Analyze S2-S1 predictability and economic filtering
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/analyze_s2_s1_predictability.py             --strategy-inputs data/phase3_source/strategy_inputs.parquet             --selected results/phase8_weekly/weekly_selected_first_positive.csv             --out-dir results/phase8_s2_s1
+
+      - name: Validate Phase 8A outputs
+        run: |
+          python - <<'PY'
+          import json, pandas as pd, pathlib
+          out=pathlib.Path('results/phase8_s2_s1')
+          s=json.loads((out/'summary.json').read_text())
+          print(s)
+          assert s['weekly_cycles']==63
+          metrics=pd.read_csv(out/'s2_s1_model_metrics.csv')
+          filters=pd.read_csv(out/'s2_s1_trade_filter_results.csv')
+          assert len(metrics)==3
+          assert len(filters)==9
+          print(metrics.to_string(index=False))
+          print(filters.to_string(index=False))
+          PY
+
+      - name: Upload Phase 8A results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-8A-s2-s1-predictability
+          path: |
+            results/phase8_s2_s1
+            results/phase8_weekly
+            results/phase8_metrics/summary.json
