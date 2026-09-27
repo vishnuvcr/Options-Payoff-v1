@@ -232,3 +232,29 @@ The research must not declare a strategy successful based on a single backtest o
 The Phase 3 implementation used an operational gate that must not be treated as user-confirmed: for each entry timestamp it checked ATM first and then ATM-400/ATM+400, retaining a candidate only when the coded chart metric exceeded 2.5% under a buy_premium denominator.
 
 The user has clarified that no separate trade-selection criterion was supplied. This is a material specification issue. The research plan therefore requires an explicit confirmation of whether the 2.5% figure is intended as (a) a trade-entry gate, (b) a descriptive payoff-chart threshold only, or (c) something else, and what denominator defines the percentage. Until that is specified, the prior 28-trade “selected” results are provisional and must not be used as the final strategy result.
+
+
+## Current approved design amendment — v1.1 (2026-09-27)
+
+This amendment records the material strategy-specification changes established during the corrected research cycle. It supersedes the provisional Phase 3 interpretation where it conflicts with the rules below; historical results produced under the superseded interpretation remain marked provisional and are not used as final evidence.
+
+### Exact operational strategy under current research
+
+1. At each available NIFTY 1-minute observation from **09:20 IST through 15:29 IST**, evaluate the payoff condition. 09:20 is the first observation, **not a skip gate**.
+2. The four-leg position is constructed using the common strike under evaluation: sell near-expiry call + buy near-expiry put; buy far-expiry call + sell far-expiry put.
+3. At every observation, scan **all 17 common strikes from ATM-400 to ATM+400 in 50-point increments, including ATM**. There is no ATM-only, -400-only, or +400-only fallback sequence.
+4. A timestamp qualifies when the reconstructed static payoff surface has the required **positive flatline / equal max-profit-max-loss condition**. The former 2.5% threshold is **removed from the current rule** and is not an entry gate.
+5. At the **first qualifying timestamp within the weekly cycle**, select the candidate having the **maximum positive estimated equal Max Profit = Max Loss** across all 17 strikes.
+6. If no candidate qualifies at 09:20, continue evaluating later timestamps that day and then subsequent trading days within the same weekly cycle. No qualifying opportunity may be skipped merely because 09:20 failed.
+7. The far-expiry legs are marked using their **actual available market prices at/just before near-expiry close** for the realized near-expiry trade outcome; they are not valued using the far-expiry terminal spot as if both expiries ended together.
+8. Realized performance is evaluated separately from the static chart condition. A 100% static chart-positive selection rate does **not** imply a 100% realized P&L win rate.
+
+### Phase 9G fixed-horizon extension
+
+Phase 9G compares three preregistered fixed far-expiry horizons, H1/H2/H3, using identical entry scanning and strike-selection logic. Horizon choice must be evaluated on the same weekly opportunities with paired, dependence-aware statistics. Dynamic horizon switching is not permitted in this phase.
+
+Acceptance requires, at minimum: successful reproduction of the authoritative H1 control; complete quote-level execution-cost sensitivity; paired H2/H3 versus H1 analysis; dependence-aware bootstrap confidence intervals; multiple-comparison control; yearly/temporal stability; and the preregistered first-positive-time and selected-strike behaviour analysis. A higher aggregate historical P&L alone is insufficient to change the control horizon.
+
+### Supersession note
+
+The original plan's statements about a configurable 2.5% trade-entry threshold and ATM/-400/+400-only selection describe the earlier provisional implementation. They must not be used to interpret Phase 9D onward or the current Phase 9G research.
