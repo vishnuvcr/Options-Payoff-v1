@@ -16,8 +16,10 @@ def main() -> None:
     ap.add_argument('--date-col',default='entry_date')
     ap.add_argument('--span-version',default='i1')
     ap.add_argument('--skip-missing',action='store_true')
+    ap.add_argument('--max-shift-points',type=int,default=400)
     args=ap.parse_args()
     df=pd.read_csv(args.candidates)
+    df=df[df['shift_points'].between(-args.max_shift_points,args.max_shift_points)].copy()
     required={'entry_timestamp','entry_date','shift_points','strike','spot_at_entry','lot_size','chart_pnl_inr'}
     missing=required-set(df.columns)
     if missing: raise ValueError(f'missing columns: {sorted(missing)}')
