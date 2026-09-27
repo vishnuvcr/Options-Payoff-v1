@@ -602,9 +602,22 @@ For each realized H1 loss under the exact current 17-strike rule, could a change
 - Rescue counts are descriptive; a new rule may only be considered after full-sample comparison and later untouched holdout validation.
 - Ex-post upper bounds cannot be adopted as trading rules.
 
+### Phase 9H-A scope correction
+The first implementation attempted to recompute every complete H1 cycle solely to obtain full-sample economics. This was unnecessarily expensive for the user's immediate research question. Phase 9H-A therefore focuses first on the 54 realized loss cycles only.
+
+For each loss cycle, reconstruct all exact-17 positive decision timestamps and the 17-strike candidate surface needed to evaluate:
+- same-timestamp strike substitution;
+- second valid timestamp;
+- 15/30/60/120-minute delays;
+- unchanged-selector later entry;
+- ex-post later timestamp/strike upper bound.
+
+A counterfactual that rescues a loss is diagnostic only. If a bounded mechanism shows a sufficiently consistent pattern, a separate prospective full-sample validation phase will be opened before any strategy change.
+
 ### Outputs / exit criteria
-- Per-loss rescue ledger.
-- Full-sample economics for each bounded entry variant.
-- Rescue overlap by mechanism.
-- Phase 9H report and machine-readable CSV/JSON outputs.
-- Phase closes after these predefined tests; no recursive optimization loop is authorized.
+- Per-loss rescue ledger covering all recoverable H1 loss cycles.
+- Rescue counts and rescue P&L by predefined mechanism.
+- Representative case-level details.
+- Phase 9H loss-entry report and machine-readable CSV/JSON outputs.
+- No rule adoption from ex-post rescue results alone.
+- No recursive optimization loop.
