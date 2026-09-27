@@ -316,3 +316,7 @@ Operational rule:
 - there is no intentional skip caused by a percentage threshold.
 
 The weekly implementation uses one observation per near-expiry weekly cycle. The primary implementation uses the first available 09:20 observation in that cycle, with the last available observation reported as a timing sensitivity. This makes the weekly cadence explicit without using future information.
+
+## Phase 7B operational definition
+
+The primary no-look-ahead implementation is **first positive opportunity per weekly expiry cycle**: scan the 17 common strikes at each available 09:20 observation in chronological order; when at least one candidate has a positive all-green flatline, select the strike with the maximum positive flatline and trade it; then stop scanning that weekly cycle. This produces exactly one trade per weekly cycle without a 2.5% threshold or margin gate. `max_in_week` is retained only as an ex-post oracle sensitivity.
