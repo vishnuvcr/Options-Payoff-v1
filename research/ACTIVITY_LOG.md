@@ -109,3 +109,7 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Audit computation succeeded | Workflow **36303823257** successfully computed the contextual audit and uploaded artifact **10926925462**, but the persistence step failed on unstaged generated files. The audit result is therefore artifact-authoritative until a repository commit is produced. |
 | 2026-09-27 | 9F | Persistence workflow corrected | Replaced `git pull --rebase` with `git fetch` + `git reset --hard` before staging generated results. |
+
+| 2026-09-27 | 9F | Phase completed | Authoritative workflow **36304036908** completed successfully and persisted the corrected descriptive context audit. The FII/DII source was explicitly excluded from inference because only 16 rows were recoverable under strict point-in-time controls. No regime filter adopted. |
+| 2026-09-27 | 9F | Main findings | Highest India-VIX quartile (42 trades) had ₹2,925.31 net, ₹69.65 mean and PF 1.10, with block-bootstrap CI crossing zero. NIFTY-vs-Sensex and global-risk groups differed descriptively; no continuous association survived BH correction. |
+| 2026-09-27 | 9F | Phase exit | H1 remains frozen; H2/H3 far-expiry selection is reopened for a separate preregistered phase. |
