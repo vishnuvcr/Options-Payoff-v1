@@ -142,3 +142,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Pipeline correction | Sensitivity now uses a backtest reader that supports the CSV realized ledgers produced by the merger. The workflow sensitivity path therefore no longer depends on an invalid CSV-to-Parquet assumption. |
 
 | 2026-09-27 | 9G | H1 completeness audit | Run 12 reached the H1 gate but failed before data analysis because of doubled shell continuations. The workflow syntax was corrected; a fresh run will be authoritative. |
+
+| 2026-09-27 | 9G | H1 completeness audit | Run 13 successfully downloaded and opened the authoritative Parquet data. The audit then exposed a field-name mismatch (`entry_timestamp` vs `timestamp`), which has been corrected. No completeness conclusion was drawn from the failed attempt. |
