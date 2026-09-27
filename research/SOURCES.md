@@ -37,3 +37,8 @@ Source retrieval dates and substantive-use citations are maintained in the resea
 22. Streak Terms / disclosures. Public Streak material describes options payoff graphs as hypothetical and not guaranteed representations of actual outcomes.
 
 These Phase 7 platform sources are used to separate (a) the static payoff-chart metric, (b) the displayed max-profit/max-loss percentage, and (c) the true economic P&L of a mixed-expiry position.
+
+
+## 2026 live-pricing verification note
+
+23. Paytm Money 2026 public educational material describes a flat ₹20-per-executed-order model; its public F&O FAQ page currently displays ₹10 per executed F&O order. Because these public pages are internally inconsistent and Paytm documents account-specific legacy rates, Phase 9G keeps the predeclared ₹20/order primary assumption and tests ₹10 and ₹40 as sensitivity cases. Live deployment should use the user's current contract-note brokerage rate, not the research default.
