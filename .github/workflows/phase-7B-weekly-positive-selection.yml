@@ -40,6 +40,8 @@ jobs:
             --dir data/phase2_source
           test -s data/phase2_source/strategy_inputs.parquet
       - name: Compute all 17-strike payoff metrics with no threshold gate
+        env:
+          PYTHONPATH: .
         run: |
           python scripts/run_backtest.py \
             --inputs data/phase2_source/strategy_inputs.parquet \
