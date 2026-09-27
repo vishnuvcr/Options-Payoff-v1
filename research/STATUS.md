@@ -511,3 +511,8 @@ Detailed report: [docs/PHASE9H_LOSS_ENTRY_ANALYSIS.md](docs/PHASE9H_LOSS_ENTRY_A
 Machine-readable rescue summary: [results/phase9h/loss_entry_rescue_summary.csv](results/phase9h/loss_entry_rescue_summary.csv)  
 Full loss ledger: [results/phase9h/loss_trade_entry_detail.csv](results/phase9h/loss_trade_entry_detail.csv)  
 Workflow: [36325328644](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36325328644)
+
+
+## Frozen current strategy specification — 2026-09-27
+
+Added [docs/CURRENT_STRATEGY_SPEC.md](../docs/CURRENT_STRATEGY_SPEC.md) as the definitive human-readable operating specification for the accepted Phase 9G H1 control. It freezes the entry cadence, exact 17-strike completeness rule, maximum-positive-flatline selector, four-leg construction, near-expiry manual far-leg close, and cost model. No Phase 9H-A entry modification was adopted.
