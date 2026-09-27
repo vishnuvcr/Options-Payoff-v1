@@ -68,3 +68,5 @@
 | 2026-09-27 | 9D | The ongoing Phase 9C H2/H3 experiment inherited the same 09:20-only entry cadence. | Any H2/H3 output from Phase 9C would be answering the wrong strategy. | Mark Phase 9C non-authoritative and rebuild H2/H3 only after the corrected intraday H1 rule is validated. |
 
 | 2026-09-27 | 9D | First intraday recheck workflow had the correct 15-test suite but the extraction step did not set `PYTHONPATH=.`. | Extraction stopped before reading market data. | Added `PYTHONPATH=.` to the extraction step; rerun required. |
+
+| 2026-09-27 | 9D | The first working intraday extractor repeatedly scanned the full index table for spot and near-expiry settlement on each minute. | Runtime was unnecessarily inflated for the multi-year 1-minute scan. | Replaced these with precomputed O(1) timestamp/expiry lookups before accepting any intraday result. |
