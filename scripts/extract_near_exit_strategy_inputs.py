@@ -4,6 +4,8 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import pandas as pd
@@ -17,6 +19,7 @@ def parse_args():
     p.add_argument('--end', required=True)
     p.add_argument('--entry-time', default='09:20')
     p.add_argument('--out', default='data/derived/strategy_inputs_near_exit.parquet')
+    p.add_argument('--download-workers', type=int, default=6)
     return p.parse_args()
 
 def normalize_timestamp(s):
@@ -57,9 +60,16 @@ def load_index():
     df['close'] = pd.to_numeric(df['close'], errors='coerce')
     return df.dropna(subset=['timestamp','close']).sort_values('timestamp')
 
-def load_option_file(expiry, filename):
+def load_option_file(expiry, filename, timestamp_min=None, timestamp_max=None):
     local = hf_hub_download(repo_id=DATASET, filename=filename, repo_type='dataset')
-    df = pd.read_parquet(local)
+    columns = ['timestamp', 'strike', 'close', 'option_type']
+    filters = None
+    if timestamp_min is not None and timestamp_max is not None:
+        filters = [('timestamp', '>=', timestamp_min), ('timestamp', '<=', timestamp_max)]
+    try:
+        df = pd.read_parquet(local, columns=columns, filters=filters)
+    except Exception:
+        df = pd.read_parquet(local, columns=columns)
     df['timestamp'] = normalize_timestamp(df['timestamp'])
     df['trading_date'] = df['timestamp'].dt.date
     df['strike'] = pd.to_numeric(df['strike'], errors='coerce')
@@ -85,6 +95,30 @@ def last_bar_on_or_before(df, exit_ts, strike, option_type):
     row = x.iloc[-1]
     return float(row['close']), row['timestamp']
 
+def build_entry_lookup(df):
+    out = defaultdict(dict)
+    for row in df.itertuples(index=False):
+        out[row.timestamp].setdefault(float(row.strike), {})[row.option_type] = float(row.close)
+    return dict(out)
+
+def build_exit_lookups(df, exit_timestamps):
+    out = {}
+    for exit_ts in sorted({x for x in exit_timestamps if x is not None}):
+        day = {}
+        x = df[(df['trading_date'] == exit_ts.date()) & (df['timestamp'] <= exit_ts)]
+        for row in x.sort_values('timestamp').itertuples(index=False):
+            day[(float(row.strike), row.option_type)] = (float(row.close), row.timestamp)
+        out[exit_ts.date()] = day
+    return out
+
+def common_from_lookup(near_lookup, far_lookup, entry_ts):
+    a = near_lookup.get(entry_ts, {})
+    b = far_lookup.get(entry_ts, {})
+    out = []
+    for strike in set(a).intersection(b):
+        if {'CE', 'PE'}.issubset(a[strike]) and {'CE', 'PE'}.issubset(b[strike]):
+            out.append(float(strike))
+    return set(out)
 def common_strikes(near, far, entry_ts):
     def strikes(df):
         x = df[(df['timestamp'] == entry_ts) & (df['option_type'].isin(['CE','PE']))]
@@ -123,12 +157,66 @@ def main():
     expiry_files = list_nifty_expiry_files(start, end)
     expiry_dates = [x[0] for x in expiry_files]
     filename_by_expiry = dict(expiry_files)
-    cache = {}
+    needed_expiries = set()
+    for entry in entry_df[['trading_date']].itertuples(index=False):
+        pair = expiry_pair(entry.trading_date, expiry_dates)
+        if pair is not None:
+            needed_expiries.update(pair)
+    needed_expiries = sorted(needed_expiries)
 
-    def get_option(expiry):
-        if expiry not in cache:
-            cache[expiry] = load_option_file(expiry, filename_by_expiry[expiry])
-        return cache[expiry]
+    expiry_entry_times = defaultdict(list)
+    expiry_exit_timestamps = defaultdict(list)
+    pair_exit_ts = {}
+    for entry in entry_df[['timestamp', 'trading_date']].itertuples(index=False):
+        pair = expiry_pair(entry.trading_date, expiry_dates)
+        if pair is None:
+            continue
+        near_expiry, far_expiry = pair
+        exit_ts, _ = last_index_bar_on_date(index_df, near_expiry)
+        if exit_ts is None:
+            continue
+        expiry_entry_times[near_expiry].append(entry.timestamp)
+        expiry_entry_times[far_expiry].append(entry.timestamp)
+        expiry_exit_timestamps[near_expiry].append(exit_ts)
+        expiry_exit_timestamps[far_expiry].append(exit_ts)
+        pair_exit_ts[(near_expiry, far_expiry)] = exit_ts
+
+    option_local_paths = {}
+
+    def download_one(expiry):
+        return expiry, hf_hub_download(
+            repo_id=DATASET,
+            filename=filename_by_expiry[expiry],
+            repo_type='dataset',
+        )
+
+    max_workers = max(1, min(args.download_workers, 8))
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        futures = [ex.submit(download_one, expiry) for expiry in needed_expiries]
+        for fut in as_completed(futures):
+            expiry, local = fut.result()
+            option_local_paths[expiry] = local
+
+    prepared = {}
+
+    def get_prepared(expiry):
+        if expiry in prepared:
+            return prepared[expiry]
+        ts_list = expiry_entry_times.get(expiry, [])
+        exit_list = expiry_exit_timestamps.get(expiry, [])
+        all_ts = list(ts_list) + list(exit_list)
+        if all_ts:
+            tmin = min(all_ts)
+            tmax = max(all_ts)
+        else:
+            tmin = tmax = None
+        df = load_option_file(
+            expiry, filename_by_expiry[expiry], timestamp_min=tmin, timestamp_max=tmax
+        )
+        entry_lookup = build_entry_lookup(df)
+        exit_lookups = build_exit_lookups(df, exit_list)
+        prepared[expiry] = (entry_lookup, exit_lookups)
+        return prepared[expiry]
 
     rows = []
     for entry in entry_df.sort_values('timestamp').itertuples(index=False):
@@ -138,12 +226,13 @@ def main():
         if pair is None:
             continue
         near_expiry, far_expiry = pair
-        near = get_option(near_expiry)
-        far = get_option(far_expiry)
+        near_lookup, near_exit_lookups = get_prepared(near_expiry)
+        far_lookup, far_exit_lookups = get_prepared(far_expiry)
         exit_ts, near_settlement = last_index_bar_on_date(index_df, near_expiry)
         if exit_ts is None:
             continue
-        common = common_strikes(near, far, entry_ts)
+        far_exit_lookup = far_exit_lookups.get(near_expiry, {})
+        common = common_from_lookup(near_lookup, far_lookup, entry_ts)
         if not common:
             continue
         spot = float(entry.close)
@@ -158,15 +247,15 @@ def main():
                     'shift_points': shift, 'strike': strike, 'status': 'candidate_strike_unavailable'
                 })
                 continue
-            vals = [
-                exact_bar(near, entry_ts, strike, 'CE'),
-                exact_bar(near, entry_ts, strike, 'PE'),
-                exact_bar(far, entry_ts, strike, 'CE'),
-                exact_bar(far, entry_ts, strike, 'PE'),
-            ]
-            near_call, near_put, far_call, far_put = vals
-            far_call_exit, far_call_exit_ts = last_bar_on_or_before(far, exit_ts, strike, 'CE')
-            far_put_exit, far_put_exit_ts = last_bar_on_or_before(far, exit_ts, strike, 'PE')
+            nrow = near_lookup.get(entry_ts, {}).get(float(strike), {})
+            frow = far_lookup.get(entry_ts, {}).get(float(strike), {})
+            near_call = nrow.get('CE')
+            near_put = nrow.get('PE')
+            far_call = frow.get('CE')
+            far_put = frow.get('PE')
+            vals = [near_call, near_put, far_call, far_put]
+            far_call_exit, far_call_exit_ts = far_exit_lookup.get((float(strike), 'CE'), (None, None))
+            far_put_exit, far_put_exit_ts = far_exit_lookup.get((float(strike), 'PE'), (None, None))
             missing = any(x is None for x in vals) or near_settlement is None or far_call_exit is None or far_put_exit is None
             status = 'ok' if not missing else 'missing_near_exit_price'
             rows.append({
