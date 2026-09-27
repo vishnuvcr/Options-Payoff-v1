@@ -1,0 +1,66 @@
+{
+  "phase": "9G",
+  "status": "complete",
+  "primary_source": "thetrademarkk/india-index-options-1m",
+  "frozen_run": 36313815542,
+  "frozen_commit": "63b399a9a1d631316dd5233bc684a4ee0a197b25",
+  "final_merge_run": 36320697995,
+  "final_merge_artifact": 10932342487,
+  "rule": "First chronological timestamp from 09:20 onward with a valid exact 17-unique-shift, no-conflicting-duplicate quote surface and at least one positive static flatline; at that timestamp choose the maximum positive flatline across shifts -400..+400 in 50-point increments.",
+  "cost_model": {
+    "slippage_pct": 0.0025,
+    "brokerage_per_order_inr": 20,
+    "transactions_per_trade": 6
+  },
+  "H1": {
+    "trades": 131,
+    "net_pnl_inr": 71868.75950141653,
+    "gross_pnl_inr": 100816.8118749999,
+    "total_costs_inr": 28948.05237358335,
+    "mean_net_pnl_inr": 548.6164847436376,
+    "median_net_pnl_inr": 352.6944938042076,
+    "realized_win_rate_pct": 58.778625954198475,
+    "wilson_95_low_pct": 50.216563846288096,
+    "wilson_95_high_pct": 66.84050465560665,
+    "profit_factor": 2.2852496366352364,
+    "max_drawdown_inr": 15704.236549774207,
+    "chart_positive_pct": 100,
+    "iid_mean_ci": [
+      212.77499917475257,
+      867.0238410817403
+    ],
+    "block4_mean_ci": [
+      199.6606742596946,
+      872.1323175469843
+    ]
+  },
+  "selection_behaviour": {
+    "mean_delay_min_after_0920": 184.55725190839695,
+    "median_delay_min": 210,
+    "p90_delay_min": 357,
+    "mean_shift_points": -67.55725190839695,
+    "median_shift_points": -250,
+    "mean_absolute_shift_points": 329.3893129770992,
+    "atm_selection_pct": 0
+  },
+  "annual_net": {
+    "2021": 9732.035833234331,
+    "2022": 10960.27352356369,
+    "2023": 12101.858605943446,
+    "2024": 20656.83123311294,
+    "2025": -2596.869179404498,
+    "2026": 21014.62948496662
+  },
+  "H2": {
+    "trades": 0,
+    "reason": "Primary Hugging Face source lacks pre-entry far-rank-2 intraday coverage; zero opportunities are a source-coverage failure, not zero strategy performance."
+  },
+  "H3": {
+    "trades": 0,
+    "reason": "Primary Hugging Face source lacks pre-entry far-rank-3 intraday coverage; zero opportunities are a source-coverage failure, not zero strategy performance."
+  },
+  "Rissin_sensitivity": {
+    "note": "Independent Rissin source covered H2/H3 and produced positive same-source paired differences, but it is a different data-construction source and does not constitute independent holdout evidence; no horizon is promoted."
+  },
+  "conclusion": "The exact current rule has positive historical H1 net P&L after modeled costs, but realized win rate is 58.78%, not 100%. The static chart-positive rate is 100% by construction. H2/H3 cannot be economically adjudicated from the primary source. No dynamic horizon selector is adopted and no deployment claim is made without untouched holdout and live-execution validation."
+}
