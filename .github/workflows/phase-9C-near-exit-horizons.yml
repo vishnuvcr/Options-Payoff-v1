@@ -15,6 +15,16 @@ on:
         description: Premium slippage as decimal
         required: true
         default: '0.0025'
+  push:
+    branches:
+      - phase-9C-near-exit-horizons
+    paths:
+      - .github/workflows/phase-9C-near-exit-horizons.yml
+      - scripts/extract_near_exit_horizon_inputs.py
+
+concurrency:
+  group: phase-9c-near-exit-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -37,15 +47,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          key: hf-nifty-options-horizons-${{ inputs.start }}-${{ inputs.end }}
-          restore-keys: hf-nifty-options-horizons- hf-nifty-options-near-exit-
+          key: hf-nifty-options-horizons-${{ github.event.inputs.start || '2021-06-01' }}-${{ github.event.inputs.end || '2026-08-31' }}
+          restore-keys: hf-nifty-options-horizons-
       - name: Unit tests
         run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py tests/test_near_exit_extractor.py
       - name: Build H2 inputs
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python scripts/extract_near_exit_horizon_inputs.py --start '${{ inputs.start }}' --end '${{ inputs.end }}' --entry-time '09:20' --download-workers 6 --horizon-steps 2 --out data/derived/strategy_inputs_h2_near_exit.parquet
+          python scripts/extract_near_exit_horizon_inputs.py --start '${{ github.event.inputs.start || '2021-06-01' }}' --end '${{ github.event.inputs.end || '2026-08-31' }}' --entry-time '09:20' --download-workers 6 --horizon-steps 2 --out data/derived/strategy_inputs_h2_near_exit.parquet
       - name: Run H2
         env:
           PYTHONPATH: .
@@ -54,7 +64,7 @@ jobs:
             tag=$(python -c "print(str($slip).replace('.','p'))")
             python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_slip_${tag} --slippage-pct $slip --brokerage-per-order 20
           done
-          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker10 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 10
+          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker10 --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}' --brokerage-per-order 10
           python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker40 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 40
       - name: Build H3 inputs
         env:
