@@ -1,0 +1,101 @@
+name: Phase 9B - Corrected H1 Validation
+
+on:
+  workflow_run:
+    workflows:
+      - 'Phase 9A - Correct Near-Expiry Manual Close Baseline (v3)'
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      phase9a_run_id:
+        description: 'Successful Phase 9A run ID whose artifact should be validated'
+        required: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  validate:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-9B-near-exit-validation
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install pandas pyarrow numpy scipy
+      - name: Resolve Phase 9A run ID
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_RUN_ID: ${{ github.event.workflow_run.id }}
+          INPUT_RUN_ID: ${{ inputs.phase9a_run_id }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_run" ]; then
+            echo "run_id=$EVENT_RUN_ID" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_id=$INPUT_RUN_ID" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Download corrected Phase 9A artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf input_artifact
+          mkdir -p input_artifact
+          gh run download '${{ steps.resolve.outputs.run_id }}' --repo '${{ github.repository }}' --name 'phase-9A-near-expiry-exit-correction' --dir input_artifact
+          test -s input_artifact/data/derived/strategy_inputs_near_exit.parquet
+      - name: Unit tests
+        run: |
+          PYTHONPATH=. python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
+      - name: Primary corrected H1
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_near_expiry_exit_backtest.py --inputs input_artifact/data/derived/strategy_inputs_near_exit.parquet --out-dir results/phase9b_primary --slippage-pct 0.0025 --brokerage-per-order 20
+      - name: Slippage sensitivity
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_near_expiry_exit_backtest.py --inputs input_artifact/data/derived/strategy_inputs_near_exit.parquet --out-dir results/phase9b_slip_0 --slippage-pct 0 --brokerage-per-order 20
+          python scripts/run_near_expiry_exit_backtest.py --inputs input_artifact/data/derived/strategy_inputs_near_exit.parquet --out-dir results/phase9b_slip_50bp --slippage-pct 0.005 --brokerage-per-order 20
+          python scripts/run_near_expiry_exit_backtest.py --inputs input_artifact/data/derived/strategy_inputs_near_exit.parquet --out-dir results/phase9b_slip_100bp --slippage-pct 0.01 --brokerage-per-order 20
+      - name: Brokerage sensitivity
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_near_expiry_exit_backtest.py --inputs input_artifact/data/derived/strategy_inputs_near_exit.parquet --out-dir results/phase9b_broker_10 --slippage-pct 0.0025 --brokerage-per-order 10
+          python scripts/run_near_expiry_exit_backtest.py --inputs input_artifact/data/derived/strategy_inputs_near_exit.parquet --out-dir results/phase9b_broker_40 --slippage-pct 0.0025 --brokerage-per-order 40
+      - name: Statistical validation and loss audit
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/validate_near_exit.py --primary results/phase9b_primary/weekly_selected_first_positive_near_exit.csv --out-dir results/phase9b_validation
+      - name: Aggregate sensitivities
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          configs = [
+              ('0bp_slippage', 'results/phase9b_slip_0/summary_near_exit.json'),
+              ('25bp_slippage_primary', 'results/phase9b_primary/summary_near_exit.json'),
+              ('50bp_slippage', 'results/phase9b_slip_50bp/summary_near_exit.json'),
+              ('100bp_slippage', 'results/phase9b_slip_100bp/summary_near_exit.json'),
+              ('Rs10_brokerage', 'results/phase9b_broker_10/summary_near_exit.json'),
+              ('Rs40_brokerage', 'results/phase9b_broker_40/summary_near_exit.json'),
+          ]
+          rows = []
+          for label, path in configs:
+              x=json.loads(Path(path).read_text())
+              rows.append({'scenario':label, **x})
+          Path('results/phase9b_validation/sensitivity_summary.json').write_text(json.dumps(rows, indent=2, default=str))
+          print(json.dumps(rows, indent=2, default=str))
+          PY
+      - name: Upload Phase 9B validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9B-corrected-H1-validation
+          path: results/phase9b_validation/
