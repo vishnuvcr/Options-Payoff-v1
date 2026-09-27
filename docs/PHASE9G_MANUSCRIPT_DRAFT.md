@@ -218,3 +218,18 @@ These are future directions, not components of the current acceptance decision.
 The authoritative Phase 9D H1 artifact was independently audited against the current exact 17-strike specification. Of 172 historical selected timestamps in that legacy artifact, only 45 contained the exact prescribed 17 unique strike shifts; 127 were missing at least one prescribed shift. No conflicting quote values were found among the audited decision surfaces. The legacy 169-trade H1 result is therefore retained only as historical diagnostic evidence and is **not** the control for Phase 9G inference. The corrected H1 control is reconstructed from the raw option data under the current exact rule and is compared with H2/H3 on matched weekly opportunities.
 
 This distinction is essential because simply filtering the legacy trades down to the 45 complete timestamps would not reconstruct the first qualifying timestamp under the corrected rule: a later timestamp within the same weekly cycle could become the valid first qualifying opportunity after incomplete timestamps are rejected.
+
+
+## Phase 9G source-coverage limitation identified
+
+A dedicated audit of the current Hugging Face source (thetrademarkk/india-index-options-1m) found that its expiry-partitioned option files generally begin only about one weekly cycle before the file's own expiry. This is sufficient for the H1 construction, because the next weekly expiry file overlaps the current near-expiry trading week, but it does not provide the far-rank-2 or far-rank-3 contract at the earlier entry dates required by the strategy.
+
+Across 152 sampled timestamps for each of far-rank 2 and far-rank 3, there were zero same-day rows in the far-expiry file, zero common CE/PE strikes, and zero exact 17-shift grids. The resulting H2/H3 zero-opportunity counts are therefore classified as data-source coverage failure, not economic evidence.
+
+This conclusion is consistent with the exchange contract structure: NSE currently specifies four weekly NIFTY 50 option expiry contracts and a 50-point strike interval for weekly/monthly contracts. The data source limitation cannot be used to infer non-existence of the underlying contracts.
+
+A replacement source must provide pre-entry intraday observations for every live expiry. The Phase 9G rule remains frozen; no H2/H3 selector or dynamic horizon switching is introduced merely to work around the data limitation.
+
+## Interim corrected H1 results
+
+Run 27 has completed 2024 and 2026. Under the primary execution-cost model (0.25% premium slippage and ₹20/order brokerage), 2024 contains 26 realized trades with ₹20,656.83 net P&L, while 2026 contains 14 realized trades with ₹21,014.63 net P&L. These are interim calendar-year results only and are not a pooled Phase 9G conclusion until all yearly reconstructions and the predeclared statistical audit complete.
