@@ -15,9 +15,10 @@ def parse_args():
     p.add_argument('--inputs',required=True)
     p.add_argument('--out-dir',required=True)
     p.add_argument('--slippage-pct',type=float,default=0.0025)
+    p.add_argument('--brokerage-per-order',type=float,default=20.0)
     return p.parse_args()
 
-def six_transaction_costs(trade_date, entry_exec, far_call_exit_exec, far_put_exit_exec, near_put_intrinsic, lot, model):
+def six_transaction_costs(entry_date, exit_date, entry_exec, far_call_exit_exec, far_put_exit_exec, near_put_intrinsic, lot, model):
     entry_turnover = entry_exec['premium_turnover']
     entry_sell = entry_exec['sell_premium_turnover']
     entry_buy = entry_exec['buy_premium_turnover']
@@ -30,15 +31,20 @@ def six_transaction_costs(trade_date, entry_exec, far_call_exit_exec, far_put_ex
     brokerage = 6.0 * model.brokerage_per_order_inr
     exchange = turnover * model.exchange_turnover_rate
     sebi = turnover * model.sebi_turnover_rate
-    stamp = buy_turnover * model.stamp_duty_buy_rate
-    stt_sales = sell_turnover * stt_rate_for_date(trade_date, model)
+    stamp_entry = entry_exec['buy_premium_turnover'] * lot * model.stamp_duty_buy_rate
+    stamp_exit = exit_buy * lot * model.stamp_duty_buy_rate
+    stt_entry_sales = entry_sell * lot * stt_rate_for_date(entry_date, model)
+    stt_exit_sales = exit_sell * lot * stt_rate_for_date(exit_date, model)
     exercise_value = near_put_intrinsic * lot
-    stt_exercise = exercise_value * exercise_stt_rate_for_date(trade_date, model)
+    stt_exercise = exercise_value * exercise_stt_rate_for_date(exit_date, model)
     gst = model.gst_rate * (brokerage + exchange + sebi)
     total = brokerage + exchange + sebi + stamp + stt_sales + stt_exercise + gst
     return {
         'brokerage': brokerage, 'exchange_transaction': exchange, 'sebi_fee': sebi,
-        'stamp_duty': stamp, 'stt_sale_transactions': stt_sales,
+        'stamp_duty_entry': stamp_entry, 'stamp_duty_exit': stamp_exit,
+        'stamp_duty': stamp_entry + stamp_exit,
+        'stt_entry_sales': stt_entry_sales, 'stt_exit_sales': stt_exit_sales,
+        'stt_sale_transactions': stt_entry_sales + stt_exit_sales,
         'stt_exercise': stt_exercise, 'gst': gst,
         'exercised_intrinsic_inr': exercise_value, 'total_costs': total
     }
@@ -74,6 +80,7 @@ def candidate_metrics(row, model):
     long_put_intrinsic = intrinsic_value('PE', near_spot, float(row.strike))
     costs = six_transaction_costs(
         pd.Timestamp(row.entry_timestamp).date(),
+        pd.Timestamp(row.near_exit_timestamp).date(),
         entry_exec, far_call_exit_exec, far_put_exit_exec,
         long_put_intrinsic, lot, model
     )
@@ -111,7 +118,7 @@ def select_first_positive_week(df):
 
 def main():
     args=parse_args()
-    model=CostModel(slippage_pct=args.slippage_pct)
+    model=CostModel(slippage_pct=args.slippage_pct, brokerage_per_order_inr=args.brokerage_per_order)
     df=pd.read_parquet(args.inputs)
     df=df[df['status'].eq('ok')].copy()
     records=[]
@@ -146,6 +153,7 @@ def main():
         'mean_net_pnl_inr':float(trades['net_pnl_inr'].mean()) if not trades.empty else None,
         'median_net_pnl_inr':float(trades['net_pnl_inr'].median()) if not trades.empty else None,
         'slippage_pct':args.slippage_pct,
+        'brokerage_per_order_inr':args.brokerage_per_order,
         'exit_rule':'All four legs closed at near expiry; far CE/PE manually squared off at near-expiry option closes.'
     }
     (out/'summary_near_exit.json').write_text(json.dumps(summary,indent=2,default=str),encoding='utf-8')
