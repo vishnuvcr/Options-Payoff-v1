@@ -10,3 +10,7 @@
 | Zerodha nearest-expiry collectors | 1-minute | Nearest-expiry design | No for H2/H3 | Account/token | **Not suitable as primary H2/H3 source** |
 
 **Decision rule:** no H2/H3 performance result enters the manuscript unless a source passes empirical entry-time coverage checks for representative weekly cycles, including the exact 17-shift universe and all four option legs. If sources are mixed across calendar periods, source heterogeneity must be reported and the periods must not be silently pooled as though measured identically.
+
+
+### Rissin validation result — 2026-09-27
+The dedicated Rissin coverage workflow sampled 96 timestamps for each far-rank (H2/H3) across 2024–2026. H2 had far-expiry rows at 64/96 samples and an exact 17-shift grid at 26/96; H3 had far-expiry rows at 63/96 and an exact 17-shift grid at 15/96. The 2024 samples were pre-coverage and had zero rows; the dataset's intraday track starts in October 2024. Therefore Rissin **passes the empirical coverage gate for 2025–2026 and partially for late 2024**, but is not a complete 2021–2026 source.
