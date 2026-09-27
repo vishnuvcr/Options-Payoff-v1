@@ -36,7 +36,7 @@ def main():
                 'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,
                 'near_expiry':row.near_expiry,'far_expiry':row.far_expiry,
                 'strike':row.strike,'shift_points':row.shift_points,
-                'reason':'missing_or_incompatible_realized_exit_input',
+                'reason':reason,'missing_fields':','.join(missing),
                 'missing_fields':','.join(missing),
             })
             continue
@@ -61,6 +61,7 @@ def main():
     incomplete_df.to_csv(out/'intraday_incomplete_selected_trades.csv',index=False)
     summary={
         'weekly_cycles':int(trades['near_expiry'].nunique()),
+        'selected_weekly_cycles':int(df['near_expiry'].nunique()),
         'selected_trades':int(len(df)),
         'realized_trade_rows':int(len(trades)),
         'incomplete_selected_trades':int(len(incomplete_df)),
