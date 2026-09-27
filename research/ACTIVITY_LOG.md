@@ -91,3 +91,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Second workflow failure | Run **36303470349** reached the data-join step but failed because the yfinance column normalizer assumed a fixed MultiIndex order; no statistical result accepted. |
 | 2026-09-27 | 9F | Global-data parser corrected | yfinance OHLC/date normalization was made schema-tolerant and a close-column invariant added before accepting global series. |
+
+| 2026-09-27 | 9F | Third workflow failure | Run **36303520586** failed on duplicate `date`/`close` columns from the NSE source normalizer; no statistical output was accepted. |
+| 2026-09-27 | 9F | NSE normalizer rewritten | Constructed explicit date/open/close output columns from the source schema to eliminate duplicate-key ambiguity. Rerun triggered by the correction. |
