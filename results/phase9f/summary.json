@@ -4,14 +4,14 @@
   "trades": 169,
   "nse_source": "yfinance fallback",
   "vix_source": "yfinance fallback",
-  "fii_dii_source": "Hareeshkesavan",
+  "fii_dii_source": "Hareeshkesavan_sparse_unusable",
+  "fii_dii_source_rows": 16,
   "global_sources": "yfinance where available",
   "regime_variables": [
     "india_vix_regime",
     "nifty_gap_regime",
-    "fii_regime",
-    "dii_regime",
+    "nse_bse_relative_regime",
     "global_risk_regime"
   ],
-  "note": "Descriptive only; no new trading rule or filter was created. Corporate/news variables were not imputed where reliable point-in-time reconstruction was unavailable."
+  "note": "Descriptive only; no new trading rule or filter was created. Sparse FII/DII source data are excluded rather than forward-filled across long gaps. Corporate/news variables were not imputed where reliable point-in-time reconstruction was unavailable."
 }
