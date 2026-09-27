@@ -62,3 +62,17 @@ jobs:
         with:
           name: phase-9E-h1-validation-evidence
           path: results/phase9e
+
+      - name: Persist validation results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin phase-9E-h1-validation
+          git pull --rebase origin phase-9E-h1-validation
+          git add results/phase9e
+          if git diff --cached --quiet; then
+            echo "No validation result changes to commit"
+            exit 0
+          fi
+          git commit -m "Add Phase 9E frozen-rule H1 validation results"
+          git push origin phase-9E-h1-validation
