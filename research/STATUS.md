@@ -412,3 +412,7 @@ Corrected run 27 has now completed 2021, 2024 and 2026. Combined interim H1: **5
 
 ### 2026-09-27 — Cross-source measurement sensitivity
 The same H1 rule and primary cost model produced different annual results across the HF and Rissin datasets, especially in 2026 (net difference ₹37,212.29). This is now a formal limitation: no cross-source pooling or vendor preference is allowed without measurement-equivalence evidence.
+
+
+### 2026-09-27 — Interim Rissin H2/H3 reconstruction
+The corrected Rissin branch has completed 2024 and 2026. 2024: H1 11 selected/9 realized/₹18,690.31 net; H2 6/4/₹5,306.22; H3 0. 2026: H1 18/18/₹58,226.92; H2 16/15/₹78,568.51; H3 11/11/₹74,265.41. The pooled same-source paired tests across these completed years remain statistically unresolved: H2-H1 mean ₹1,272.74 with block-4 bootstrap CI crossing zero; H3-H1 mean ₹3,367.84 with CI crossing zero. No horizon selector adopted; 2025 remains pending.
