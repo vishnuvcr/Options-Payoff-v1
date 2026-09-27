@@ -15,6 +15,11 @@ on:
         description: Premium slippage as decimal
         required: true
         default: '0.0025'
+  push:
+    branches:
+      - phase-9-near-expiry-exit-correction
+    paths:
+      - .github/workflows/phase-9A-near-expiry-exit-correction.yml
 
 concurrency:
   group: phase-9a-near-exit-${{ github.ref }}
@@ -49,8 +54,8 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           python scripts/extract_near_exit_strategy_inputs.py \
-            --start '${{ inputs.start }}' \
-            --end '${{ inputs.end }}' \
+            --start '${{ github.event.inputs.start || '2021-06-01' }}' \
+            --end '${{ github.event.inputs.end || '2026-08-31' }}' \
             --entry-time '09:20' \
             --out data/derived/strategy_inputs_near_exit.parquet
       - name: Run corrected H1 baseline
@@ -60,7 +65,7 @@ jobs:
           python scripts/run_near_expiry_exit_backtest.py \
             --inputs data/derived/strategy_inputs_near_exit.parquet \
             --out-dir results/phase9a_near_exit \
-            --slippage-pct '${{ inputs.slippage_pct }}'
+            --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}'
       - name: Validate corrected output
         run: |
           python - <<'PY'
