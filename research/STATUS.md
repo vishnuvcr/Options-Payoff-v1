@@ -318,3 +318,11 @@ Workflow **36303117489** completed successfully. The validation consumed only th
 **Interpretation:** historical validation checks pass for the frozen rule, but this is not a clean future holdout. The 2021–2026 sample was already observed during strategy development. No new filter has been adopted.
 
 **Next phase:** non-optimizing point-in-time cross-market/regime audit of the corrected H1 ledger. H2/H3 remains frozen until that audit is complete.
+
+## Phase 9F — cross-market and regime audit
+
+**Status: EXECUTING.**
+
+Branch `phase-9F-regime-crossmarket-audit` is running a non-optimizing point-in-time contextual audit of the corrected H1 ledger. It covers NSE/India VIX, FII/FPI-DII, BSE/Sensex, global equity/volatility, USD/INR and gold where reproducible, with source coverage and missingness recorded. No new trading filter is permitted in this phase.
+
+The first workflow attempt (36303419672) failed on a date arithmetic bug before any result was accepted; the script has been corrected and rerun.
