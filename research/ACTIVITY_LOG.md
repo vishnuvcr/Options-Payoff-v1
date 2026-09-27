@@ -118,3 +118,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Workflow corrected | Added explicit `PYTHONPATH` handling and hardened recursive artifact discovery in the merge script before the rerun. |
 
 | 2026-09-27 | 9G | Pre-rerun hardening | Fixed duplicate workflow `env` keys and made the result merger recursively locate yearly H1/H2/H3 trade files, avoiding the brittle nested-directory assumption. |
+
+| 2026-09-27 | 9G | Sensitivity-schema audit | Audited the execution-cost sensitivity path before accepting any horizon comparison. Identified the realized-vs-raw schema mismatch; no sensitivity result accepted. |
