@@ -59,3 +59,5 @@
 | 2026-09-27 | 9A | The dedicated near-expiry regression fixture omitted the newly required `near_exit_timestamp` field. | Phase 9A v7 stopped at the unit-test gate before any market-data result could be generated. | Added a realistic near-expiry exit timestamp to the synthetic fixture and will rerun v8. |
 
 | 2026-09-27 | 9A | v8 indexed extractor completed its full ~30-second reconstruction pass but ended on an obsolete `for stale in list(cache)` cleanup block after the DataFrame cache had been replaced by `prepared` lookup dictionaries. | H1 workflow stopped after data extraction before producing the ledger. | Removed the obsolete cleanup block; v9 reruns the same optimized extractor. |
+
+| 2026-09-27 | 9A | v10 chunked workflow was rejected at workflow-parse time because a Python heredoc inside a YAML block scalar was not indented as YAML. | Six-year parallel reconstruction did not start. | Removed the unnecessary sentinel heredoc branch and promoted the workflow to v11. |
