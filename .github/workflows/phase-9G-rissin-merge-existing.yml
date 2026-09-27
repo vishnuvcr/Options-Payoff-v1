@@ -1,0 +1,48 @@
+name: Phase 9G - Rissin Merge Existing Artifacts
+
+on:
+  push:
+    branches:
+      - phase-9G-rissin-reconstruction-2024-2026
+    paths:
+      - .github/workflows/phase-9G-rissin-merge-existing.yml
+      - research/PHASE9G_RISSIN_RECONSTRUCTION_STATUS.md
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Completed Rissin reconstruction run containing yearly artifacts
+        required: true
+        default: '36317925406'
+      bootstrap_reps:
+        description: Bootstrap repetitions
+        required: true
+        default: '20000'
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas numpy scipy pyarrow tabulate
+      - name: Download existing yearly artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: rissin-year-*
+          merge-multiple: false
+          path: rissin_evidence
+          run-id: ${{ github.event.inputs.source_run_id || '36317925406' }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge corrected Rissin horizons
+        run: python scripts/merge_phase9g_results.py --evidence-dir rissin_evidence --out-dir results/phase9g_rissin --bootstrap-reps "${{ github.event.inputs.bootstrap_reps || '20000' }}"
+      - name: Upload corrected merged Rissin evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9g-rissin-merged-results
+          path: results/phase9g_rissin
