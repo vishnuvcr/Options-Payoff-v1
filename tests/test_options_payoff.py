@@ -104,9 +104,6 @@ class StrategyPayoffTests(unittest.TestCase):
         self.assertFalse(threshold_met(2.50, 100.0, 2.5))
 
 
-if __name__ == "__main__":
-    unittest.main()
-
     def test_near_expiry_manual_close_pnl_uses_far_option_exit_prices(self) -> None:
         pnl = near_expiry_manual_close_pnl(
             near_spot=100.0,
@@ -120,3 +117,7 @@ if __name__ == "__main__":
         )
         # Entry cashflow = 0; near pair payoff = 0; far pair close value = 5.
         self.assertAlmostEqual(pnl, 5.0)
+
+
+if __name__ == "__main__":
+    unittest.main()
