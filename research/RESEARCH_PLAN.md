@@ -1,7 +1,7 @@
 # Research plan — Options-Payoff-v1
 
-**Version:** 2.1  
-**Plan status:** Updated 2026-09-27 because the user materially changed the selection rule from ordered fallback selection to exhaustive maximum-flatline selection.
+**Version:** 2.2  
+**Plan status:** Updated 2026-09-27 to add Phase 9H bounded loss-trade entry perturbation analysis without changing the frozen H1 candidate rule.
 
 ## Research questions
 
@@ -579,3 +579,32 @@ Phase 9G exit criteria are satisfied:
 - final manuscript and candidate specification published.
 
 **Phase 9G decision:** retain the fixed H1 next-weekly-expiry rule as the research candidate; do not introduce dynamic H2/H3 switching. Proceed only to untouched forward-holdout and executable-quote validation before any deployment claim.
+
+
+## Phase 9H — Loss-trade entry analysis
+
+**Branch:** phase-9H-loss-entry-analysis
+
+### Research question
+For each realized H1 loss under the exact current 17-strike rule, could a change to entry timing or entry strike have turned that individual loss into a positive trade while leaving the payoff construction, H1 next-weekly horizon, near-expiry manual far-leg close and cost model unchanged?
+
+### Predeclared bounded tests
+1. Same-timestamp strike substitution across all 17 shifts, reported only as an ex-post upper bound.
+2. Second exact-17 valid timestamp, keeping the maximum-positive-flatline selector.
+3. First valid exact-17 positive timestamp at or after 15, 30, 60 and 120 minutes after the baseline decision.
+4. Best later timestamp under the unchanged selector, labeled ex-post diagnostic.
+5. Best later timestamp/strike across all candidates, labeled the strongest ex-post entry-only upper bound.
+
+### Scientific controls
+- Primary cost model remains 0.25% premium slippage and ₹20/order.
+- No exit optimization is permitted in Phase 9H.
+- No unbounded search over arbitrary entry times, strike rules, thresholds or market filters is permitted.
+- Rescue counts are descriptive; a new rule may only be considered after full-sample comparison and later untouched holdout validation.
+- Ex-post upper bounds cannot be adopted as trading rules.
+
+### Outputs / exit criteria
+- Per-loss rescue ledger.
+- Full-sample economics for each bounded entry variant.
+- Rescue overlap by mechanism.
+- Phase 9H report and machine-readable CSV/JSON outputs.
+- Phase closes after these predefined tests; no recursive optimization loop is authorized.
