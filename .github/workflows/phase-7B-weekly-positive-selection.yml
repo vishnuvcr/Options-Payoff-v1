@@ -34,17 +34,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p data/phase2_source
-          gh run download '36255238050' \
+          gh run download '36262958536' \
             --repo '${{ github.repository }}' \
-            --name phase-2-strategy-inputs \
-            --dir data/phase2_source
-          test -s data/phase2_source/strategy_inputs.parquet
+            --name phase-3-expanded-strategy-inputs \
+            --dir data/phase3_source
+          test -s data/phase3_source/strategy_inputs.parquet
       - name: Compute all 17-strike payoff metrics with no threshold gate
         env:
           PYTHONPATH: .
         run: |
           python scripts/run_backtest.py \
-            --inputs data/phase2_source/strategy_inputs.parquet \
+            --inputs data/phase3_source/strategy_inputs.parquet \
             --out-dir results/phase7b_metrics \
             --selection-mode max_equal_flatline \
             --selection-score equal_max_profit_loss_inr \
@@ -74,6 +74,8 @@ jobs:
               x=json.loads(p.read_text())
               print(obs,x)
               assert x['selected_trades'] > 0
+              assert x['weeks_without_positive_candidate'] == 0
+              assert x['non_positive_selected_trades'] == 0
           PY
       - name: Upload weekly results
         uses: actions/upload-artifact@v4
