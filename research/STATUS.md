@@ -405,3 +405,7 @@ The independent H1 completeness job has completed successfully. All six yearly r
 Run 27 has completed yearly reconstructions for 2024 and 2026. Interim H1 results: 2024 = 26 realized trades, ₹20,656.83 net; 2026 = 14 realized trades, ₹21,014.63 net. H2/H3 in both completed years produced scan rows but no qualifying 17-strike decision surfaces.
 
 The dedicated source audit (runs 36317177731 and 36317271416) sampled 152 timestamps for each of far-rank 2 and 3 and found zero same-day rows in the far-expiry file at every sampled entry timestamp, zero common CE/PE strikes, and zero exact 17-shift grids. The underlying source's expiry files typically begin about 8 days before their own expiry. This makes the source unsuitable for H2/H3 entry-time reconstruction. No H2/H3 performance inference is accepted.
+
+
+### 2026-09-27 — Three-year interim H1 checkpoint
+Corrected run 27 has now completed 2021, 2024 and 2026. Combined interim H1: **54 realized trades, ₹51,403.50 net P&L, 72.22% realized win rate** at the primary cost model. Remaining years 2022/2023/2025 are still reconstructing. No pooled Phase 9G conclusion is accepted.
