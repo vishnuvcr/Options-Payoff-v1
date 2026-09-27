@@ -6,6 +6,9 @@ on:
       - 'Phase 9A - Correct Near-Expiry Manual Close Baseline (v13 chunked + exit-date fix)'
     types: [completed]
   workflow_dispatch:
+  push:
+    branches:
+      - phase-9B-near-exit-validation:
     inputs:
       phase9a_run_id:
         description: 'Successful Phase 9A run ID whose artifact should be validated'
@@ -34,11 +37,14 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           EVENT_RUN_ID: ${{ github.event.workflow_run.id }}
           INPUT_RUN_ID: ${{ inputs.phase9a_run_id }}
+          POINTER_RUN_ID: ${{ vars.PHASE9A_RUN_ID || '' }}
         run: |
           if [ "$EVENT_NAME" = "workflow_run" ]; then
             echo "run_id=$EVENT_RUN_ID" >> "$GITHUB_OUTPUT"
-          else
+          elif [ -n "$INPUT_RUN_ID" ]; then
             echo "run_id=$INPUT_RUN_ID" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_id=$POINTER_RUN_ID" >> "$GITHUB_OUTPUT"
           fi
       - name: Download corrected Phase 9A artifact
         env:
