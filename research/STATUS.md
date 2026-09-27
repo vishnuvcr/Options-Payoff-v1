@@ -1,3 +1,6 @@
+**Active branch:** phase-9-near-expiry-exit-correction
+**Overall status:** Phase 9A — corrected near-expiry manual-close H1 backtest in progress
+
 # Research status
 
 **As of:** 2026-09-27  
@@ -66,3 +69,8 @@ The 2.5% percentage denominator remains unconfirmed. The buy-premium denominator
 The clarified rule is reproducible and had a positive historical point estimate under one explicit implementation, but the evidence is not sufficient to treat it as robust, denominator-independent or risk-free arbitrage.
 
 The loss audit explains why: a positive static payoff-chart trigger can coexist with a strongly negative realized cross-expiry settlement outcome.
+
+
+## Phase 9A corrective checkpoint
+
+All prior realized-P&L conclusions remain superseded. Correct H1 uses point-in-time far-expiry CE/PE prices at the near-expiry close, manual far-leg exits, entry and exit slippage, entry/exit-date tax timing, and six-order brokerage accounting. GitHub Actions run 36296334057 is the current authoritative H1 execution; unit tests passed and data reconstruction is active. H2/H3 remain frozen until H1 completes.
