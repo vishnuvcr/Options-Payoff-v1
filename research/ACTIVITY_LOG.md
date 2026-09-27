@@ -140,3 +140,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Execution governance | Run 36305850007 remains in the old pre-concurrency reconstruction step. It is not the accepted result because run 10 contains the strict all-17-strike rule and H1 completeness gate. |
 
 | 2026-09-27 | 9G | Pipeline correction | Sensitivity now uses a backtest reader that supports the CSV realized ledgers produced by the merger. The workflow sensitivity path therefore no longer depends on an invalid CSV-to-Parquet assumption. |
+
+| 2026-09-27 | 9G | H1 completeness audit | Run 12 reached the H1 gate but failed before data analysis because of doubled shell continuations. The workflow syntax was corrected; a fresh run will be authoritative. |
