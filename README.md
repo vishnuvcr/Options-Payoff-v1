@@ -4,7 +4,7 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 7A — exact historical margin-denominator selection: COMPLETE**
+**Phase 7B — positive-only weekly maximum-flatline rule: COMPLETE**
 
 The current research rule is now the exact platform-calibrated version. The superseded proxy studies remain in the repository only as comparators:
 
@@ -121,3 +121,14 @@ Phase 7A's 4-trade result is therefore **superseded and must not be used as the 
 The final rule now removes the 2.5% threshold entirely. The primary no-look-ahead interpretation is **first positive opportunity in each weekly expiry cycle**: scan all 17 strikes from ATM-400 through ATM+400, and when any positive/all-green flatline appears, trade the strike with the maximum positive flatline. No weekly cycle is skipped in the cached sample.
 
 Preliminary baseline result: **63 weekly cycles, 63 trades, ₹-9,627.90 net P&L**, 57.14% win rate, ₹9,861.15 modeled costs. The `max_in_week` result is an ex-post oracle sensitivity and is not the primary backtest.
+
+
+### Phase 7B final result
+
+The 2.5% threshold and margin filter are removed. The final rule evaluates all 17 strikes from ATM-400 to ATM+400 in 50-point steps and selects the maximum positive/all-green flatline. The primary no-look-ahead operationalization is the first positive 09:20 opportunity in each weekly expiry cycle.
+
+Result: **63 weekly cycles, 63 trades, 0 skipped weeks, ₹-9,627.90 net P&L** after 0.25% premium slippage and ₹20/order brokerage; 57.14% win rate, PF 0.98, max drawdown ₹-174,083.24, modeled costs ₹9,861.15.
+
+The positive static chart component totaled ₹20,213.00, while realized cross-expiry S2-S1 contribution totaled ₹-19,979.75 before costs. IID 95% CI for mean weekly P&L: ₹-4,996 to ₹4,410; four-week block CI: ₹-4,024 to ₹4,739.
+
+See [docs/PHASE7B_RESULTS.md](docs/PHASE7B_RESULTS.md) and [results/phase7b/summary.json](results/phase7b/summary.json).
