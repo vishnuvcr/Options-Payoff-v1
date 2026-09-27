@@ -53,3 +53,15 @@ At 0.25% premium slippage and ₹20/order brokerage, the 169 complete trades pro
 This is a materially different and more complete empirical result than the superseded 09:20-only studies. It supports continued validation of the corrected H1 rule, but it is **not yet sufficient to declare a deployable trading edge** because the present result is a historical in-sample reconstruction. Independent walk-forward/holdout validation, regime robustness, and execution robustness remain required.
 
 See [docs/PHASE9D_RESULTS.md](PHASE9D_RESULTS.md). H2/H3 research remains frozen until the corrected H1 validation phase is complete.
+
+## Phase 9E — Frozen-rule H1 validation conclusion
+
+Phase 9E froze the corrected Phase 9D strategy and validated the existing ledger without introducing a new filter. The authoritative sample contains **169 complete realized trades** from 2021–2026, with **₹125,688.82 net P&L**, **63.91% realized win rate**, **2.94 profit factor**, and **₹16,200.65 maximum drawdown** under 0.25% premium slippage and ₹20/order brokerage. The Wilson 95% interval for win rate is **56.43%–70.76%**.
+
+All annual cohorts (2021–2026) and all anchored chronological test cohorts (2022–2026) had positive net P&L. 20,000-resample IID and circular four-trade block bootstrap diagnostics produced mean-P&L 95% intervals of **₹441.82–₹1,039.55** and **₹413.92–₹1,066.30**, respectively.
+
+The weakest year in the sample was 2025: 17 trades, ₹1,708.07 net P&L, 35.29% win rate, PF 1.077 and ₹16,200.65 within-year maximum drawdown. This shows that the aggregate result is not uniform across time.
+
+These validation results remain historical rather than prospective because the 2021–2026 sample was already observed during strategy development. Therefore they support continued research of the frozen H1 rule but do not by themselves establish future or deployable performance.
+
+The next phase is a descriptive, point-in-time cross-market and regime audit using available cached NSE/India VIX/FII-DII/global-index/FX/gold/news/corporate-action context. The audit will not create or optimize a new entry rule. H2/H3 expiry-selection research stays frozen until that audit is complete.
