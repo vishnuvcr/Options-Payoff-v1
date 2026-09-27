@@ -4,7 +4,7 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 7C — entry Greek / feature analysis: COMPLETE**
+**Phase 8A — S2-S1 predictability: COMPLETE; no S2-S1 filter adopted**
 
 Current operational rule:
 - every weekly expiry cycle is scanned chronologically;
@@ -14,7 +14,9 @@ Current operational rule:
 
 Phase 7C tested reconstructed entry Greeks, IV term structure/skew, moneyness, and Greek imbalance against 63 weekly trades (36 winners, 27 losers). No tested feature remained robust after multiple-testing correction; simple feature-based strike selectors all underperformed the maximum-positive-flatline baseline; the best training-selected Greek/IV selector also underperformed it in both expanding walk-forward test blocks.
 
-The primary entry-strike rule is therefore unchanged.
+Phase 8A then tested whether the dominant economic term, future (S_2-S_1), could be predicted from entry-time information and used as a trade filter. The all-timestamp walk-forward design used 905 prior entry timestamps across 255 weekly cycles for training and 43 strictly OOS weekly decision cycles. Predictive sign accuracy was only 44.2% (Ridge), 51.2% (Random Forest), and 53.5% (HGB). The strongest apparent economic improvement came from Random Forest, but its paired bootstrap 95% CI included zero and its chronological block performance was unstable.
+
+Therefore **no S2-S1 filter is adopted**. The primary entry-strike rule remains unchanged.
 
 ### Historical comparator — superseded selection rule
 
@@ -146,3 +148,14 @@ Compact Phase 7C outputs: [winner/loser Greek summary](results/phase7c/winner_lo
 ### Phase 8A — Predicting the cross-expiry S2-S1 component
 
 The next research question is whether the future settlement difference (S_2-S_1), which dominated the economics of the current strategy, can be predicted from entry-time information. Phase 8A uses only cached internal option/surface/spot information with expanding one-week-ahead walk-forward validation. The predefined filters are predicted S2-S1 > 0 and expected trade P&L > 0 after modeled costs. External variables such as futures basis, India VIX, global markets, USD/INR, gold and FII/DII flows are reserved for Phase 8B only if the internal baseline shows predictive signal.
+
+
+### Phase 8A — S2-S1 predictor conclusion
+
+The S2-S1 term is the dominant economic risk component of the strategy, but it was not predictable robustly enough out of sample with the cached internal information. Random Forest improved the same-test OOS P&L from ₹-10,634.75 to ₹91,388.05 when filtering on predicted S2-S1 > 0, a +₹102,022.80 difference, but directional accuracy was only 51.16%, AUC 0.5136, and chronological block differences were +₹140,877, -₹58,226 and +₹19,372. The paired weekly bootstrap mean improvement was +₹2,372.62/week with a 95% CI of ₹-2,740.68 to ₹7,993.14.
+
+This is treated as an unstable research signal, not a usable trading rule.
+
+Detailed report: [Phase 8A S2-S1 results](docs/PHASE8_S2_S1_RESULTS.md)  
+Compact model summary: [results/phase8/s2_s1_model_summary.csv](results/phase8/s2_s1_model_summary.csv)  
+Chronological stability: [results/phase8/s2_s1_block_stability.csv](results/phase8/s2_s1_block_stability.csv)
