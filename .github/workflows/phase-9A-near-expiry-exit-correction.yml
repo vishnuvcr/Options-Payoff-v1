@@ -1,0 +1,88 @@
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: Start date YYYY-MM-DD
+        required: true
+        default: '2021-06-01'
+      end:
+        description: End date YYYY-MM-DD
+        required: true
+        default: '2026-08-31'
+      slippage_pct:
+        description: Premium slippage as decimal
+        required: true
+        default: '0.0025'
+  push:
+    paths:
+      - .github/workflows/phase-9A-near-expiry-exit-correction.yml
+
+concurrency:
+  group: phase-9a-near-exit-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  corrected-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-9-near-expiry-exit-correction
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'huggingface_hub>=0.34' 'pandas>=2.2' 'pyarrow>=18'
+      - name: Restore/cache Hugging Face source files
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-nifty-options-near-exit-${{ github.event.inputs.start || '2021-06-01' }}-${{ github.event.inputs.end || '2026-08-31' }}
+          restore-keys: hf-nifty-options-near-exit-
+      - name: Unit tests
+        run: |
+          python -m unittest tests/test_options_payoff.py
+      - name: Build corrected strategy inputs
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python scripts/extract_near_exit_strategy_inputs.py \
+            --start '${{ github.event.inputs.start || '2021-06-01' }}' \
+            --end '${{ github.event.inputs.end || '2026-08-31' }}' \
+            --entry-time '09:20' \
+            --out data/derived/strategy_inputs_near_exit.parquet
+      - name: Run corrected H1 baseline
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_near_expiry_exit_backtest.py \
+            --inputs data/derived/strategy_inputs_near_exit.parquet \
+            --out-dir results/phase9a_near_exit \
+            --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}'
+      - name: Validate corrected output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('results/phase9a_near_exit/summary_near_exit.json')
+          x=json.loads(p.read_text())
+          print(json.dumps(x, indent=2))
+          assert x['selected_trades'] > 0
+          assert x['positive_weeks'] == x['selected_trades']
+          assert x['weekly_cycles'] >= x['selected_trades']
+          PY
+      - name: Upload corrected baseline
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9A-near-expiry-exit-correction
+          path: |
+            data/derived/strategy_inputs_near_exit.parquet
+            data/derived/strategy_inputs_near_exit.metadata.json
+            results/phase9a_near_exit/
