@@ -80,3 +80,11 @@ GitHub Actions run: 36290510390.
 Artifact: 10922191628.
 
 Primary ledger artifact file: `weekly_selected_first_positive.csv`.
+
+## CRITICAL CORRECTION — exit convention invalidates realized P&L
+
+The user has clarified that **all four legs are closed at the near weekly expiry**. The far-expiry CE/PE are manually squared off at that near-expiry close.
+
+The Phase 7B implementation instead valued the far legs at the far-expiry settlement. Therefore the 63-trade realized-P&L table, economic decomposition, bootstrap intervals, and timing sensitivities in this document are **superseded for the actual strategy**.
+
+The positive flatline/entry-selection calculations remain useful only as an entry-chart hypothesis. A corrected H=1 backtest must use observed far-option prices at the near-expiry exit timestamp, plus exit slippage and transaction costs.
