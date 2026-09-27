@@ -180,3 +180,9 @@ The corrected operational P&L for a selected strike is based on:
 The corrected backtest therefore requires point-in-time prices for the far-expiry options at the near-expiry close. Far-expiry settlement is not an acceptable substitute.
 
 The H=2/H=3 far-expiry selection experiment is paused until the corrected H=1 baseline is completed.
+
+
+## Phase 9B — Corrected H1 validation
+
+This branch validates only the corrected near-expiry manual-close convention. It consumes the Phase 9A cached artifact, reruns the H1 ledger under predefined slippage/brokerage scenarios, audits all losses, computes bootstrap/time-split statistics, and preserves the full weekly ledger as a reproducible artifact. It must not reuse the superseded far-expiry P&L results.
+
