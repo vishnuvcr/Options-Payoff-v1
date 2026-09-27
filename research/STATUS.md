@@ -343,3 +343,8 @@ The first workflow attempt (36303419672) failed on a date arithmetic bug before 
 **Conclusion:** Phase 9F is complete. It provides regime diagnostics and source-coverage limitations but does not alter the frozen H1 rule. H2/H3 far-expiry selection is now reopened under a separately preregistered phase.
 
 Results: `docs/PHASE9F_RESULTS.md`, `results/phase9f/summary.json`, `results/phase9f/regime_summary.csv`, `results/phase9f/continuous_associations.csv`, `results/phase9f/coverage.csv`.
+
+
+## Phase 9G — current execution checkpoint
+
+**Status: EXECUTING.** H1/H2/H3 yearly reconstructions are running in Actions. The predeclared design remains unchanged. A separate schema audit found a sensitivity-stage bug: the realized trade CSV does not yet retain all raw quote fields required to recompute costs under alternate slippage/brokerage assumptions. This is logged as a repository error and is excluded from interpretation; it will be corrected before Phase 9G can exit.
