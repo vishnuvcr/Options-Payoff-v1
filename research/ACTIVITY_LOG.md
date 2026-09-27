@@ -73,3 +73,7 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9D | Chart-vs-realized distinction locked | The corrected workflow asserts 100% positivity of the selected static chart metric by construction, while separately reporting realized net-P&L win rate; the latter is not mathematically guaranteed by a mixed-expiry static chart. |
 
 | 2026-09-27 | 9D | 2026 chunk validation | Chunk completed successfully. 14 weekly cycles (Jan-Aug 2026) produced 14 selected opportunities; 100.0% of selected chart flatlines were positive. Intraday scan audit contained 34,040 timestamps and decision surfaces covered 234 candidate rows at decision times. Full H1 remains pending while 2021-2025 chunks run. |
+| 2026-09-27 | 9D | Full six-year no-skip reconstruction complete | 172 selected weekly-cycle entries, 448,280 checked intraday timestamps and 17,606 decision-surface rows. All six yearly chunk jobs completed successfully. |
+| 2026-09-27 | 9D | Corrected H1 realized-P&L complete | Authoritative run 36302077730: 169 complete realized trades after 3 lot-size-incompatible selections were audited/excluded; ₹162,953.84 gross, ₹37,265.02 costs, ₹125,688.82 net, 63.91% realized win rate, PF 2.94. |
+| 2026-09-27 | 9D | Execution sensitivity complete | Net P&L remained positive at 0.50% and 1.00% premium slippage and at ₹40/order brokerage in the tested historical sample. |
+| 2026-09-27 | 9D | H1 phase stopped | Corrected H1 baseline is complete; independent walk-forward/holdout validation is the next phase. H2/H3 remain frozen. |
