@@ -7,7 +7,8 @@ import json
 from pathlib import Path
 
 import pandas as pd
-import pyarrow as pa\nimport pyarrow.dataset as ds
+import pyarrow as pa
+import pyarrow.dataset as ds
 from huggingface_hub import hf_hub_download
 
 from scripts.extract_near_exit_strategy_inputs import DATASET as BASE_INDEX_DATASET, list_nifty_expiry_files, load_index
