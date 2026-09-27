@@ -1,0 +1,1 @@
+# Phase 9G Rissin source validation\n\nSeparate source-validation branch for testing whether the rissin/nse-options-intraday dataset provides pre-entry far-expiry intraday quotes and the exact 17-strike grid needed by the frozen strategy. No performance result is produced by this branch.\n
