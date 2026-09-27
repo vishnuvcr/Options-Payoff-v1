@@ -120,3 +120,5 @@
 | 2026-09-27 | 9G | Audit schema defect | H1 completeness audit assumed the selected ledger also used `timestamp`; authoritative selected data use `entry_timestamp`. The audit now renames `entry_timestamp` to `timestamp` for the keyed comparison with the scan audit. |
 
 | 2026-09-27 | 9G | Audit output defect | H1 completeness audit successfully loaded the authoritative Parquet files but failed when writing because it created only the parent of the requested output directory. It now creates the requested output directory itself. |
+
+| 2026-09-27 | 9G | Data-model defect identified | H1 audit showed `candidate_count` reached 264, proving it counted duplicate merged rows rather than unique strikes. The strict rule has been corrected to require 17 unique shift points and zero conflicting duplicate quote values. |
