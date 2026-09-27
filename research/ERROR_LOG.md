@@ -45,3 +45,5 @@
 | 2026-09-27 | 9A | Initial workflow-log connector call used the wrong argument name; a second log fetch returned BlobNotFound while the job was still running. | No research output changed; live step logs were unavailable through that endpoint. | Monitor the run through the GitHub Actions REST run/job state and artifacts instead. |
 
 | 2026-09-27 | 9A | Initial corrected H1 implementation applied slippage to transaction-turnover costs but passed raw entry premiums into realized gross P&L. | Entry slippage was omitted from the cashflow itself, systematically overstating gross/net P&L. | Corrected `candidate_metrics` to use executed entry premiums from `four_leg_entry_cashflow` and added an end-to-end regression test. Superseded run 36296081746 was cancelled; v2 run 36296224407 is authoritative. |
+
+| 2026-09-27 | 9B | Validation workflow unit-test gate imported `scripts.extract_near_exit_strategy_inputs`, which requires `huggingface_hub`, but the validation environment did not install it. | Phase 9B stopped before any statistical validation. | Added `huggingface_hub>=0.34` to the validation dependencies and rerun the gate. |
