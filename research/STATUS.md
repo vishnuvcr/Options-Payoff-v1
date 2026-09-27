@@ -348,3 +348,6 @@ Results: `docs/PHASE9F_RESULTS.md`, `results/phase9f/summary.json`, `results/pha
 ## Phase 9G — current execution checkpoint
 
 **Status: EXECUTING.** H1/H2/H3 yearly reconstructions are running in Actions. The predeclared design remains unchanged. A separate schema audit found a sensitivity-stage bug: the realized trade CSV does not yet retain all raw quote fields required to recompute costs under alternate slippage/brokerage assumptions. This is logged as a repository error and is excluded from interpretation; it will be corrected before Phase 9G can exit.
+
+
+Phase 9G completeness audit also identified a predeclared analysis gap: the final report must compare first-positive decision-time and selected-strike distributions across H1/H2/H3, not only realized P&L. This is now a required correction before phase exit.
