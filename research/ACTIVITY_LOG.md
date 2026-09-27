@@ -168,3 +168,8 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Final primary reconstruction accepted | Run 36313815542 completed all six yearly reconstructions. Corrected merge run 36320697995 produced the accepted pooled H1 result: 131 trades, ₹71,868.76 net, 58.78% realized wins, PF 2.29. |
 | 2026-09-27 | 9G | Final H2/H3 decision | Primary-source H2/H3 were not adjudicated because of pre-entry far-expiry source coverage failure. Rissin H2/H3 results are retained as measurement sensitivity and no horizon is promoted. |
 | 2026-09-27 | 9G | Final phase exit | Phase 9G is complete. Candidate strategy is H1 fixed-next-weekly-expiry only, pending untouched holdout and live-execution validation. |
+
+
+| 2026-09-27 | 9H | Phase opened | Frozen Phase 9G H1 rule is retained. New research branch phase-9H-loss-entry-analysis created from the accepted Phase 9G final-results commit. |
+| 2026-09-27 | 9H | Analysis protocol predeclared | Same-timestamp strike substitution, second valid timestamp, 15/30/60/120-minute delays, and two explicitly ex-post later-entry upper bounds defined before execution. |
+| 2026-09-27 | 9H | Workflow prepared | Manual GitHub Actions workflow added with yearly matrix, Hugging Face cache, and pooled result merge. No Phase 9H result accepted yet. |
