@@ -52,9 +52,9 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git fetch origin phase-9F-regime-crossmarket-audit
-          git reset --hard origin/phase-9F-regime-crossmarket-audit
           git add results/phase9f
           if git diff --cached --quiet; then echo 'No result changes'; exit 0; fi
           git commit -m 'Add Phase 9F cross-market regime audit results'
+          git fetch origin phase-9F-regime-crossmarket-audit
+          git rebase origin/phase-9F-regime-crossmarket-audit
           git push origin phase-9F-regime-crossmarket-audit
