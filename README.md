@@ -176,3 +176,7 @@ The governing research plan is now version **1.1** and records the corrected ope
 
 ### Latest research-governance correction — 2026-09-27
 Phase 9G now requires **all 17 common strikes** to be evaluable at a qualifying timestamp; a positive result from a partial strike set cannot trigger a trade. The current Phase 9G execution candidate also gates downstream H2/H3 inference on an authoritative H1 completeness audit and uses a corrected sensitivity reader for CSV ledgers.
+
+
+### Unique-strike completeness correction — 2026-09-27
+The authoritative H1 audit showed that merged row counts can exceed 17 because of duplicate quote rows. The research now defines the required 17-strike universe by **17 unique shift points**, with any conflicting duplicate quote values making the timestamp invalid. This supersedes the earlier raw-row completeness check.
