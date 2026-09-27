@@ -343,3 +343,14 @@ The first workflow attempt (36303419672) failed on a date arithmetic bug before 
 **Conclusion:** Phase 9F is complete. It provides regime diagnostics and source-coverage limitations but does not alter the frozen H1 rule. H2/H3 far-expiry selection is now reopened under a separately preregistered phase.
 
 Results: `docs/PHASE9F_RESULTS.md`, `results/phase9f/summary.json`, `results/phase9f/regime_summary.csv`, `results/phase9f/continuous_associations.csv`, `results/phase9f/coverage.csv`.
+
+
+## Phase 9F — cross-market/regime audit COMPLETE
+
+- Workflow: **36304036908**
+- Complete H1 trades audited: **169**
+- Predeclared regimes: India VIX, NIFTY opening gap, NIFTY-vs-Sensex relative performance, global risk context.
+- No continuous association survived Benjamini-Hochberg correction at q < 0.05.
+- FII/DII data were too sparse for valid regime analysis and were excluded rather than forward-filled.
+- No new trading filter or strategy parameter was adopted.
+- H2/H3 expiry-selection research may now be reopened under a separate preregistered phase.
