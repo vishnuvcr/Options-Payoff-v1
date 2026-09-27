@@ -161,8 +161,7 @@ def year_run(a):
         choices["same_timestamp_any_candidate"] = None if real_same.empty else real_same.sort_values("net_pnl_inr", ascending=False).iloc[0]
 
         base_pnl = float(base.net_pnl_inr)
-        if base_pnl >= 0: continue  # loss-detail file is intentionally loss focused
-        d = {
+        cycle_variants = []
             "entry_date": str(pd.Timestamp(valid[0]).date()), "entry_timestamp": str(valid[0]),
             "near_expiry": str(near), "baseline_shift": int(base.shift_points),
             "baseline_strike": float(base.strike), "baseline_flatline_inr": float(base.flatline_inr),
@@ -170,18 +169,27 @@ def year_run(a):
         }
         for name, row in choices.items():
             pnl = None if row is None or not bool(row.realizable) or pd.isna(row.net_pnl_inr) else float(row.net_pnl_inr)
-            d[f"{name}_entry_timestamp"] = None if row is None else str(row.entry_timestamp)
-            d[f"{name}_shift"] = None if row is None else int(row.shift_points)
-            d[f"{name}_net_pnl_inr"] = pnl
-            d[f"{name}_rescues_loss"] = bool(pnl is not None and pnl > 0)
-            d[f"{name}_delta_vs_baseline_inr"] = None if pnl is None else pnl - base_pnl
             variants.append({
                 "variant": name, "near_expiry": str(near), "cycle_entry_timestamp": str(valid[0]),
                 "entry_timestamp": None if row is None else str(row.entry_timestamp),
                 "shift_points": None if row is None else int(row.shift_points),
                 "net_pnl_inr": pnl, "baseline_net_pnl_inr": base_pnl, "status": "realized" if pnl is not None else "unrealizable"
             })
-        details.append(d)
+            cycle_variants.append((name, row, pnl))
+        if base_pnl < 0:
+            d = {
+                "entry_date": str(pd.Timestamp(valid[0]).date()), "entry_timestamp": str(valid[0]),
+                "near_expiry": str(near), "baseline_shift": int(base.shift_points),
+                "baseline_strike": float(base.strike), "baseline_flatline_inr": float(base.flatline_inr),
+                "baseline_net_pnl_inr": base_pnl, "valid_timestamp_count": len(valid)
+            }
+            for name, row, pnl in cycle_variants:
+                d[f"{name}_entry_timestamp"] = None if row is None else str(row.entry_timestamp)
+                d[f"{name}_shift"] = None if row is None else int(row.shift_points)
+                d[f"{name}_net_pnl_inr"] = pnl
+                d[f"{name}_rescues_loss"] = bool(pnl is not None and pnl > 0)
+                d[f"{name}_delta_vs_baseline_inr"] = None if pnl is None else pnl - base_pnl
+            details.append(d)
 
     out = Path(a.out_dir); out.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(details).to_csv(out/"loss_trade_entry_detail.csv", index=False)
