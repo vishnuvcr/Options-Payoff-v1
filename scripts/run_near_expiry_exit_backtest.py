@@ -67,8 +67,8 @@ def candidate_metrics(row, model):
     far_put_exit_exec = executed_premium(float(row.far_put_exit_close), +1, model.slippage_pct)
     gross_per_unit = near_expiry_manual_close_pnl(
         near_spot, float(row.strike),
-        float(row.near_call_close), float(row.near_put_close),
-        float(row.far_call_close), float(row.far_put_close),
+        entry_exec['sell_call'], entry_exec['buy_put'],
+        entry_exec['buy_call'], entry_exec['sell_put'],
         far_call_exit_exec, far_put_exit_exec
     )
     long_put_intrinsic = intrinsic_value('PE', near_spot, float(row.strike))
