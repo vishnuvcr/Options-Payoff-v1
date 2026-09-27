@@ -34,19 +34,28 @@ def shift_label(s):
     s = int(s)
     return "ATM" if s == 0 else f"ATM_PLUS_{s}" if s > 0 else f"ATM_MINUS_{abs(s)}"
 
-def metric_row(r, exit_ts, settlement, far_df, model, near, far):
+def build_far_exit_lookup(far_df, exit_ts):
+    x = far_df[
+        (far_df.trading_date == exit_ts.date()) &
+        (far_df.timestamp <= exit_ts) &
+        (far_df.option_type.isin(["CE", "PE"]))
+    ].sort_values("timestamp")
+    x = x.drop_duplicates(["strike", "option_type"], keep="last")
+    return {
+        (float(r.strike), str(r.option_type)): (float(r.close), r.timestamp)
+        for r in x.itertuples(index=False)
+    }
+
+def metric_row(r, exit_ts, settlement, far_exit_lookup, model, near, far):
     strike = float(r.strike)
-    x = far_df[(far_df.trading_date == exit_ts.date()) & (far_df.timestamp <= exit_ts) & (far_df.strike == strike)]
-    ce = x[x.option_type.eq("CE")].sort_values("timestamp")
-    pe = x[x.option_type.eq("PE")].sort_values("timestamp")
-    fc = None if ce.empty else float(ce.iloc[-1].close)
-    fp = None if pe.empty else float(pe.iloc[-1].close)
+    fc, fc_ts = far_exit_lookup.get((strike, "CE"), (None, None))
+    fp, fp_ts = far_exit_lookup.get((strike, "PE"), (None, None))
     base = pd.Series({
         "entry_timestamp": r.timestamp, "entry_date": pd.Timestamp(r.timestamp).date(),
         "near_expiry": near, "far_expiry": far,
         "near_exit_timestamp": exit_ts,
-        "far_call_exit_timestamp": None if ce.empty else ce.iloc[-1].timestamp,
-        "far_put_exit_timestamp": None if pe.empty else pe.iloc[-1].timestamp,
+        "far_call_exit_timestamp": fc_ts,
+        "far_put_exit_timestamp": fp_ts,
         "candidate_label": shift_label(r.shift_points), "shift_points": int(r.shift_points),
         "strike": strike,
         "near_call_close": float(r.near_call), "near_put_close": float(r.near_put),
@@ -104,6 +113,8 @@ def year_run(a):
         far = pair(pd.DatetimeIndex(cycle_ts[near])[0].date(), exps)[1]
         n, f = prepared.get(near), prepared.get(far)
         if n is None or f is None: continue
+        exit_ts, settlement = cycle_exit[near]
+        far_exit_lookup = build_far_exit_lookup(f, exit_ts)
         nce = n[n.option_type.eq("CE")][["timestamp","strike","close"]].rename(columns={"close":"near_call"})
         npe = n[n.option_type.eq("PE")][["timestamp","strike","close"]].rename(columns={"close":"near_put"})
         fce = f[f.option_type.eq("CE")][["timestamp","strike","close"]].rename(columns={"close":"far_call"})
@@ -128,11 +139,10 @@ def year_run(a):
         if not valid: continue
 
         rows = []
-        exit_ts, settlement = cycle_exit[near]
         for ts in valid:
             h = surf[surf.timestamp.eq(ts)].drop_duplicates(["timestamp","shift_points"])
             for r in h.itertuples(index=False):
-                rows.append(metric_row(r, exit_ts, settlement, f, model, near, far))
+                rows.append(metric_row(r, exit_ts, settlement, far_exit_lookup, model, near, far))
         cands = pd.DataFrame(rows)
         base = select(cands[cands.realizable.eq(True) | cands.net_pnl_inr.notna()])  # identical to frozen selector for complete cycles
         if base is None or pd.isna(base.net_pnl_inr): continue
