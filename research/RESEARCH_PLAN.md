@@ -1,6 +1,6 @@
 # Research plan — Options-Payoff-v1
 
-**Version:** 2.2  
+**Version:** 2.3  
 **Plan status:** Updated 2026-09-27 to add Phase 9H bounded loss-trade entry perturbation analysis without changing the frozen H1 candidate rule.
 
 ## Research questions
@@ -621,3 +621,25 @@ A counterfactual that rescues a loss is diagnostic only. If a bounded mechanism 
 - Phase 9H loss-entry report and machine-readable CSV/JSON outputs.
 - No rule adoption from ex-post rescue results alone.
 - No recursive optimization loop.
+
+
+## Phase 9H-A final exit record — 2026-09-27
+
+**Status: COMPLETE.**
+
+Accepted workflow: **36325328644**. Result persistence commit: **ec75cb20e8e23f0550f8d615e796eea815e3d161**.
+
+The 54 realized H1 losses were reconstructed under the exact 17-strike rule and the frozen near-expiry manual-close cost model.
+
+Primary findings:
+- 54/131 complete H1 trades were net losses.
+- 45/54 were already gross-negative before fees; 9/54 were gross-nonnegative but became net losses after modeled costs.
+- Same-timestamp alternative strike rescued 6/54.
+- Second valid timestamp rescued 8/54 among the 52 cycles with a second valid opportunity.
+- Fixed 15/30/60/120-minute delays rescued 8/54, 7/54, 6/54 and 4/54 respectively.
+- The union of same-timestamp strike substitution plus the bounded second/fixed-delay tests rescued 14/54 losses (25.9%).
+- Ex-post best-later unchanged-selector rescued 31/54.
+- Ex-post best-later/any-strike rescued 38/54.
+- Even the strongest ex-post later-entry/strike test left 16/54 losses unrecovered.
+
+No entry modification is adopted. Any prospective rule suggested by the loss audit must be tested on the full 131-trade population and then an untouched holdout. The research will not recursively optimize individual losses.
