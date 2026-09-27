@@ -1,0 +1,68 @@
+name: Phase 7B - Weekly Maximum Positive Flatline
+
+on:
+  push:
+    branches:
+      - phase-7B-weekly-cadence
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Phase 3 run containing candidate_results.parquet
+        required: true
+        default: '36262958536'
+
+concurrency:
+  group: phase-7B-weekly-positive-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  weekly-selection:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install 'pandas>=2.2' 'pyarrow>=18'
+      - name: Download Phase 3 candidate artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/phase3_source
+          gh run download '${{ inputs.source_run_id || '36262958536' }}' \
+            --repo '${{ github.repository }}' \
+            --name phase-3-backtest-results \
+            --dir data/phase3_source
+          test -s data/phase3_source/candidate_results.parquet
+      - name: Weekly selection using first available 09:20 observation
+        run: |
+          python scripts/weekly_positive_selection.py \
+            --inputs data/phase3_source/candidate_results.parquet \
+            --out-dir results/phase7b_weekly \
+            --observation first
+      - name: Weekly selection using last available observation sensitivity
+        run: |
+          python scripts/weekly_positive_selection.py \
+            --inputs data/phase3_source/candidate_results.parquet \
+            --out-dir results/phase7b_weekly \
+            --observation last
+      - name: Validate weekly coverage and positive rule
+        run: |
+          python - <<'PY'
+          import json, pathlib
+          for obs in ('first','last'):
+              p=pathlib.Path(f'results/phase7b_weekly/weekly_summary_{obs}.json')
+              x=json.loads(p.read_text())
+              print(obs,x)
+              assert x['selected_trades'] > 0
+          PY
+      - name: Upload weekly results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-7B-weekly-positive-selection
+          path: results/phase7b_weekly
