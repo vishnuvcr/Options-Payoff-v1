@@ -88,3 +88,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9F | Cross-market/regime audit opened | Created `phase-9F-regime-crossmarket-audit`, predeclared descriptive regimes, registered NSE/BSE/FII-DII/VIX/global/FX/gold sources, and added a manual Actions workflow. |
 | 2026-09-27 | 9F | Initial workflow failed | Run **36303419672** failed before statistical output due to a Python date arithmetic bug; no result accepted. |
 | 2026-09-27 | 9F | Script corrected | Fixed date arithmetic and aligned the NIFTY same-day opening-gap feature to the actual entry date. Rerun triggered by the correction. |
+
+| 2026-09-27 | 9F | Second workflow failure | Run **36303470349** reached the data-join step but failed because the yfinance column normalizer assumed a fixed MultiIndex order; no statistical result accepted. |
+| 2026-09-27 | 9F | Global-data parser corrected | yfinance OHLC/date normalization was made schema-tolerant and a close-column invariant added before accepting global series. |
