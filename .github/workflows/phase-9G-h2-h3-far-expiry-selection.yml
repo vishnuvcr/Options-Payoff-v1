@@ -28,6 +28,10 @@ permissions:
   actions: read
   contents: write
 
+concurrency:
+  group: phase-9G-h2-h3-far-expiry-selection
+  cancel-in-progress: true
+
 jobs:
   yearly-reconstruction:
     strategy:
