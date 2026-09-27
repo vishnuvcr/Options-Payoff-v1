@@ -327,3 +327,25 @@ The primary no-look-ahead implementation is **first positive opportunity per wee
 The final strategy removes the 2.5% threshold, margin percentage filter and buy-premium denominator. Each weekly expiry cycle is scanned chronologically at available 09:20 observations across the 17 common strikes ATM-400..ATM+400. The first observation with any positive/all-green flatline is the entry observation; at that observation, trade the candidate with the maximum positive estimated equal max-profit=max-loss value. This produces one trade per historical cycle in the cached sample with no look-ahead and no threshold-based skips.
 
 `max_in_week` is retained only as an ex-post oracle sensitivity and is not used for the primary result.
+
+## Phase 7C — Entry-feature / Greek discrimination analysis
+
+Objective: determine whether observable entry parameters differ systematically between profitable and unprofitable selected trades, and whether any such parameter can improve **entry-strike selection** within the 17-strike ATM-400..ATM+400 candidate grid.
+
+Feature families:
+- individual-leg implied volatility and Greeks (delta, gamma, vega, theta/day) for all four legs;
+- signed aggregate strategy Greeks and absolute Greek imbalance;
+- IV term structure (next-expiry IV minus near-expiry IV) and call-put skew for each expiry;
+- strike moneyness and absolute moneyness;
+- positive flatline magnitude and normalized flatline size.
+
+Greek construction: Black-Scholes implied-volatility inversion from the observed option close, with r=0 and q=0 and expiry time fixed at 15:30 IST. These are **research proxies**, not a claim to reproduce Sensibull's proprietary inputs exactly. The r/q assumption is tested as a modelling limitation, not treated as observed truth.
+
+Statistical plan:
+1. At the 63 actual weekly decision observations, compare winning and losing selected trades with Welch's t-test, Mann-Whitney U, and Cliff's delta.
+2. Control the univariate multiple-comparison family with Benjamini-Hochberg FDR.
+3. At each weekly decision, evaluate every positive candidate's entry features and realized net P&L; compute within-week Spearman associations.
+4. Test alternative one-feature strike selectors (max/min each feature) against the baseline maximum-flatline selector using paired weekly differences and bootstrap 95% intervals.
+5. Treat all feature selection findings as exploratory until out-of-sample confirmation is run.
+
+Entry-selection criterion for any follow-on feature hypothesis: it must be observable at entry, operate inside the same 17-strike grid, survive transaction costs, and show stability under time-split/out-of-sample validation.
