@@ -65,3 +65,13 @@ The weakest year in the sample was 2025: 17 trades, ₹1,708.07 net P&L, 35.29% 
 These validation results remain historical rather than prospective because the 2021–2026 sample was already observed during strategy development. Therefore they support continued research of the frozen H1 rule but do not by themselves establish future or deployable performance.
 
 The next phase is a descriptive, point-in-time cross-market and regime audit using available cached NSE/India VIX/FII-DII/global-index/FX/gold/news/corporate-action context. The audit will not create or optimize a new entry rule. H2/H3 expiry-selection research stays frozen until that audit is complete.
+
+## Phase 9F — Cross-market and regime audit conclusion
+
+Phase 9F completed a point-in-time descriptive audit of the 169 complete corrected H1 trades without changing the trading rule. NIFTY and India VIX context were available for all 169 trades; Sensex context for 160/169. FII/DII was **not** accepted for inference because only 16 source rows were recoverable and strict recency controls made the series too sparse.
+
+The highest India-VIX quartile (42 trades) produced **₹2,925.31 net P&L, ₹69.65 mean P&L/trade and PF 1.10**; its IID and four-trade block bootstrap lower bounds were negative. This is a descriptive robustness warning, not a proposed filter. The NIFTY-vs-Sensex split also differed: the Sensex-outperform group averaged **₹978.79/trade** versus **₹411.26/trade** when NIFTY outperformed Sensex. Global risk-off averaged **₹853.24/trade** versus **₹577.08** in risk-on conditions. No continuous market-context association survived Benjamini-Hochberg correction at 5%.
+
+Phase 9F therefore adds contextual understanding but **does not change the frozen H1 strategy**. Its main research value is to identify high-volatility and cross-market conditions that warrant dedicated prospective testing, while preserving the no-optimization rule.
+
+**Next phase:** H2/H3 far-expiry selection research under a separate branch, with H1 entry timing, 17-strike grid, near-expiry manual-close exit and execution-cost model held constant.
