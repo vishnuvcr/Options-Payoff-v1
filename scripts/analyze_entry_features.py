@@ -85,7 +85,7 @@ def candidate_payoff_and_cost(row, slippage_pct=0.0025):
     flatline = float(row.near_call_close - row.near_put_close - row.next_call_close + row.next_put_close) * lot
     # Match the repository backtest: premium slippage changes turnover/costs, while the cached
     # entry cashflow used for gross P&L is the observed close-to-close premium cashflow.
-    raw_entry_cash_per_unit = float(-row.near_call_close + row.near_put_close - row.next_call_close + row.next_put_close)
+    raw_entry_cash_per_unit = float(row.near_call_close + row.next_put_close - row.near_put_close - row.next_call_close)
     gross = (raw_entry_cash_per_unit + float(row.next_settlement) - float(row.near_settlement)) * lot
     next_call_intrinsic = intrinsic("C", float(row.next_settlement), float(row.strike))
     near_put_intrinsic = intrinsic("P", float(row.near_settlement), float(row.strike))
