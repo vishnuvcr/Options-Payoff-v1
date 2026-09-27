@@ -466,3 +466,8 @@ The entry-time static flatline calculation itself remains a valid description of
 ### Phase 9A stop rule
 
 Do not run far-expiry H=2/H=3 selection yet. First reproduce the corrected H=1 strategy with the exact near-expiry manual-close convention. Only after the corrected H=1 baseline is established should H=2/H=3 be compared.
+
+
+## Phase 9A execution-cost calibration amendment
+
+Because the user explicitly requires Paytm Money costs, the corrected H1 validation must distinguish the strategy P&L from a broker-specific implementation layer. The current Paytm Money F&O FAQ states ₹10 brokerage per executed unique F&O order (checked 27-Sep-2026). Paytm Money also has older published material showing a ₹20 flat brokerage regime for newer accounts from 15-Jan-2025. Therefore the primary corrected ledger retains the repository's ₹20/order conservative assumption for continuity, but Phase 9B must run a broker-cost sensitivity at ₹10/order and document the account-era ambiguity rather than silently treating either rate as universal. Official/current Paytm Money source: https://www.paytmmoney.com/stocks/customer/fno-faq/onboarding-and-kyc/account-segment-activation/how-to-activate-fo-from-mobile-app-web
