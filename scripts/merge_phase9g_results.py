@@ -61,12 +61,12 @@ def main():
     horizons={}; incomplete={}
     for rank in (1,2,3):
         parts=[]; inc_total=0
-        for year_dir in sorted(root.glob('*/year-*')) + sorted(root.glob('year-*')):
-            hdir=year_dir/f'H{rank}'
-            p=hdir/'intraday_selected_trades.csv'; inc=hdir/'intraday_incomplete_selected_trades.csv'
-            if p.exists():
-                x=pd.read_csv(p)
-                if not x.empty: parts.append(x)
+        for hfile in sorted(root.rglob('intraday_selected_trades.csv')):
+            if hfile.parent.name != f'H{rank}':
+                continue
+            x=pd.read_csv(hfile)
+            if not x.empty: parts.append(x)
+            inc=hfile.parent/'intraday_incomplete_selected_trades.csv'
             if inc.exists(): inc_total+=len(pd.read_csv(inc))
         df=pd.concat(parts,ignore_index=True) if parts else pd.DataFrame()
         if not df.empty:
