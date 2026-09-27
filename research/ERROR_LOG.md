@@ -133,3 +133,5 @@
 
 | 2026-09-27 | 9G-Rissin | Reconstruction parity defect | The independent Rissin extractor initially lacked the frozen 30-day maximum near/far expiry separation guard. | The pre-correction Rissin run is superseded; the extractor was corrected before accepting any Rissin P&L. |
 | 2026-09-27 | 9G-Rissin | Validator tooling defects | Three source-validation attempts failed before valid data inference: Arrow timestamp/string mismatch; literal backslash-n syntax in an automated patch; Arrow string-date vs timestamp scalar mismatch. | Each failure was logged on the Rissin source-validation branch and corrected; no failed-run data were interpreted. |
+
+| 2026-09-27 | 9G | Run-27 pooled merge failure | Frozen run 36313815542 completed all six yearly reconstruction jobs, but the merge job failed because `pd.read_csv()` was called on a zero-byte `intraday_incomplete_selected_trades.csv`, raising `pandas.errors.EmptyDataError`. | Promote the already-corrected empty-ledger handling to the run-27 merge branch; rerun only the aggregation against the six frozen artifacts. Do not rerun market-data reconstruction or interpret the failed merge as a data result. |
