@@ -1,84 +1,61 @@
-# Payoff formula audit
+# Payoff formula audit — corrected exit convention
 
 Date: 2026-09-27
-Authoritative code: phase-3-strike-grid / phase-6-loss-audit
 
 ## 1. Strategy legs
 
 For common strike K:
 - Near expiry: short call, long put
-- Next expiry: long call, short put
+- Far expiry: long call, short put
 
-Using C1, P1, C2, P2 for entry premiums:
-
-Entry cashflow per unit = C1 - P1 - C2 + P2
+Entry cashflow per unit = C1 - P1 - Cf + Pf
 
 ## 2. One-dimensional static chart
 
-The repository static chart applies one hypothetical terminal spot S to all four legs.
+The repository static chart applies one hypothetical terminal spot S to all four legs, even though the expiries differ.
 
-Near expiry = -max(S-K,0) + max(K-S,0) = K-S.
-Next expiry = +max(S-K,0) - max(K-S,0) = S-K.
+Near pair intrinsic = K-S
+Far pair intrinsic = S-K
 
-Therefore the intrinsic terms cancel:
+Therefore they cancel and the chart is:
 
-(K-S) + (S-K) = 0.
+Static chart P&L = C1 - P1 - Cf + Pf
 
-So the static chart is:
+This remains a valid description of the platform-style same-terminal-spot chart metric.
 
-Static chart P&L = C1 - P1 - C2 + P2
+## 3. Actual user exit convention
 
-Verdict: YES. This algebra is correct for a one-dimensional chart that deliberately assigns the same hypothetical terminal spot to both expiries. The repository unit test checks that the chart is flat across terminal spot.
+The user has now explicitly clarified that all four legs are closed at the near weekly expiry. The near-expiry options settle there. The far-expiry options are manually squared off at the near-expiry close.
 
-## 3. Actual two-expiry economic P&L
+Let QC(T1) be the executable sale price of the far-expiry call at T1, and QP(T1) be the executable repurchase price of the far-expiry put at T1.
 
-The actual position has two different settlement dates.
+The near short-call + long-put pair has payoff:
 
-Near expiry = K - S1
-Next expiry = S2 - K
+K - S1
 
-Therefore the expiry component is:
+The far long-call + short-put pair is closed for:
 
-(K-S1) + (S2-K) = S2-S1.
+QC(T1) - QP(T1)
 
-Gross per-unit terminal P&L = C1 - P1 - C2 + P2 + S2 - S1
+Therefore the correct gross per-unit P&L is:
 
-Verdict: YES. This is the economically correct two-expiry P&L formula used by the research, excluding fees and execution costs.
+P&L(T1) = C1 - P1 - Cf + Pf + (K-S1) + QC(T1) - QP(T1)
 
-## 4. What the corrected backtest uses
+This is not equal to C1 - P1 - Cf + Pf + Sfar-S1 unless the far options are actually held to the far expiry. The previous backtest made that latter assumption.
 
-The full-grid backtest uses the entry cashflow C1 - P1 - C2 + P2 as the chart trigger. That is algebraically identical to the static one-dimensional chart because the common-spot intrinsic terms cancel.
+## 4. Research validity correction
 
-The realized trade P&L then adds S2-S1 and subtracts modeled execution/statutory costs.
+The previous Phase 7B/7C/8A realized-P&L results were calculated with far-expiry settlement values and therefore modeled a different holding period. They are superseded for the user's actual strategy.
 
-Thus the implementation separates:
-1. static chart edge;
-2. cross-expiry settlement movement;
-3. transaction/execution costs.
+The entry-time flatline/strike-selection calculation remains valid as an entry-chart metric, but realized P&L must be rebuilt using point-in-time far-option exit prices at the near-expiry close.
 
-That separation is correct.
+## 5. Required corrected data
 
-## 5. Critical unresolved issue: the 2.5% denominator
+A corrected historical backtest requires, for every selected candidate:
+- near-expiry settlement/close;
+- far-expiry call price at the near-expiry exit timestamp;
+- far-expiry put price at the near-expiry exit timestamp;
+- exact exit timestamp convention;
+- exit slippage and transaction costs.
 
-The payoff numerator is well defined by the algebra above.
-
-The current research uses a working denominator of:
-
-near put premium + next call premium
-
-so chart % = (C1 - P1 - C2 + P2) / (P1 + C2) × 100.
-
-This denominator was not explicitly established from the user's original strategy description. A charting application could instead express percentage against capital, margin, spot notional, net debit/credit, or another application-specific base.
-
-Those definitions can materially change whether a trade qualifies. The tested spot-notional denominator generated no qualifying trades from 1% through 5%.
-
-## 6. Final conclusion
-
-The intrinsic-value and premium-cashflow formula is not the error.
-
-The correct conclusion is:
-
-- The static flatline formula is mathematically correct for the artificial same-terminal-spot chart.
-- The cross-expiry S2-S1 formula is mathematically correct for the actual held position.
-- The unresolved item is the exact definition of the displayed 2.5% percentage denominator.
-- Therefore the current positive backtest should be treated as conditional on that denominator assumption until the original chart interface is matched exactly.
+Far-expiry settlement is not a valid substitute.
