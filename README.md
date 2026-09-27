@@ -165,3 +165,10 @@ Active research branch: [phase-9G-h2-h3-far-expiry-selection](https://github.com
 Plan: [docs/PHASE9G_H2_H3_PLAN.md](https://github.com/vishnuvcr/Options-Payoff-v1/blob/phase-9G-h2-h3-far-expiry-selection/docs/PHASE9G_H2_H3_PLAN.md)
 
 The current Actions reconstruction runs are **36304489832** and **36304477026**. Earlier setup failures are logged. A pre-analysis audit also identified a sensitivity-stage input-schema mismatch; no sensitivity result is being accepted until that is corrected and rerun.
+
+
+## Strategy-specification governance update — 2026-09-27
+
+The governing research plan is now version **1.1** and records the corrected operational rule: scan every 1-minute timestamp from 09:20–15:29; scan all 17 strikes from ATM-400 to ATM+400 in 50-point steps; remove the former 2.5% entry threshold; at the first qualifying timestamp choose the maximum positive equal Max Profit=Max Loss candidate; and continue later in the weekly cycle when 09:20 does not qualify. Phase 9G additionally fixes H1/H2/H3 as non-switching horizon variants and requires paired/dependence-aware statistical validation before any horizon change.
+
+[Research plan](research/RESEARCH_PLAN.md) · [Status](research/STATUS.md) · [Activity log](research/ACTIVITY_LOG.md) · [Error log](research/ERROR_LOG.md)
