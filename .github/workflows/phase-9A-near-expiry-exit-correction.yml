@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v3)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v4)
 
 on:
   workflow_dispatch:
@@ -57,6 +57,8 @@ jobs:
             --start '${{ github.event.inputs.start || '2021-06-01' }}' \
             --end '${{ github.event.inputs.end || '2026-08-31' }}' \
             --entry-time '09:20' \
+            --download-workers 6 \
+
             --out data/derived/strategy_inputs_near_exit.parquet
       - name: Run corrected H1 baseline
         env:
