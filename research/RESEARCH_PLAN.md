@@ -471,3 +471,28 @@ Do not run far-expiry H=2/H=3 selection yet. First reproduce the corrected H=1 s
 ## Phase 9A execution-cost calibration amendment
 
 Because the user explicitly requires Paytm Money costs, the corrected H1 validation must distinguish the strategy P&L from a broker-specific implementation layer. The current Paytm Money F&O FAQ states ₹10 brokerage per executed unique F&O order (checked 27-Sep-2026). Paytm Money also has older published material showing a ₹20 flat brokerage regime for newer accounts from 15-Jan-2025. Therefore the primary corrected ledger retains the repository's ₹20/order conservative assumption for continuity, but Phase 9B must run a broker-cost sensitivity at ₹10/order and document the account-era ambiguity rather than silently treating either rate as universal. Official/current Paytm Money source: https://www.paytmmoney.com/stocks/customer/fno-faq/onboarding-and-kyc/account-segment-activation/how-to-activate-fo-from-mobile-app-web
+
+## Phase 9C — H=2 / H=3 far-expiry horizons with the same near-expiry close
+
+**Branch:** phase-9C-near-exit-horizons
+
+Purpose: test whether extending the far option legs to the second or third subsequent weekly expiry changes the corrected near-expiry economics, while keeping the exit rule identical.
+
+Definitions:
+- H=1: far expiry is the next weekly expiry after near expiry.
+- H=2: far expiry is two weekly expiries after near expiry.
+- H=3: far expiry is three weekly expiries after near expiry.
+- In every case, all four legs are closed at the near-expiry close.
+
+For horizon H, corrected gross P&L per underlying unit is:
+`C1 - P1 - C_H + P_H + (K - S1) + Q_C,H(T1) - Q_P,H(T1)`.
+
+Selection rule remains unchanged: chronological 09:20 observation within each near-expiry cycle; first observation with any positive/all-green static flatline; among ATM-400..ATM+400 in 50-point steps choose the maximum positive estimated equal max-profit=max-loss candidate.
+
+Comparisons:
+- H=1 corrected baseline versus H=2 and H=3.
+- 0%, 0.25%, 0.50%, 1.00% slippage.
+- ₹10, ₹20, ₹40 brokerage per executed order.
+- weekly net P&L, drawdown, loss ledger, bootstrap and chronological stability.
+
+Stop rule: do not change the selection rule, add external predictors, or mine new Greeks between H=1/H=2/H=3. The only experimental factor is far-expiry horizon. If a horizon appears useful, it must be evaluated under the same frozen cost/exit protocol before being considered for any later research.
