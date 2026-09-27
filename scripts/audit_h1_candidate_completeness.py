@@ -24,9 +24,10 @@ audit['near_expiry']=audit['near_expiry'].astype(str)
 audit['timestamp']=pd.to_datetime(audit['timestamp'],errors='coerce')
 sel['near_expiry']=sel['near_expiry'].astype(str)
 sel['entry_timestamp']=pd.to_datetime(sel['entry_timestamp'],errors='coerce')
-keys=['near_expiry','timestamp']
-decision=sel[keys].drop_duplicates()
-joined=decision.merge(audit[keys+['candidate_count','positive_count','decision']],on=keys,how='left')
+audit_keys=['near_expiry','timestamp']
+selected_keys=['near_expiry','entry_timestamp']
+decision=sel[selected_keys].drop_duplicates().rename(columns={'entry_timestamp':'timestamp'})
+joined=decision.merge(audit[audit_keys+['candidate_count','positive_count','decision']],on=audit_keys,how='left')
 if joined['candidate_count'].isna().any():
     raise SystemExit('Selected timestamps could not be matched to scan audit.')
 incomplete_selected=joined[joined['candidate_count']!=17].copy()
