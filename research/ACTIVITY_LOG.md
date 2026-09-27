@@ -59,3 +59,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9A | Corrected regression test audit | Found the near-expiry P&L regression test below the `__main__` guard, so it would not run under `unittest`. Moved it inside the test class. |
 | 2026-09-27 | 9A | Unit-test checkpoint | GitHub Actions run 36296081746 passed the options-payoff unit suite before data reconstruction began. |
 | 2026-09-27 | 9A | Reproducible execution harness | Added a default-branch Actions anchor so the phase-9 branch can execute automatically while retaining a manual `workflow_dispatch` button. Run 36296081746 is the primary corrective H1 run; run 36296102040 is a queued duplicate anchor run and is non-authoritative. |
+| 2026-09-27 | 9A | Execution-cost audit | Found a second P&L implementation bug: entry slippage affected fees/turnover but not the entry cashflow. This was corrected before accepting any H1 result. |
+| 2026-09-27 | 9A | Regression extension | Added `tests/test_near_expiry_backtest.py`; the test verifies entry slippage plus far-leg exit slippage are both reflected in gross P&L. |
+| 2026-09-27 | 9A | Corrected rerun | Run 36296081746 was cancelled by branch concurrency after the slippage fix. Run 36296224407 (v2) is the authoritative H1 execution. |
