@@ -122,3 +122,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Sensitivity-schema audit | Audited the execution-cost sensitivity path before accepting any horizon comparison. Identified the realized-vs-raw schema mismatch; no sensitivity result accepted. |
 
 | 2026-09-27 | 9G | Paytm Money pricing-source verification | Current public Paytm pages show inconsistent brokerage figures (₹20 flat-order material versus a ₹10 F&O FAQ). The Phase 9G predeclared ₹20 primary and ₹10/₹40 sensitivity framework is retained; no strategy result is altered. |
+
+| 2026-09-27 | 9G | Selection-analysis completeness audit | Reconciled the Phase 9G research questions against the merger implementation and found the timestamp/strike-distribution comparison was absent. Logged before accepting any horizon result. |
