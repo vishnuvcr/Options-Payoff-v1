@@ -42,3 +42,20 @@ These Phase 7 platform sources are used to separate (a) the static payoff-chart 
 ## 2026 live-pricing verification note
 
 23. Paytm Money 2026 public educational material describes a flat ₹20-per-executed-order model; its public F&O FAQ page currently displays ₹10 per executed F&O order. Because these public pages are internally inconsistent and Paytm documents account-specific legacy rates, Phase 9G keeps the predeclared ₹20/order primary assumption and tests ₹10 and ₹40 as sensitivity cases. Live deployment should use the user's current contract-note brokerage rate, not the research default.
+
+
+## Literature-review additions — 2026-09-27
+
+1. **Vipul (2009), “Box-spread arbitrage efficiency of Nifty index options: The Indian evidence,” Journal of Futures Markets 29(6), 544–562.** Time-stamped NIFTY transactions data were used to identify box-spread mispricing; the reported transaction-cost-adjusted opportunities were frequent but short-lived, with liquidity/moneyness/volatility associated with mispricing. This supports testing execution realism and does not by itself establish persistence for the present cross-expiry strategy. Source: https://ideas.repec.org/a/wly/jfutmk/v29y2009i6p544-562.html
+
+2. **Mixon (2007), “The implied volatility term structure of stock index options,” Journal of Empirical Finance 14(3), 333–354.** The paper finds some predictive content in the slope of implied-volatility term structures but reports weaker-than-expectations-hypothesis forecasting and discusses time-varying risk premia. This is directly relevant to H1/H2/H3 far-expiry comparisons because the horizon changes the option term structure being traded. Source: https://www.sciencedirect.com/science/article/pii/S0927539806000715
+
+3. **Christoffersen et al. (2016), “Analyzing volatility risk and risk premium in option contracts: A new theory,” Journal of Financial Economics 120(1), 1–20.** The study models maturity- and strike-specific volatility surfaces and documents time variation in volatility risk premia. It motivates treating cross-maturity option differences as potentially risk-premium driven rather than automatically as arbitrage. Source: https://www.sciencedirect.com/science/article/pii/S0304405X16000052
+
+4. **Caldana et al. (2017), “From the Samuelson volatility effect to a Samuelson correlation effect: An analysis of crude oil calendar spread options.”** Calendar-spread pricing depends on the dependence structure across maturities; empirical calibration indicates that cross-maturity dependence is material. Although the underlying market differs from NIFTY, the result reinforces that calendar structures cannot be interpreted from one-dimensional terminal-price intuition alone. Source: https://www.sciencedirect.com/science/article/pii/S0378426616302424
+
+5. **Câmara, Krehbiel & Li (2011), “Expected returns, risk premia, and volatility surfaces implicit in option market prices,” Journal of Banking & Finance 35(1), 215–230.** The paper documents non-monotonic implied-volatility term structures and relates them to jump and risk-premium components. This supports keeping volatility-surface variables as explanatory/contextual features rather than assuming a flat forward-volatility relation. Source: https://www.sciencedirect.com/science/article/pii/S0378426610002992
+
+### Literature implications for Phase 9G
+
+The literature does not justify treating a positive static cross-expiry payoff chart as a guaranteed arbitrage. Empirical work on NIFTY box spreads indicates that transaction-cost-adjusted mispricing can exist but may disappear rapidly, while broader option research shows that maturity-dependent volatility, risk premia, and cross-maturity dependence materially affect option prices. Phase 9G therefore treats the static flatline as a **selection metric**, evaluates realized near-expiry P&L separately, and compares fixed far-expiry horizons with explicit execution costs and paired statistical inference.
