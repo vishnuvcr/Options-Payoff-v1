@@ -250,3 +250,10 @@ Machine-readable results: [results/phase9f/summary.json](results/phase9f/summary
 Workflow: [.github/workflows/phase-9F-regime-crossmarket-audit.yml](.github/workflows/phase-9F-regime-crossmarket-audit.yml)
 
 **Next:** H2/H3 far-expiry selection research is reopened on a separate preregistered branch; the H1 rule remains frozen while that research runs.
+
+
+## Phase 9F — Cross-market/regime audit
+
+**Complete — workflow 36304036908.** The frozen 169-trade H1 ledger was joined to point-in-time market context. No BH-adjusted contextual association survived q<0.05 and no new trading filter was adopted. FII/DII data were too sparse for valid analysis. [Phase 9F report](docs/PHASE9F_AUDIT.md) · [Phase plan](docs/PHASE9F_REGIME_CROSSMARKET_PLAN.md) · [Machine-readable results](results/phase9f/summary.json)
+
+**Next:** reopen H2/H3 expiry-selection research under a separate preregistered phase; keep H1 entry/selection/exit rule frozen.
