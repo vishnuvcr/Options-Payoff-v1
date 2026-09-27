@@ -221,3 +221,20 @@ The economically important cross-expiry S2-S1 term is not predicted robustly eno
 | 8B External variables | NOT PROMOTED | Predeclared stop rule prevents open-ended predictor search without stronger independent data. |
 
 Current consolidated conclusion: **the final positive-flatline weekly strategy is not validated as a deployable edge under the cached historical implementation.** See `docs/PHASE8_S2_S1_RESULTS.md` and `docs/FINAL_CONCLUSION.md`.
+
+
+## Critical correction — prior realized-P&L backtests superseded
+
+**As of 2026-09-27, the user's exit convention was clarified:** all four legs are closed at the near weekly expiry; far-expiry CE/PE legs are manually squared off at that near-expiry close.
+
+Repository inspection shows the prior backtest calculated:
+`gross_pnl = entry_cashflow + next_settlement - near_settlement`
+and calculated far-leg exit costs using intrinsic values at `next_settlement`.
+
+That is a different strategy: it holds the far-expiry legs until their own expiry. It is not the user's manual near-expiry close convention.
+
+Accordingly, **the prior realized-P&L results must be treated as superseded/invalid for the actual trading rule**. This affects Phase 7B P&L, Phase 7C winner/loser classification, and Phase 8A S2-S1 prediction/economic-filter results. The static entry flatline/selection calculation is retained only as an entry-chart hypothesis.
+
+## Phase 9A status — OPEN
+
+Primary task: rebuild the H=1 baseline using far-expiry option market prices at the near-expiry close, including manual exit slippage and all transaction costs. No H=2/H=3 research should be accepted until this corrected baseline is complete.
