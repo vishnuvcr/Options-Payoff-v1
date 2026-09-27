@@ -384,3 +384,7 @@ Run **36307233038 (Phase 9G run 10)** is the current accepted execution candidat
 
 ### Critical duplicate-row correction — 2026-09-27
 The authoritative H1 scan audit demonstrated that raw merged row counts were not a valid measure of the 17-strike universe. The corrected rule now requires **17 unique strike shifts** and **no conflicting duplicate quotes** at a valid decision timestamp. Previous completeness failures are therefore superseded as diagnostic failures, not strategy results.
+
+
+### Corrected execution reset — 2026-09-27
+The earlier Phase 9G run remained in the old concurrency group. The corrected pipeline is now isolated in **concurrency group v2** and will be the accepted execution candidate. The old run's outputs remain excluded.

@@ -148,3 +148,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | H1 completeness audit | Second corrected attempt reached data processing successfully; failure was only output-directory creation. Fixed before accepting or interpreting any completeness value. |
 
 | 2026-09-27 | 9G | Critical data-quality audit | Authoritative H1 audit returned 172 selected timestamps: 33 had 17 raw merged rows, 27 fewer, and 112 more. Positive timestamps frequently had row counts >17. This is not evidence of >17 strikes; it reveals duplicate quote rows. The pipeline was corrected to evaluate unique strike shifts and detect conflicting duplicates. |
+
+| 2026-09-27 | 9G | Execution reset | Consolidated the exact-17-strike rule, empty-horizon handling, corrected H1-control logic, and legacy-H1 diagnostic treatment. Reset workflow concurrency to a new v2 group so the corrected run can execute without cancellation by the stale process. |

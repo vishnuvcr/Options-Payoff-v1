@@ -30,7 +30,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: phase-9G-h2-h3-far-expiry-selection
+  group: phase-9G-h2-h3-far-expiry-selection-v2
   cancel-in-progress: true
 
 jobs:

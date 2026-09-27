@@ -122,3 +122,5 @@
 | 2026-09-27 | 9G | Audit output defect | H1 completeness audit successfully loaded the authoritative Parquet files but failed when writing because it created only the parent of the requested output directory. It now creates the requested output directory itself. |
 
 | 2026-09-27 | 9G | Data-model defect identified | H1 audit showed `candidate_count` reached 264, proving it counted duplicate merged rows rather than unique strikes. The strict rule has been corrected to require 17 unique shift points and zero conflicting duplicate quote values. |
+
+| 2026-09-27 | 9G | Governance/data-model correction | The old Phase 9G concurrency group remained occupied by a stale reconstruction run. A v2 concurrency group is being used so the corrected exact-17-strike pipeline can execute independently; stale outputs remain excluded. |
