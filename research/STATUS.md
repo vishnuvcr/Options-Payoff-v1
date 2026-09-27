@@ -360,3 +360,7 @@ The sensitivity path has been hardened: realized trade ledgers now retain the ra
 
 ### 2026-09-27 — pre-result implementation audit
 The Phase 9G selector was manually audited for chronology, 17-strike scan logic, maximum-positive selection, far-leg near-expiry marking, realized P&L sign conventions, six-order brokerage accounting, and STT/stamp/GST handling. No calculation defect was identified in this audit. The active data reconstruction remains the blocking step; no H2/H3 conclusion is accepted.
+
+
+### Literature-review extension — 2026-09-27
+Added peer-reviewed/working literature on NIFTY box-spread efficiency, implied-volatility term structure, volatility risk premia, and calendar-spread dependence. These sources will frame the Phase 9G interpretation without changing the preregistered strategy or acceptance tests.
