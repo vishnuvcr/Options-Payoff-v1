@@ -36,7 +36,7 @@ The selected chart metric is positive by construction. Therefore the corrected w
 
 The second measure is not mathematically guaranteed to be 100% because the static chart applies one hypothetical terminal spot across two expiries, whereas the actual trade liquidates the far options at their observed market prices at the near expiry.
 
-Sensibull documents target-date/time P&L as a separate concept from expiry-day P&L and notes that approximate P&L can change with market conditions, implied volatility and the exact exit date. citeturn198794search0turn198794search9
+Sensibull documents target-date/time P&L as a separate concept from expiry-day P&L and notes that approximate P&L can change with market conditions, implied volatility and the exact exit date. Sources: https://blog.sensibull.com/2023/07/06/payoff-table-on-strategy-builder-analyse-widgets/ and https://blog.sensibull.com/2025/06/06/introducing-conditional-exits/
 
 ## Cross-verification artifacts
 
