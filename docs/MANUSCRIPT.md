@@ -669,3 +669,8 @@ The key research contribution is identifying and testing the true economic sourc
 Detailed Phase 8A report: `docs/PHASE8_S2_S1_RESULTS.md`.
 
 Current consolidated conclusion: `docs/FINAL_CONCLUSION.md`.
+
+
+## CRITICAL RESEARCH CORRECTION — exit convention
+
+A 2026-09-27 audit found that the prior realized-P&L pipeline did not implement the user's actual exit convention. The previous engine held the far-expiry options to their own expiry, whereas the user closes all four legs at the near weekly expiry. Therefore all manuscript claims based on prior realized P&L, winner/loser labels, S2-S1 decomposition, or performance statistics are now marked superseded until Phase 9A rebuilds the baseline with point-in-time far-option exit prices at the near expiry.
