@@ -21,6 +21,7 @@ on:
     paths:
       - .github/workflows/phase-9C-near-exit-horizons.yml
       - scripts/extract_near_exit_horizon_inputs.py
+      - tests/test_near_exit_extractor.py
 
 concurrency:
   group: phase-9c-near-exit-${{ github.ref }}
