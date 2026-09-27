@@ -9,7 +9,8 @@ from src.options_payoff import (
     strike_candidates,
     strike_grid,
     threshold_met,
-)
+,
+    near_expiry_manual_close_pnl)
 
 
 class StrategyPayoffTests(unittest.TestCase):
@@ -105,3 +106,19 @@ class StrategyPayoffTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
+def test_near_expiry_manual_close_pnl_uses_far_option_exit_prices():
+    pnl = near_expiry_manual_close_pnl(
+        near_spot=100.0,
+        common_strike=100.0,
+        near_call=8.0,
+        near_put=8.0,
+        far_call_entry=10.0,
+        far_put_entry=10.0,
+        far_call_exit=12.0,
+        far_put_exit=7.0,
+    )
+    # Entry cashflow = 0; near pair payoff = 0; far pair close value = 5.
+    assert pnl == 5.0
