@@ -1,0 +1,46 @@
+name: Phase 9G H1 17-strike completeness audit
+
+on:
+  push:
+    branches:
+      - phase-9G-h2-h3-far-expiry-selection
+    paths:
+      - .github/workflows/phase-9G-h1-17-strike-audit.yml
+      - scripts/audit_h1_candidate_completeness.py
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas pyarrow
+      - name: Download authoritative Phase 9D H1 artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p h1_artifact
+          gh run download 36302077730 -n phase-9D-final-H1-evidence -D h1_artifact
+      - name: Audit selected timestamps for all 17 strikes
+        run: |
+          python scripts/audit_h1_candidate_completeness.py \
+            --audit h1_artifact/data/derived/intraday_scan_audit.parquet \
+            --selected h1_artifact/data/derived/intraday_selected_near_exit.parquet \
+            --out results/phase9g_h1_17_strike_audit
+      - name: Upload audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9g-h1-17-strike-audit
+          path: results/phase9g_h1_17_strike_audit
+      - name: Persist audit evidence
+        run: |
+          git add results/phase9g_h1_17_strike_audit
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Add H1 17-strike completeness audit"
+          git push origin HEAD:phase-9G-h2-h3-far-expiry-selection
