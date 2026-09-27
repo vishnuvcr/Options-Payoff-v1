@@ -77,3 +77,7 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9D | Corrected H1 realized-P&L complete | Authoritative run 36302077730: 169 complete realized trades after 3 lot-size-incompatible selections were audited/excluded; ₹162,953.84 gross, ₹37,265.02 costs, ₹125,688.82 net, 63.91% realized win rate, PF 2.94. |
 | 2026-09-27 | 9D | Execution sensitivity complete | Net P&L remained positive at 0.50% and 1.00% premium slippage and at ₹40/order brokerage in the tested historical sample. |
 | 2026-09-27 | 9D | H1 phase stopped | Corrected H1 baseline is complete; independent walk-forward/holdout validation is the next phase. H2/H3 remain frozen. |
+
+| 2026-09-27 | 9E | Validation phase opened | Created `phase-9E-h1-validation` with a frozen-rule temporal validation plan, manual workflow and validation script sourced only from authoritative Phase 9D run 36302077730. |
+| 2026-09-27 | 9E | First workflow attempt failed | Run 36303004660 failed on a Python report-writer syntax error before statistical output; no research result was accepted. |
+| 2026-09-27 | 9E | Script correction committed | Corrected the newline-generation bug; the next push triggers the validation rerun. |
