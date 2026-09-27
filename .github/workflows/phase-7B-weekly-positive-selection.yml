@@ -91,6 +91,27 @@ jobs:
           assert primary['non_positive_selected_trades'] == 0
           assert primary['selected_trades'] > 0
           PY
+      - name: Slippage sensitivity for the primary weekly rule
+        env:
+          PYTHONPATH: .
+        run: |
+          mkdir -p results/phase7b_slippage
+          for s in 0 0.0025 0.005 0.01; do
+            tag=$(echo "$s" | tr '.' '_')
+            python scripts/run_backtest.py \
+              --inputs data/phase3_source/strategy_inputs.parquet \
+              --out-dir "results/phase7b_slippage/metrics_${tag}" \
+              --selection-mode max_equal_flatline \
+              --selection-score equal_max_profit_loss_inr \
+              --selection-max-shift-points 400 \
+              --selection-step-points 50 \
+              --min-chart-return-pct 0.0 \
+              --slippage-pct "$s"
+            python scripts/weekly_positive_selection.py \
+              --inputs "results/phase7b_slippage/metrics_${tag}/candidate_results.parquet" \
+              --out-dir "results/phase7b_slippage/weekly_${tag}" \
+              --observation first_positive
+          done
       - name: Upload weekly results
         uses: actions/upload-artifact@v4
         with:
