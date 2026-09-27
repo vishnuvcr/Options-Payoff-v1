@@ -399,3 +399,9 @@ The old Phase 9D H1 control is **not accepted under the exact current rule**: 12
 **Frozen execution commit:** 63b399a9a1d631316dd5233bc684a4ee0a197b25  
 **State:** in progress.  
 The independent H1 completeness job has completed successfully. All six yearly reconstructions (2021–2026) have passed setup, dependency and data-cache stages and remain in the exact H1/H2/H3 decision-surface reconstruction step. No horizon performance result or H2/H3 conclusion has been accepted. A transient GitHub log-artifact lookup returned 404 while jobs were still running; this is recorded as tooling availability only, not a research/data result.
+
+
+### 2026-09-27 — H2/H3 source-coverage audit
+Run 27 has completed yearly reconstructions for 2024 and 2026. Interim H1 results: 2024 = 26 realized trades, ₹20,656.83 net; 2026 = 14 realized trades, ₹21,014.63 net. H2/H3 in both completed years produced scan rows but no qualifying 17-strike decision surfaces.
+
+The dedicated source audit (runs 36317177731 and 36317271416) sampled 152 timestamps for each of far-rank 2 and 3 and found zero same-day rows in the far-expiry file at every sampled entry timestamp, zero common CE/PE strikes, and zero exact 17-shift grids. The underlying source's expiry files typically begin about 8 days before their own expiry. This makes the source unsuitable for H2/H3 entry-time reconstruction. No H2/H3 performance inference is accepted.
