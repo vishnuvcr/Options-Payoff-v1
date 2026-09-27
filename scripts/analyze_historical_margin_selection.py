@@ -12,8 +12,10 @@ def main() -> None:
     ap.add_argument('--margins',required=True)
     ap.add_argument('--out-dir',required=True)
     ap.add_argument('--threshold-pct',type=float,default=2.5)
+    ap.add_argument('--max-shift-points',type=int,default=400)
     args=ap.parse_args()
     df=pd.read_csv(args.margins)
+    df=df[df['shift_points'].between(-args.max_shift_points,args.max_shift_points)].copy()
     if df.empty: raise RuntimeError('No reconstructed candidate margins')
     df['max_profit_pct_margin']=pd.to_numeric(df['max_profit_pct_margin'],errors='coerce')
     eligible=df[df['max_profit_pct_margin']>args.threshold_pct].copy()
@@ -51,6 +53,7 @@ def main() -> None:
     pct_df.to_csv(out/'selected_by_max_percentage.csv',index=False)
     result={
       'threshold_pct':args.threshold_pct,
+      'max_shift_points':args.max_shift_points,
       'candidate_rows_reconstructed':int(len(df)),
       'eligible_rows':int(len(eligible)),
       'eligible_timestamps':int(eligible['entry_timestamp'].nunique()),
