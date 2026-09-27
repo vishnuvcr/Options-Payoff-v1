@@ -106,3 +106,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Data-quality audit of provisional results | Provisional FII/DII joins were found too sparse (7 FII, 1 DII rows) to support point-in-time regime inference. Those subgroup results are treated as invalid and will be regenerated with strict recency controls. |
 | 2026-09-27 | 9F | Cross-market scope expanded | Added BSE Sensex via the documented fallback source and a predeclared NIFTY-vs-Sensex relative-return descriptive regime. |
+
+| 2026-09-27 | 9F | Audit computation succeeded | Workflow **36303823257** successfully computed the contextual audit and uploaded artifact **10926925462**, but the persistence step failed on unstaged generated files. The audit result is therefore artifact-authoritative until a repository commit is produced. |
+| 2026-09-27 | 9F | Persistence workflow corrected | Replaced `git pull --rebase` with `git fetch` + `git reset --hard` before staging generated results. |
