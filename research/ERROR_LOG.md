@@ -110,3 +110,5 @@
 | 2026-09-27 | 9G | Data-quality watch item | Selector uses inner joins across four option quotes; therefore candidate availability can be <17 at some timestamps when historical quotes are missing. This is logged as a data-quality audit item, not treated as a strategy criterion or result. |
 
 | 2026-09-27 | 9G | Methodological correction | The previous selector could qualify a timestamp using a partial inner-joined strike set. This violated the explicit all-17-strikes rule. The selector was changed so partial sets cannot qualify. |
+
+| 2026-09-27 | 9G | Execution issue | A pre-concurrency Phase 9G run (36305850007) remained active while newer corrected runs queued. Concurrency was added so future corrections supersede obsolete running attempts; no output from the stale run will be accepted. |
