@@ -332,7 +332,7 @@ def main():
     summary={
         "selected_trades":int(len(selected_feat)),
         "selected_winners":int((selected_feat.selected_net_pnl_inr>0).sum()),
-        "selected_losers":int((selected_feat.net_pnl_inr<=0).sum()),
+        "selected_losers":int((selected_feat.selected_net_pnl_inr<=0).sum()),
         "candidate_rows_at_decision_times":int(len(feat)),
         "candidate_weeks":int(feat.weekly_cycle.nunique()),
         "black_scholes_rate_assumption":0.0,
