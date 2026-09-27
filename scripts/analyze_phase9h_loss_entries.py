@@ -162,11 +162,6 @@ def year_run(a):
 
         base_pnl = float(base.net_pnl_inr)
         cycle_variants = []
-            "entry_date": str(pd.Timestamp(valid[0]).date()), "entry_timestamp": str(valid[0]),
-            "near_expiry": str(near), "baseline_shift": int(base.shift_points),
-            "baseline_strike": float(base.strike), "baseline_flatline_inr": float(base.flatline_inr),
-            "baseline_net_pnl_inr": base_pnl, "valid_timestamp_count": len(valid)
-        }
         for name, row in choices.items():
             pnl = None if row is None or not bool(row.realizable) or pd.isna(row.net_pnl_inr) else float(row.net_pnl_inr)
             variants.append({
