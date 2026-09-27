@@ -1,0 +1,20 @@
+{
+  "selected_trades": 172,
+  "strict_complete": 45,
+  "strict_incomplete": 127,
+  "strict_complete_pct": 26.16279069767442,
+  "unique_shift_count_distribution": {
+    "5": 1,
+    "8": 1,
+    "9": 2,
+    "10": 3,
+    "11": 9,
+    "12": 13,
+    "13": 14,
+    "14": 25,
+    "15": 31,
+    "16": 28,
+    "17": 45
+  },
+  "conflicting_quote_timestamps": 0
+}
