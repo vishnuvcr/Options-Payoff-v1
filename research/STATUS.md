@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-9H-loss-entry-analysis
-**Overall status:** Phase 9G COMPLETE; Phase 9H-A OPEN — targeted loss-cycle entry analysis running against the frozen H1 rule
+**Overall status:** Phase 9G COMPLETE; Phase 9H-A COMPLETE — loss-cycle entry counterfactual audit accepted; no entry rule change adopted
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -489,3 +489,25 @@ The initial full-sample Phase 9H implementation was cancelled because the immedi
 ## Phase 9H accounting correction — 2026-09-27
 
 A first targeted loss reconstruction exposed a transaction-cost accounting defect: far-call exit STT was double-counted. The pre-fix Phase 9H outputs are explicitly invalidated. The corrected implementation now separates entry-leg sell STT from far-call exit STT and the workflow contains a hard baseline-reproduction gate against the frozen Phase 9G loss ledger.
+
+
+## Phase 9H-A — FINAL STATUS — 2026-09-27
+
+Accepted workflow: **36325328644**  
+Result persistence commit: **ec75cb20e8e23f0550f8d615e796eea815e3d161**
+
+- 54 net-loss H1 trades analyzed.
+- Frozen Phase 9G baseline reproduced exactly for every loss before rescue analysis.
+- Same-timestamp alternate-strike rescue: 6/54.
+- Second-valid-timestamp rescue: 8/54 where a second valid timestamp existed.
+- Fixed-delay rescues: 15m 8/54; 30m 7/54; 60m 6/54; 120m 4/54.
+- Union of bounded practical entry counterfactuals: **14/54 (25.9%)**.
+- Ex-post later timestamp with frozen strike selector: 31/54.
+- Ex-post later timestamp + any strike: 38/54.
+- **16/54 remained losses even under the strongest tested ex-post entry-only upper bound.**
+- No entry rule adopted.
+
+Detailed report: [docs/PHASE9H_LOSS_ENTRY_ANALYSIS.md](docs/PHASE9H_LOSS_ENTRY_ANALYSIS.md)  
+Machine-readable rescue summary: [results/phase9h/loss_entry_rescue_summary.csv](results/phase9h/loss_entry_rescue_summary.csv)  
+Full loss ledger: [results/phase9h/loss_trade_entry_detail.csv](results/phase9h/loss_trade_entry_detail.csv)  
+Workflow: [36325328644](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36325328644)
