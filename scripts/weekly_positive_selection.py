@@ -15,32 +15,52 @@ def select_weekly(df: pd.DataFrame, observation: str) -> tuple[pd.DataFrame, pd.
     x = df[df['shift_points'].between(-400, 400) & (df['shift_points'] % 50 == 0)].copy()
     x['entry_timestamp'] = pd.to_datetime(x['entry_timestamp'])
     x['near_expiry'] = pd.to_datetime(x['near_expiry']).dt.date.astype(str)
-    cycles = []
+    selected_rows = []
     diagnostics = []
     for expiry, g in x.groupby('near_expiry', sort=True):
         g = g.sort_values('entry_timestamp')
-        chosen_ts = g['entry_timestamp'].iloc[0] if observation == 'first' else g['entry_timestamp'].iloc[-1]
-        h = g[g['entry_timestamp'] == chosen_ts].copy()
-        if h.empty:
+        chosen = None
+        chosen_ts = None
+        positive_count = 0
+        if observation == 'max_in_week':
+            pool = g[g['estimated_all_green_flatline'].fillna(False) & (g['estimated_equal_max_profit_loss_inr'] > 0)].copy()
+            positive_count = len(pool)
+            if not pool.empty:
+                pool['_score'] = pool['estimated_equal_max_profit_loss_inr']
+                chosen = pool.sort_values(['_score','entry_timestamp','shift_points'], ascending=[False,True,True]).iloc[0].copy()
+                chosen_ts = chosen['entry_timestamp']
+        elif observation == 'first_positive':
+            for ts, h in g.groupby('entry_timestamp', sort=True):
+                pool = h[h['estimated_all_green_flatline'].fillna(False) & (h['estimated_equal_max_profit_loss_inr'] > 0)].copy()
+                positive_count += len(pool)
+                if not pool.empty:
+                    pool['_score'] = pool['estimated_equal_max_profit_loss_inr']
+                    chosen = pool.sort_values(['_score','shift_points'], ascending=[False,True]).iloc[0].copy()
+                    chosen_ts = ts
+                    break
+        else:
+            chosen_ts = g['entry_timestamp'].iloc[0] if observation == 'first_observation' else g['entry_timestamp'].iloc[-1]
+            h = g[g['entry_timestamp'] == chosen_ts].copy()
+            pool = h[h['estimated_all_green_flatline'].fillna(False) & (h['estimated_equal_max_profit_loss_inr'] > 0)].copy()
+            positive_count = len(pool)
+            if not pool.empty:
+                pool['_score'] = pool['estimated_equal_max_profit_loss_inr']
+                chosen = pool.sort_values(['_score','shift_points'], ascending=[False,True]).iloc[0].copy()
+        if chosen is None:
+            diagnostics.append({'weekly_cycle':expiry,'decision_timestamp':str(chosen_ts) if chosen_ts is not None else None,'positive_candidates':int(positive_count),'selected_positive':False})
             continue
-        positive = h[h['estimated_all_green_flatline'].fillna(False) & (h['estimated_equal_max_profit_loss_inr'] > 0)].copy()
-        pool = positive if not positive.empty else h.copy()
-        pool['_score'] = pool['estimated_equal_max_profit_loss_inr']
-        best = pool.sort_values(['_score','shift_points'], ascending=[False, True]).iloc[0].copy()
-        best['weekly_cycle'] = expiry
-        best['decision_observation'] = observation
-        best['positive_at_selection'] = bool(best['estimated_all_green_flatline'] and best['estimated_equal_max_profit_loss_inr'] > 0)
-        best['positive_candidate_count_at_selection'] = int(len(positive))
-        cycles.append(best.drop(labels=['_score']))
-        diagnostics.append({'weekly_cycle':expiry,'decision_timestamp':str(chosen_ts),'positive_candidates':int(len(positive)),'selected_shift_points':int(best['shift_points']),'selected_positive':bool(best['positive_at_selection'])})
-    selected = pd.DataFrame(cycles)
-    diag = pd.DataFrame(diagnostics)
-    return selected, diag
+        chosen['weekly_cycle'] = expiry
+        chosen['decision_observation'] = observation
+        chosen['positive_at_selection'] = True
+        chosen['positive_candidate_count_at_selection'] = int(positive_count)
+        selected_rows.append(chosen.drop(labels=['_score']))
+        diagnostics.append({'weekly_cycle':expiry,'decision_timestamp':str(chosen_ts),'positive_candidates':int(positive_count),'selected_shift_points':int(chosen['shift_points']),'selected_positive':True})
+    return pd.DataFrame(selected_rows), pd.DataFrame(diagnostics)
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('--inputs', required=True)
     ap.add_argument('--out-dir', required=True)
-    ap.add_argument('--observation', choices=['first','last'], default='first')
+    ap.add_argument('--observation', choices=['first_positive','first_observation','last_observation','max_in_week'], default='first')
     args = ap.parse_args()
 
     df = pd.read_parquet(args.inputs)
