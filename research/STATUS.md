@@ -2,7 +2,7 @@
 
 **As of:** 2026-09-27  
 **Active branch:** phase-9H-loss-entry-analysis
-**Overall status:** Phase 9G COMPLETE; Phase 9H OPEN — bounded loss-trade entry analysis running against the frozen H1 rule
+**Overall status:** Phase 9G COMPLETE; Phase 9H-A OPEN — targeted loss-cycle entry analysis running against the frozen H1 rule
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -479,3 +479,8 @@ The frozen Phase 9G H1 rule is not being changed yet. Phase 9H tests whether rea
 - ex-post later-entry upper bounds.
 
 No exit changes, additional market filters, or free-form timestamp optimization are allowed in this phase. Results are not yet accepted.
+
+
+## Phase 9H-A — targeted loss-cycle analysis
+
+The initial full-sample Phase 9H implementation was cancelled because the immediate research question is loss-specific and did not require recomputing all winners. The phase has been narrowed to reconstructing the exact entry decision surface only for the 54 realized H1 loss cycles. This preserves the frozen rule, the exact 17-strike completeness gate, the near-expiry far-leg exit convention, and the primary cost model.
