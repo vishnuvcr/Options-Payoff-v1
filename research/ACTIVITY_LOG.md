@@ -164,3 +164,7 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9G | Run-27 yearly reconstruction completed | All six yearly jobs (2021–2026) in run 36313815542 completed successfully. The pooled merge alone failed on an empty incomplete CSV; no yearly reconstruction was rejected. |
 | 2026-09-27 | 9G | Merge repair | Promoting the validated empty-ledger handling from the Rissin merger into the dedicated run-27 merge branch. Only aggregation will be rerun against the frozen six artifacts. |
+
+| 2026-09-27 | 9G | Final primary reconstruction accepted | Run 36313815542 completed all six yearly reconstructions. Corrected merge run 36320697995 produced the accepted pooled H1 result: 131 trades, ₹71,868.76 net, 58.78% realized wins, PF 2.29. |
+| 2026-09-27 | 9G | Final H2/H3 decision | Primary-source H2/H3 were not adjudicated because of pre-entry far-expiry source coverage failure. Rissin H2/H3 results are retained as measurement sensitivity and no horizon is promoted. |
+| 2026-09-27 | 9G | Final phase exit | Phase 9G is complete. Candidate strategy is H1 fixed-next-weekly-expiry only, pending untouched holdout and live-execution validation. |
