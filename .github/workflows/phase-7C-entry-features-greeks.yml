@@ -1,0 +1,88 @@
+name: Phase 7C - Entry Features and Greeks
+
+on:
+  push:
+    branches:
+      - phase-7C-entry-features-greeks
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Cached Phase 3 run containing the expanded strategy inputs
+        required: true
+        default: '36262958536'
+
+concurrency:
+  group: phase-7C-greeks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  feature-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install analysis dependencies
+        run: |
+          pip install 'pandas>=2.2' 'pyarrow>=18' 'scipy>=1.14' 'statsmodels>=0.14'
+
+      - name: Download cached Phase 3 expanded inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p data/phase3_source
+          gh run download '${{ inputs.source_run_id || '36262958536' }}'             --repo '${{ github.repository }}'             --name phase-3-expanded-strategy-inputs             --dir data/phase3_source
+          test -s data/phase3_source/strategy_inputs.parquet
+
+      - name: Build Phase 7C candidate metrics
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_backtest.py             --inputs data/phase3_source/strategy_inputs.parquet             --out-dir results/phase7c_metrics             --selection-mode max_equal_flatline             --selection-score equal_max_profit_loss_inr             --selection-max-shift-points 400             --selection-step-points 50             --min-chart-return-pct 0.0             --slippage-pct 0.0025
+          test -s results/phase7c_metrics/candidate_results.parquet
+
+      - name: Recreate first-positive weekly selection
+        run: |
+          python scripts/weekly_positive_selection.py             --inputs results/phase7c_metrics/candidate_results.parquet             --out-dir results/phase7c_weekly             --observation first_positive
+          test -s results/phase7c_weekly/weekly_selected_first_positive.csv
+
+      - name: Analyze entry Greeks and other observable strike features
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/analyze_entry_features.py             --strategy-inputs data/phase3_source/strategy_inputs.parquet             --selected results/phase7c_weekly/weekly_selected_first_positive.csv             --out-dir results/phase7c_features             --slippage-pct 0.0025
+          test -s results/phase7c_features/selected_entry_features.csv
+          test -s results/phase7c_features/winner_loser_univariate_stats.csv
+          test -s results/phase7c_features/candidate_feature_selection_tests.csv
+
+      - name: Validate feature analysis outputs
+        run: |
+          python - <<'PY'
+          import json, pandas as pd, pathlib
+          out=pathlib.Path('results/phase7c_features')
+          s=json.loads((out/'summary.json').read_text())
+          print(s)
+          assert s['selected_trades'] == 63
+          x=pd.read_csv(out/'selected_entry_features.csv')
+          assert len(x)==63
+          stat=pd.read_csv(out/'winner_loser_univariate_stats.csv')
+          assert len(stat)>0
+          sel=pd.read_csv(out/'candidate_feature_selection_tests.csv')
+          assert len(sel)>0
+          PY
+
+      - name: Upload Phase 7C results
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-7C-entry-features-greeks
+          path: |
+            results/phase7c_features
+            results/phase7c_weekly
+            results/phase7c_metrics/summary.json
