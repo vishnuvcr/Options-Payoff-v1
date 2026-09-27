@@ -1,4 +1,4 @@
-name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v9)
+name: Phase 9A - Correct Near-Expiry Manual Close Baseline (v10 chunked)
 
 on:
   workflow_dispatch:
@@ -20,6 +20,8 @@ on:
       - phase-9-near-expiry-exit-correction
     paths:
       - .github/workflows/phase-9A-near-expiry-exit-correction.yml
+      - scripts/extract_near_exit_strategy_inputs.py
+      - scripts/merge_near_exit_chunks.py
 
 concurrency:
   group: phase-9a-near-exit-${{ github.ref }}
@@ -29,10 +31,16 @@ permissions:
   contents: read
 
 jobs:
-  corrected-baseline:
+  build-chunks:
+    strategy:
+      fail-fast: false
+      matrix:
+        year: [2021, 2022, 2023, 2024, 2025, 2026]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: phase-9-near-expiry-exit-correction
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -44,21 +52,67 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface
-          key: hf-nifty-options-near-exit-${{ inputs.start }}-${{ inputs.end }}
-          restore-keys: hf-nifty-options-near-exit-
+          key: hf-nifty-options-near-exit-${{ matrix.year }}-${{ github.event.inputs.start || '2021-06-01' }}-${{ github.event.inputs.end || '2026-08-31' }}
+          restore-keys: hf-nifty-options-near-exit-${{ matrix.year }}-
       - name: Unit tests
-        run: |
-          python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
-      - name: Build corrected strategy inputs
+        run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
+      - name: Build yearly corrected inputs
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          INPUT_START='${{ github.event.inputs.start || '2021-06-01' }}'
+          INPUT_END='${{ github.event.inputs.end || '2026-08-31' }}'
+          YEAR='${{ matrix.year }}'
+          YEAR_START="${YEAR}-01-01"
+          YEAR_END="${YEAR}-12-31"
+          if [[ "$YEAR_START" < "$INPUT_START" ]]; then YEAR_START="$INPUT_START"; fi
+          if [[ "$YEAR_END" > "$INPUT_END" ]]; then YEAR_END="$INPUT_END"; fi
+          if [[ "$YEAR_START" > "$YEAR_END" ]]; then
+            echo 'No dates in this matrix chunk; create a sentinel and exit.'
+            mkdir -p data/derived
+            python - <<'PY'
+import pandas as pd
+pd.DataFrame(columns=['entry_timestamp','status']).to_parquet('data/derived/strategy_inputs_${{ matrix.year }}.parquet', index=False)
+PY
+            exit 0
+          fi
+          mkdir -p data/derived
           python scripts/extract_near_exit_strategy_inputs.py \
-            --start '${{ github.event.inputs.start || '2021-06-01' }}' \
-            --end '${{ github.event.inputs.end || '2026-08-31' }}' \
+            --start "$YEAR_START" \
+            --end "$YEAR_END" \
             --entry-time '09:20' \
-            --download-workers 6 \
-            --out data/derived/strategy_inputs_near_exit.parquet
+            --download-workers 2 \
+            --out "data/derived/strategy_inputs_${YEAR}.parquet"
+      - name: Upload yearly chunk
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9a-inputs-${{ matrix.year }}
+          path: data/derived/strategy_inputs_${{ matrix.year }}.parquet
+
+  merge-and-backtest:
+    needs: build-chunks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-9-near-expiry-exit-correction
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
+      - name: Download yearly chunks
+        uses: actions/download-artifact@v4
+        with:
+          pattern: phase9a-inputs-*
+          path: chunks
+          merge-multiple: false
+      - name: Merge yearly chunks
+        run: |
+          mkdir -p data/derived
+          python scripts/merge_near_exit_chunks.py --input-dir chunks --out data/derived/strategy_inputs_near_exit.parquet
       - name: Run corrected H1 baseline
         env:
           PYTHONPATH: .
@@ -66,17 +120,18 @@ jobs:
           python scripts/run_near_expiry_exit_backtest.py \
             --inputs data/derived/strategy_inputs_near_exit.parquet \
             --out-dir results/phase9a_near_exit \
-            --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}'
+            --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}' \
+            --brokerage-per-order 20
       - name: Validate corrected output
         run: |
           python - <<'PY'
-          import json
-          p='results/phase9a_near_exit/summary_near_exit.json'
-          x=json.load(open(p))
-          print(json.dumps(x, indent=2))
-          assert x['selected_trades'] > 0
-          assert x['positive_weeks'] == x['selected_trades']
-          PY
+import json
+from pathlib import Path
+x=json.loads(Path('results/phase9a_near_exit/summary_near_exit.json').read_text())
+print(json.dumps(x, indent=2))
+assert x['selected_trades'] > 0
+assert x['positive_weeks'] == x['selected_trades']
+PY
       - name: Upload corrected baseline
         uses: actions/upload-artifact@v4
         with:
