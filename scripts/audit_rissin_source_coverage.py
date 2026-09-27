@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
-import pyarrow.dataset as ds
+import pyarrow as pa\nimport pyarrow.dataset as ds
 from huggingface_hub import hf_hub_download
 
 from scripts.extract_near_exit_strategy_inputs import DATASET as BASE_INDEX_DATASET, list_nifty_expiry_files, load_index
@@ -34,9 +34,8 @@ def expiry_pair(entry_date, expiries, rank):
     return xs[0], xs[rank]
 
 def day_slice(dataset, trading_day):
-    start=f"{trading_day.isoformat()} 00:00:00"
-    end=f"{trading_day.isoformat()} 23:59:59"
-    filt=(ds.field("timestamp") >= start) & (ds.field("timestamp") <= end)
+    start_dt=dt.datetime.combine(trading_day,dt.time.min)
+    filt=(ds.field("date") == pa.scalar(start_dt))
     table=dataset.to_table(filter=filt, columns=["timestamp","expiry","strike","option_type","close","underlying"])
     if table.num_rows==0:
         return pd.DataFrame(columns=["timestamp","expiry","strike","option_type","close","underlying"])
