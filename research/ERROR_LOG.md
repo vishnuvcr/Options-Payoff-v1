@@ -129,3 +129,7 @@
 
 
 | 2026-09-27 | 9G | Data-source coverage defect | The Hugging Face option files used by the corrected pipeline typically begin ~7–10 calendar days before their own expiry. For far-rank 2 and 3, sampled entry dates fall before the file's available window, yielding zero same-day far-expiry rows and no 17-strike surface. | Do not interpret H2/H3 zero opportunities as zero strategy performance. Persist the source audit, seek a source with pre-entry far-expiry coverage, and rerun only after provenance/coverage validation. |
+
+
+| 2026-09-27 | 9G-Rissin | Reconstruction parity defect | The independent Rissin extractor initially lacked the frozen 30-day maximum near/far expiry separation guard. | The pre-correction Rissin run is superseded; the extractor was corrected before accepting any Rissin P&L. |
+| 2026-09-27 | 9G-Rissin | Validator tooling defects | Three source-validation attempts failed before valid data inference: Arrow timestamp/string mismatch; literal backslash-n syntax in an automated patch; Arrow string-date vs timestamp scalar mismatch. | Each failure was logged on the Rissin source-validation branch and corrected; no failed-run data were interpreted. |
