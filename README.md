@@ -98,3 +98,24 @@ Each phase remains on its own branch and exposes a manual GitHub Actions workflo
 Under the current working denominator and execution assumptions, the corrected full-grid backtest is historically positive, but the uncertainty intervals include zero, the chronology is strongly time-dependent, and the exact chart-percentage denominator remains unresolved.
 
 The loss audit shows why the positive aggregate cannot be interpreted as a risk-free payoff-chart arbitrage: the static chart edge can be positive while the realized two-expiry settlement component is strongly negative.
+
+
+## Phase 9A — Corrected H1 near-expiry manual-close baseline
+
+Authoritative Actions run **36297418698** completed successfully. The corrected strategy closes all four legs at the near weekly expiry; far CE/PE are manually squared off at observed prices at or before the near-expiry index close.
+
+Primary H1 result at 0.25% premium slippage and ₹20/order brokerage:
+- 252 weekly cycles scanned
+- 64 selected trades
+- gross P&L ₹25,859.55
+- modeled costs ₹13,541.69
+- net P&L ₹12,317.86
+- win rate 51.56%
+- profit factor 1.47
+- maximum drawdown approximately -₹6,363.84
+
+Independent audit: 27/31 losers were already negative before fees; 4/31 net losses were cost-only flips; all selected trades have complete far-leg exit timestamps and none exits after near expiry.
+
+These results supersede all previous realized-P&L numbers based on holding the far legs to their own expiry. Full details: `docs/PHASE9A_RESULTS.md`.
+
+**Current state:** Phase 9A is complete. Phase 9B statistical validation is next; H2/H3 remain frozen until that validation is complete.
