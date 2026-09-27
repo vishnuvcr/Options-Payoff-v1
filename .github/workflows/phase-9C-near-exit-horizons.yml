@@ -1,0 +1,99 @@
+name: Phase 9C - H2 H3 Near-Expiry Horizons
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: Start date YYYY-MM-DD
+        required: true
+        default: '2021-06-01'
+      end:
+        description: End date YYYY-MM-DD
+        required: true
+        default: '2026-08-31'
+      slippage_pct:
+        description: Premium slippage as decimal
+        required: true
+        default: '0.0025'
+
+permissions:
+  contents: read
+
+jobs:
+  horizons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-9C-near-exit-horizons
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'huggingface_hub>=0.34' 'pandas>=2.2' 'pyarrow>=18'
+      - name: Restore/cache Hugging Face source files
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-nifty-options-horizons-${{ inputs.start }}-${{ inputs.end }}
+          restore-keys: hf-nifty-options-horizons- hf-nifty-options-near-exit-
+      - name: Unit tests
+        run: python -m unittest tests/test_options_payoff.py tests/test_near_expiry_backtest.py
+      - name: Build H2 inputs
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python scripts/extract_near_exit_horizon_inputs.py --start '${{ inputs.start }}' --end '${{ inputs.end }}' --entry-time '09:20' --download-workers 6 --horizon-steps 2 --out data/derived/strategy_inputs_h2_near_exit.parquet
+      - name: Run H2
+        env:
+          PYTHONPATH: .
+        run: |
+          for slip in 0 0.0025 0.005 0.01; do
+            tag=$(python -c "print(str($slip).replace('.','p'))")
+            python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_slip_${tag} --slippage-pct $slip --brokerage-per-order 20
+          done
+          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker10 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 10
+          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h2_near_exit.parquet --out-dir results/phase9c_h2_broker40 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 40
+      - name: Build H3 inputs
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python scripts/extract_near_exit_horizon_inputs.py --start '${{ inputs.start }}' --end '${{ inputs.end }}' --entry-time '09:20' --download-workers 6 --horizon-steps 3 --out data/derived/strategy_inputs_h3_near_exit.parquet
+      - name: Run H3
+        env:
+          PYTHONPATH: .
+        run: |
+          for slip in 0 0.0025 0.005 0.01; do
+            tag=$(python -c "print(str($slip).replace('.','p'))")
+            python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h3_near_exit.parquet --out-dir results/phase9c_h3_slip_${tag} --slippage-pct $slip --brokerage-per-order 20
+          done
+          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h3_near_exit.parquet --out-dir results/phase9c_h3_broker10 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 10
+          python scripts/run_near_expiry_exit_backtest.py --inputs data/derived/strategy_inputs_h3_near_exit.parquet --out-dir results/phase9c_h3_broker40 --slippage-pct '${{ inputs.slippage_pct }}' --brokerage-per-order 40
+      - name: Summarize horizons
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[]
+          for p in Path('results').glob('phase9c_h*_slip_*/summary_near_exit.json'):
+              x=json.loads(p.read_text())
+              x['scenario']=str(p.parent)
+              rows.append(x)
+          for p in Path('results').glob('phase9c_h*_broker*/summary_near_exit.json'):
+              x=json.loads(p.read_text())
+              x['scenario']=str(p.parent)
+              rows.append(x)
+          Path('results/phase9c_horizon_summary.json').write_text(json.dumps(rows,indent=2,default=str))
+          print(json.dumps(rows,indent=2,default=str))
+          PY
+      - name: Upload Phase 9C horizons
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9C-H2-H3-near-expiry-horizons
+          path: |
+            data/derived/strategy_inputs_h2_near_exit.parquet
+            data/derived/strategy_inputs_h3_near_exit.parquet
+            results/phase9c_*
+            results/phase9c_horizon_summary.json
