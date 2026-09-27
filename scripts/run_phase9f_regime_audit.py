@@ -129,7 +129,7 @@ def fetch_fii_json(dates):
             continue
     return pd.DataFrame(rows)
 
-def prior_merge(trades, ctx, prefix):
+def prior_merge(trades, ctx, prefix, tolerance_days=7):
     ctx=ctx.copy()
     ctx['date']=pd.to_datetime(ctx['date'],errors='coerce')
     ctx=ctx.dropna(subset=['date']).sort_values('date')
@@ -142,7 +142,7 @@ def prior_merge(trades, ctx, prefix):
     data_cols=[col for col in ctx.columns if col!='date']
     right=ctx[['date']+data_cols].copy()
     right=right.rename(columns={col:f'{prefix}_{col}' for col in data_cols})
-    out=pd.merge_asof(t,right,left_on='entry_date',right_on='date',direction='backward',allow_exact_matches=False)
+    out=pd.merge_asof(t,right,left_on='entry_date',right_on='date',direction='backward',allow_exact_matches=False,tolerance=pd.Timedelta(days=tolerance_days))
     return out.drop(columns=['date'],errors='ignore')
 
 def main():
@@ -164,7 +164,7 @@ def main():
     vix=nse_vix.copy(); vix['date']=pd.to_datetime(vix['date']).dt.date
     if 'close' in vix.columns: vix['india_vix_prev']=vix['close'].shift(1)
 
-    symbols={'sp500':'^GSPC','nasdaq':'^IXIC','nikkei':'^N225','hangseng':'^HSI','shanghai':'000001.SS','gold':'GC=F','usdinr':'USDINR=X','global_vix':'^VIX'}
+    symbols={'sp500':'^GSPC','nasdaq':'^IXIC','nikkei':'^N225','hangseng':'^HSI','shanghai':'000001.SS','sensex':'^BSESN','gold':'GC=F','usdinr':'USDINR=X','global_vix':'^VIX'}
     global_frames={k:fetch_yf(sym,'2020-12-01',end) for k,sym in symbols.items()}
     global_ctx=None
     for name,df in global_frames.items():
@@ -182,12 +182,16 @@ def main():
             fii=fii.copy(); fii['date']=pd.to_datetime(fii['date']).dt.date
             m=json_fii.set_index('date'); fii=fii.set_index('date'); fii.update(m[['fii_net','dii_net']]); fii=fii.reset_index()
     if isinstance(fii,pd.DataFrame) and not fii.empty: fii['date']=pd.to_datetime(fii['date']).dt.date
+    fii_rows=int(len(fii)) if isinstance(fii,pd.DataFrame) else 0
+    if fii_rows < 60:
+        dsrc=f'{dsrc}_sparse_unusable' if dsrc!='unavailable' else 'unavailable_sparse'
+        fii=pd.DataFrame()
 
     joined=trades.copy()
-    joined=prior_merge(joined,nifty,'nifty') if not nifty.empty else joined
-    joined=prior_merge(joined,vix[['date','india_vix_prev']] if 'india_vix_prev' in vix.columns else vix,'vix') if not vix.empty else joined
-    joined=prior_merge(joined,global_ctx,'global') if not global_ctx.empty else joined
-    if not fii.empty: joined=prior_merge(joined,fii,'fii_dii')
+    joined=prior_merge(joined,nifty,'nifty',tolerance_days=7) if not nifty.empty else joined
+    joined=prior_merge(joined,vix[['date','india_vix_prev']] if 'india_vix_prev' in vix.columns else vix,'vix',tolerance_days=7) if not vix.empty else joined
+    joined=prior_merge(joined,global_ctx,'global',tolerance_days=7) if not global_ctx.empty else joined
+    if not fii.empty: joined=prior_merge(joined,fii,'fii_dii',tolerance_days=3)
 
     # Same-day opening gap is known by 09:20, and remains known for later entries.
     if not nifty.empty and {'open','close'}.issubset(nifty.columns):
@@ -231,7 +235,7 @@ def main():
         s=joined[c]; coverage.append({'variable':c,'non_missing':int(s.notna().sum()),'coverage_pct':float(100*s.notna().mean())})
     pd.DataFrame(coverage).to_csv(out/'coverage.csv',index=False)
 
-    meta={'phase':'9F','status':'complete','trades':169,'nse_source':nse_source,'vix_source':vix_source,'fii_dii_source':dsrc,'global_sources':'yfinance where available','regime_variables':regime_cols,'note':'Descriptive only; no new trading rule or filter was created. Corporate/news variables were not imputed where reliable point-in-time reconstruction was unavailable.'}
+    meta={'phase':'9F','status':'complete','trades':169,'nse_source':nse_source,'vix_source':vix_source,'fii_dii_source':dsrc,'fii_dii_source_rows':fii_rows,'global_sources':'yfinance where available','regime_variables':regime_cols,'note':'Descriptive only; no new trading rule or filter was created. Sparse FII/DII source data are excluded rather than forward-filled across long gaps. Corporate/news variables were not imputed where reliable point-in-time reconstruction was unavailable.'}
     (out/'summary.json').write_text(json.dumps(meta,indent=2))
 
     report=[]
