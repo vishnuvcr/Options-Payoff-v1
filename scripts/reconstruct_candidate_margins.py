@@ -14,7 +14,8 @@ def main() -> None:
     ap.add_argument('--span-dir',required=True)
     ap.add_argument('--out',required=True)
     ap.add_argument('--date-col',default='entry_date')
-    ap.add_argument('--span-version',default='i02')
+    ap.add_argument('--span-version',default='i1')
+    ap.add_argument('--skip-missing',action='store_true')
     args=ap.parse_args()
     df=pd.read_csv(args.candidates)
     required={'entry_timestamp','entry_date','shift_points','strike','spot_at_entry','lot_size','chart_pnl_inr'}
@@ -26,16 +27,23 @@ def main() -> None:
     for entry_date, g in df.groupby(args.date_col, sort=True):
         date_key=str(entry_date)
         if date_key in cache:
-            engine=cache[date_key]
+            cached=cache[date_key]
+            if cached is None:
+                continue
+            engine,spn_name=cached
         else:
             ymd=pd.Timestamp(date_key).strftime('%Y%m%d')
             candidates=list(span_dir.glob(f'nsccl.{ymd}.'+'*.spn'))
-            if not candidates:
-                raise FileNotFoundError(f'No SPN file for {date_key}')
-            preferred=[p for p in candidates if args.span_version.lower() in p.name.lower()]
-            spn=preferred[0] if preferred else sorted(candidates)[-1]
+            preferred=[p for p in candidates if f'.{args.span_version.lower()}.' in p.name.lower()]
+            if not preferred:
+                if args.skip_missing:
+                    cache[date_key]=None
+                    continue
+                raise FileNotFoundError(f'No SPN file for {date_key} variant={args.span_version}')
+            spn=sorted(preferred)[0]
             engine=RiskEngine.from_file(str(spn))
-            cache[date_key]=engine
+            spn_name=spn.name
+            cache[date_key]=(engine,spn_name)
         for r in g.itertuples(index=False):
             qty=int(r.lot_size)
             strike=float(r.strike)
@@ -71,7 +79,7 @@ def main() -> None:
               'exposure_inr':float(final['exposure']),
               'option_premium_reported_inr':float(final['option_premium']),
               'additional_inr':float(final['additional']),
-              'source_spn_version':next((p.name for p in span_dir.glob(f'nsccl.{pd.Timestamp(date_key).strftime("%Y%m%d")}.*.spn') if args.span_version.lower() in p.name.lower()), None),
+              'source_spn_version':spn_name,
             })
     out=Path(args.out); out.parent.mkdir(parents=True,exist_ok=True)
     pd.DataFrame(rows).sort_values(['entry_timestamp','shift_points']).to_csv(out,index=False)
