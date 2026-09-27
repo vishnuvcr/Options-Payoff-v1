@@ -531,3 +531,17 @@ The phase must be run as a preregistered comparison of predefined H2/H3 candidat
 
 ### Phase 9G execution checkpoint — 2026-09-27
 Run **36313815542** is frozen at commit **63b399a9a1d631316dd5233bc684a4ee0a197b25**. The execution uses the exact 17 unique shifts from -400 to +400 in 50-point increments, rejects conflicting duplicate quote groups, and scans later timestamps when an earlier timestamp is incomplete. H1 completeness passed; yearly H1/H2/H3 reconstruction is still running. Acceptance remains blocked until realized ledgers, paired horizon comparisons, cost sensitivity, multiple-comparison controls, and selection-behaviour diagnostics are all generated and audited.
+
+
+### Phase 9G-S — H2/H3 source validation gate
+**Status:** opened after a reproducible source-coverage defect was identified.
+
+Before any H2/H3 performance inference, the source must be able to reconstruct all four option legs for the selected far expiry at the same intraday entry timestamp and support the exact 17-strike ATM-400..ATM+400 universe. The current Hugging Face source fails this gate for far-rank 2 and 3 because its expiry-partitioned files do not overlap the required pre-entry dates.
+
+Candidate replacement-source classes now recorded for validation include:
+1. A full-chain 1-minute archive claiming every NIFTY strike and every live expiry from June 2021–September 2026.
+2. The rissin/nse-options-intraday Hugging Face dataset, which exposes expiry, strike and option type in its 1-minute intraday track from October 2024 onward.
+3. The SauMStats NIFTY market-data engine / 2024 Kaggle raw archive plus 2026 live data, to be tested for actual far-expiry pre-entry coverage.
+4. Authenticated broker/API archives such as ICICI Breeze-derived pipelines or MoneyTicks where legally available.
+
+Acceptance gate: source coverage must be demonstrated on representative predeclared weekly cycles before any horizon comparison is pooled. If multiple sources are needed, source provenance and measurement heterogeneity must be analyzed explicitly rather than silently mixing them.
