@@ -195,3 +195,7 @@ Phase 7A's four-trade margin-gated result is superseded by the user's latest pos
 ## Phase 7C — Entry-feature / Greek analysis OPEN
 
 The primary weekly rule is fixed: first positive observation in the weekly cycle, then maximum positive flatline across the 17 strikes. This phase tests whether entry Greeks, IV structure, moneyness, or other observable parameters contain additional strike-selection information. No feature is accepted as a new rule before out-of-sample validation.
+
+## Phase 7C result
+
+63 selected weekly trades contained 36 winners and 27 losers. Greek/IV/moneyness winner-loser differences were not robust after Benjamini-Hochberg correction (best q ≈ 0.435 among tested Greek/IV features). Every full-coverage single-feature selector tested underperformed maximum positive flatline. Walk-forward training selected near-expiry call-put IV skew (maximum) in both splits, but it underperformed the baseline by ₹100.98/week and ₹66.24/week respectively in the two 16-week test blocks. Primary strike-selection rule remains unchanged.
