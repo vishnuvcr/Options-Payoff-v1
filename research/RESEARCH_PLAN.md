@@ -354,3 +354,44 @@ Entry-selection criterion for any follow-on feature hypothesis: it must be obser
 Phase 7C is complete when entry Greeks/IV/moneyness are compared between winners and losers, candidate-level within-week relationships are tested, alternative single-feature strike selectors are benchmarked against the maximum-positive-flatline rule, and at least one time-split/walk-forward test is completed. These criteria are met in workflow 36291838252.
 
 Result: none of the tested Greek/IV/moneyness features survives the multiple-comparison evidence threshold, all full-coverage simple alternative selectors underperform the baseline, and the best training-selected Greek/IV selector underperforms the baseline in both expanding walk-forward test blocks. **No new feature is adopted into the primary strategy.**
+
+## Phase 8 — Predictability of the cross-expiry (S_2-S_1) component
+
+Rationale: the Phase 7B decomposition showed that the static positive flatline was largely offset by the realized cross-expiry settlement difference. Phase 8 tests whether an **entry-time estimate** of (S_2-S_1) can improve the weekly trade decision.
+
+### Phase 8A — Internal information baseline
+
+Target: (S_2-S_1) per index point for each weekly cycle.
+
+Predictors available at entry only:
+- selected candidate and positive-candidate surface IV/Greek summaries;
+- moneyness and flatline state;
+- NIFTY spot at entry and entry-to-entry spot change;
+- calendar variables;
+- lagged realized (S_2-S_1) from completed prior weekly cycles.
+
+Models:
+- ridge regression;
+- random forest regression;
+- histogram gradient boosting regression.
+
+Validation:
+- expanding walk-forward, one week ahead;
+- initial training window 31 weeks;
+- 32 strictly out-of-sample weeks;
+- target prediction error and sign accuracy;
+- economic trade filters using predicted (S_2-S_1), with the existing transaction-cost model.
+
+Predefined trade filters:
+1. predicted (S_2-S_1>0);
+2. expected total trade P&L (=) observed static flatline + predicted (S_2-S_1	imes lot - modeled costs >0).
+
+No threshold is tuned on the out-of-sample results.
+
+### Phase 8B — External market-state expansion
+
+Only if the internal-information baseline gives evidence of useful predictability, add point-in-time external variables that can plausibly forecast the cross-expiry move: NIFTY futures basis, India VIX/volatility regime, global index futures, USD/INR, gold, FII/DII flow, option OI/volume and relevant news/event regime indicators. External data must be cached in the repository and joined strictly by information availability time.
+
+### Phase 8 stop rule
+
+Do not declare (S_2-S_1) useful unless the walk-forward predictor improves the existing weekly strategy after costs and remains stable across time blocks. If it does not, the research should document the negative result and stop this branch rather than endlessly searching for predictors.
