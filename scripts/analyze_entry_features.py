@@ -331,7 +331,7 @@ def main():
     baseline_selector = sel_df[(sel_df.feature=="estimated_equal_max_profit_loss_inr")&(sel_df.direction=="max")] if not sel_df.empty else pd.DataFrame()
     summary={
         "selected_trades":int(len(selected_feat)),
-        "selected_winners":int((selected_feat.net_pnl_inr>0).sum()),
+        "selected_winners":int((selected_feat.selected_net_pnl_inr>0).sum()),
         "selected_losers":int((selected_feat.net_pnl_inr<=0).sum()),
         "candidate_rows_at_decision_times":int(len(feat)),
         "candidate_weeks":int(feat.weekly_cycle.nunique()),
