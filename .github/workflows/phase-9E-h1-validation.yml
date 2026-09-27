@@ -62,13 +62,3 @@ jobs:
         with:
           name: phase-9E-h1-validation-evidence
           path: results/phase9e
-
-      - name: Persist validation results
-        env:
-          SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36302077730' }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add results/phase9e
-          git commit -m "Add Phase 9E frozen-rule H1 validation results" || echo "No result changes to commit"
-          git push origin phase-9E-h1-validation
