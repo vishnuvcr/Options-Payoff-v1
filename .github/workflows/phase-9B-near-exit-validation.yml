@@ -3,7 +3,7 @@ name: Phase 9B - Corrected H1 Validation
 on:
   workflow_run:
     workflows:
-      - 'Phase 9A - Correct Near-Expiry Manual Close Baseline (v4)'
+      - 'Phase 9A - Correct Near-Expiry Manual Close Baseline (v5)'
     types: [completed]
   workflow_dispatch:
     inputs:
