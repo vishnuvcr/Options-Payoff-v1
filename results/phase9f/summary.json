@@ -1,0 +1,17 @@
+{
+  "phase": "9F",
+  "status": "complete",
+  "trades": 169,
+  "nse_source": "yfinance fallback",
+  "vix_source": "yfinance fallback",
+  "fii_dii_source": "Hareeshkesavan",
+  "global_sources": "yfinance where available",
+  "regime_variables": [
+    "india_vix_regime",
+    "nifty_gap_regime",
+    "fii_regime",
+    "dii_regime",
+    "global_risk_regime"
+  ],
+  "note": "Descriptive only; no new trading rule or filter was created. Corporate/news variables were not imputed where reliable point-in-time reconstruction was unavailable."
+}
