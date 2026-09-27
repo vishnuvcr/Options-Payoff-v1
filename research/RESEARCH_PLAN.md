@@ -262,3 +262,7 @@ The original plan's statements about a configurable 2.5% trade-entry threshold a
 
 ### Strict strike-completeness safeguard — 2026-09-27
 For the all-17-strike rule, a timestamp is a valid decision observation only when all 17 common-strike candidates have the required four option quotes. A positive payoff from a partial strike universe is not a valid signal; such timestamps are logged as incomplete and skipped only because the required evaluation set is unavailable.
+
+
+### Legacy-control supersession amendment — 2026-09-27
+The Phase 9D H1 result previously quoted as 169 complete trades is **not** the accepted control for the current research protocol because the independent decision-surface audit found only 45/172 legacy selected timestamps with the complete exact 17-strike set. The corrected Phase 9G H1 reconstruction is the control for H2/H3 inference.
