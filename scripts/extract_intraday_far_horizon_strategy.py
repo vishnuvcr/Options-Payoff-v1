@@ -207,11 +207,21 @@ def main():
         })
         # Do not check later timestamps in this weekly cycle after the first positive timestamp.
 
-    selected_df=pd.DataFrame(selected).sort_values('entry_timestamp').reset_index(drop=True)
+    selected_columns=[
+        'entry_timestamp','entry_date','spot_at_entry','near_expiry','far_expiry',
+        'near_exit_timestamp','far_call_exit_timestamp','far_put_exit_timestamp',
+        'candidate_label','shift_points','strike','near_call_close','near_put_close',
+        'far_call_close','far_put_close','near_settlement','far_call_exit_close',
+        'far_put_exit_close','execution_fidelity','near_lot_size','far_lot_size',
+        'net_entry_cashflow_per_unit','flatline_per_unit','flatline_inr'
+    ]
+    selected_df=pd.DataFrame(selected)
+    if selected_df.empty:
+        selected_df=pd.DataFrame(columns=selected_columns)
+    else:
+        selected_df=selected_df.sort_values('entry_timestamp').reset_index(drop=True)
     audit_df=pd.concat(scan_audit,ignore_index=True) if scan_audit else pd.DataFrame()
     surface_df=pd.concat(decision_surface,ignore_index=True) if decision_surface else pd.DataFrame()
-    if selected_df.empty:
-        raise RuntimeError('No intraday positive opportunities were found')
     Path(args.out_selected).parent.mkdir(parents=True,exist_ok=True)
     selected_df.to_parquet(args.out_selected,index=False)
     audit_df.to_parquet(args.out_scan_audit,index=False)
