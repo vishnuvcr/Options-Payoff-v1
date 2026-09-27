@@ -160,20 +160,22 @@ def main():
         ).reset_index()
         quote_nuniq=surf.groupby(['timestamp','shift_points'])[['near_call','near_put','far_call','far_put']].nunique()
         conflicting_shift_count=quote_nuniq.gt(1).any(axis=1).groupby(level=0).sum().rename('conflicting_shift_count').reset_index()
-        aud=aud.merge(conflicting_shift_count,on='timestamp',how='left')
+        shift_sets=surf.groupby('timestamp')['shift_points'].agg(lambda s: frozenset(pd.to_numeric(s,errors='coerce').dropna().astype(int))).rename('shift_set').reset_index()
+        aud=aud.merge(conflicting_shift_count,on='timestamp',how='left').merge(shift_sets,on='timestamp',how='left')
         pos=surf[surf['flatline_inr']>0].groupby('timestamp').size().rename('positive_count')
         pmax=surf[surf['flatline_inr']>0].groupby('timestamp')['flatline_inr'].max().rename('max_positive_flatline_inr')
         aud=all_times.merge(aud,on='timestamp',how='left').merge(pos,on='timestamp',how='left').merge(pmax,on='timestamp',how='left')
         for col in ['candidate_row_count','candidate_shift_count','conflicting_shift_count','positive_count']:
             aud[col]=aud[col].fillna(0).astype(int)
+        aud['shift_set_complete']=aud['shift_set'].map(lambda s: bool(s==frozenset(range(-400,401,50))) if isinstance(s,frozenset) else False)
         aud['near_expiry']=near_expiry
-        # The strategy requires all 17 unique strike shifts and unambiguous quotes.
-        aud['decision']=(aud['candidate_shift_count']==17) & (aud['conflicting_shift_count']==0) & (aud['positive_count']>0)
+        # The strategy requires the exact 17 strike shifts and unambiguous quotes.
+        aud['decision']=aud['shift_set_complete'] & (aud['conflicting_shift_count']==0) & (aud['positive_count']>0)
         aud['reason']='no_positive_candidate'
-        aud.loc[(aud['candidate_shift_count']!=17) & (aud['positive_count']>0),'reason']='incomplete_17_strike_set'
-        aud.loc[(aud['candidate_shift_count']==17) & (aud['conflicting_shift_count']>0) & (aud['positive_count']>0),'reason']='conflicting_duplicate_quotes'
+        aud.loc[(~aud['shift_set_complete']) & (aud['positive_count']>0),'reason']='incomplete_17_strike_set'
+        aud.loc[aud['shift_set_complete'] & (aud['conflicting_shift_count']>0) & (aud['positive_count']>0),'reason']='conflicting_duplicate_quotes'
         aud.loc[aud['decision'],'reason']='positive_candidate_found'
-        scan_audit.append(aud[['near_expiry','timestamp','candidate_row_count','candidate_shift_count','conflicting_shift_count','positive_count','max_flatline_inr','max_positive_flatline_inr','decision','reason']])
+        scan_audit.append(aud[['near_expiry','timestamp','candidate_row_count','candidate_shift_count','shift_set_complete','conflicting_shift_count','positive_count','max_flatline_inr','max_positive_flatline_inr','decision','reason']])
 
         valid_times=set(aud.loc[aud['decision'],'timestamp'])
         positive=surf[(surf['flatline_inr']>0) & (surf['timestamp'].isin(valid_times))].sort_values(['timestamp','flatline_inr','shift_points'],ascending=[True,False,True])
@@ -238,6 +240,7 @@ def main():
         'complete_17_unique_shift_timestamp_count':int((audit_df['candidate_shift_count']==17).sum()) if not audit_df.empty else 0,
         'incomplete_positive_timestamp_count':int(((audit_df['candidate_shift_count']!=17)&(audit_df['positive_count']>0)).sum()) if not audit_df.empty else 0,
         'conflicting_duplicate_quote_timestamp_count':int(((audit_df['conflicting_shift_count']>0)&(audit_df['positive_count']>0)).sum()) if not audit_df.empty else 0,
+        'exact_17_shift_timestamp_count':int(audit_df['shift_set_complete'].sum()) if not audit_df.empty else 0,
     }
     Path(args.out_selected).with_suffix('.metadata.json').write_text(json.dumps(meta,indent=2,default=str),encoding='utf-8')
     print(json.dumps(meta,indent=2,default=str))
