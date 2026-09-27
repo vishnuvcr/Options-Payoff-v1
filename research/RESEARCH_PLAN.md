@@ -416,3 +416,92 @@ Result:
 - therefore **no S2-S1 predictor/filter is adopted**.
 
 Per the predefined stop rule, Phase 8B external-variable expansion is not promoted unless a materially larger independent dataset or a new predeclared information source becomes available. The current branch is therefore treated as a completed negative/insufficient-evidence result rather than an invitation to keep optimizing predictors.
+
+
+## Phase 9 — Far-expiry selection grid (1/2/3 weeks beyond the near expiry)
+
+**Branch:** phase-9-far-expiry-selection-grid
+
+### Research question
+
+RQ9.1. After fixing the near expiry to the current weekly cycle, does allowing the far leg expiry to be selected from the next weekly expiry, next-next weekly expiry, or next-next-next weekly expiry improve the realized net economics of the four-leg structure?
+
+### Proposed strategy family
+
+For each near-expiry weekly cycle and each entry observation at which at least one positive/all-green candidate exists:
+
+- near legs remain: sell near-expiry CE + buy near-expiry PE;
+- far legs become a choice:
+  - H=1: buy next-week CE + sell next-week PE;
+  - H=2: buy next-next-week CE + sell next-next-week PE;
+  - H=3: buy next-next-next-week CE + sell next-next-next-week PE;
+- common strike candidates remain ATM-400 through ATM+400 in 50-point steps;
+- evaluate every valid (strike, far-expiry horizon) combination;
+- among positive/all-green combinations, select the one with the maximum estimated equal max-profit=max-loss flatline value in INR;
+- retain the current first-positive weekly decision timing and one selected combination per near-expiry cycle.
+
+### Algebra that must remain explicit
+
+For far expiry j:
+
+  static chart component = C1 - P1 - Cj + Pj
+
+  economic gross P&L = C1 - P1 - Cj + Pj + (Sj - S1)
+
+before execution costs.
+
+The green chart flatline remains a same-terminal-spot chart property. Changing far expiry changes both the observed calendar/carry component and the future Sj-S1 exposure; it does not turn the chart into a risk-free payoff.
+
+### Selection comparisons
+
+The Phase 9 workflow must compare, at minimum:
+
+1. Current baseline: H=1 only, then select the best positive strike.
+2. H=2 only, then select the best positive strike.
+3. H=3 only, then select the best positive strike.
+4. Exhaustive H in {1,2,3} × strike in {-400,...,+400}, selecting the single maximum positive flatline combination.
+5. A no-selection benchmark with H=1 at ATM where data support it.
+
+### No-look-ahead and overlapping-position rule
+
+A H=2 or H=3 far leg remains open beyond the near expiry. Therefore weekly trades can overlap across cycles. The primary Phase 9 portfolio backtest must not incorrectly treat overlapping far legs as independent capital events.
+
+The workflow must:
+
+- calculate each trade's four-leg entry costs at its actual entry;
+- close the near-expiry pair at S1 and the selected far-expiry pair at Sj;
+- preserve open far legs across intervening weekly cycles;
+- aggregate realized P&L on a chronological portfolio ledger;
+- show concurrent open positions, peak concurrent lots and capital/margin usage;
+- apply transaction costs and slippage to every executed order;
+- prevent any accidental use of a future week's information in selecting H.
+
+A separate sensitivity may impose a no-overlap rule, but it must not replace the primary overlapping-portfolio interpretation.
+
+### Multiple-testing protection
+
+Because H=1/2/3 and 17 strikes create 51 candidate combinations per entry observation, Phase 9 must report both:
+
+- the individual-horizon results; and
+- the combined 51-way selection result.
+
+Any apparent improvement from the combined selection is exploratory until it survives chronological walk-forward/holdout analysis. The workflow must retain the H=1 baseline as the fixed comparator.
+
+### Required analyses
+
+- trade count and weekly coverage;
+- gross and net P&L;
+- win rate, profit factor and drawdown;
+- static flatline contribution versus Sj-S1 contribution;
+- slippage and brokerage sensitivity;
+- far-horizon usage frequency;
+- realized holding duration;
+- concurrent-position and capital usage;
+- chronological train/test or walk-forward comparison;
+- block bootstrap / paired weekly P&L differences;
+- sensitivity to excluding the longest horizon H=3;
+- explicit data-availability loss accounting where H=2/H=3 expiries are unavailable.
+
+### Phase 9 stop rule
+
+Do not promote the far-expiry extension merely because the 51-way in-sample selector improves P&L. A new rule can only replace the baseline if the improvement is reproduced out of sample, remains positive after realistic costs, and does not rely on an unmodeled financing/margin or overlapping-position assumption.
