@@ -40,3 +40,6 @@
 | 2026-09-27 | 9A | Downstream analyses contaminated by the same exit convention | Phase 7C labels winners/losers from the prior P&L; Phase 8A predicts the prior S2-S1 economic component. | Freeze both analyses as non-authoritative until corrected H=1 realized P&L is regenerated. |
 
 | 2026-09-27 | 9A | Repository documentation update hit a JavaScript template-literal syntax error while embedding formula backticks. | Payoff-audit and final-spec writes in that call were not applied. | Re-run with plain strings/arrays; no research result was changed. |
+
+| 2026-09-27 | 9A | Workflow patch attempt used a JavaScript template-literal payload containing GitHub `${{ ... }}` expressions. | The repository-write call failed before mutation. | Retried with ordinary string literals; workflow update committed successfully. |
+| 2026-09-27 | 9A | Initial workflow-log connector call used the wrong argument name; a second log fetch returned BlobNotFound while the job was still running. | No research output changed; live step logs were unavailable through that endpoint. | Monitor the run through the GitHub Actions REST run/job state and artifacts instead. |
