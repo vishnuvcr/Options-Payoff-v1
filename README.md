@@ -172,3 +172,7 @@ The current Actions reconstruction runs are **36304489832** and **36304477026**.
 The governing research plan is now version **1.1** and records the corrected operational rule: scan every 1-minute timestamp from 09:20–15:29; scan all 17 strikes from ATM-400 to ATM+400 in 50-point steps; remove the former 2.5% entry threshold; at the first qualifying timestamp choose the maximum positive equal Max Profit=Max Loss candidate; and continue later in the weekly cycle when 09:20 does not qualify. Phase 9G additionally fixes H1/H2/H3 as non-switching horizon variants and requires paired/dependence-aware statistical validation before any horizon change.
 
 [Research plan](research/RESEARCH_PLAN.md) · [Status](research/STATUS.md) · [Activity log](research/ACTIVITY_LOG.md) · [Error log](research/ERROR_LOG.md)
+
+
+### Latest research-governance correction — 2026-09-27
+Phase 9G now requires **all 17 common strikes** to be evaluable at a qualifying timestamp; a positive result from a partial strike set cannot trigger a trade. The current Phase 9G execution candidate also gates downstream H2/H3 inference on an authoritative H1 completeness audit and uses a corrected sensitivity reader for CSV ledgers.
