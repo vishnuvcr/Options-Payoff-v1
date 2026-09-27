@@ -136,3 +136,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | H1 control annual reference | Independently checked the archived H1 ledger: all 2021–2026 annual cohorts were historically net-positive, with materially weaker 2025 performance. Added annual control table to the Phase 9G H1 analysis document. |
 
 | 2026-09-27 | 9G | Methodological correction | Decision timestamps now require a complete 17-strike quote set. Positive timestamps with fewer than 17 candidates are recorded as incomplete and cannot trigger a trade. |
+
+| 2026-09-27 | 9G | Execution governance | Run 36305850007 remains in the old pre-concurrency reconstruction step. It is not the accepted result because run 10 contains the strict all-17-strike rule and H1 completeness gate. |
