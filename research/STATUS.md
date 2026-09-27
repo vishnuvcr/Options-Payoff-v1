@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-7A-margin-reconstruction  
-**Overall status:** Phase 7B — positive-only weekly selection analysis complete; final artifacts pending publication
+**Active branch:** phase-7B-weekly-cadence  
+**Overall status:** Phase 7B — positive-only weekly maximum-flatline research COMPLETE
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -171,3 +171,23 @@ The 2.5% rule is removed. Margin is no longer a trade-entry denominator. Every w
 ## Phase 7B preliminary result
 
 The first-positive no-look-ahead rule produced 63 weekly cycles and 63 trades, with positive candidates in every cycle. Baseline net P&L is ₹-9,627.90 after 0.25% premium slippage and ₹20/order brokerage. Win rate 57.14%; modeled costs ₹9,861.15. This is the current primary result pending artifact-backed full statistical analysis.
+
+
+## Phase 7B final result
+
+- 63 weekly cycles
+- 63 trades
+- 0 skipped cycles
+- positive candidate in every cycle
+- net P&L ₹-9,627.90
+- gross P&L ₹233.25
+- modeled costs ₹9,861.15
+- win rate 57.14%
+- profit factor 0.98
+- maximum drawdown ₹-174,083.24
+- largest win ₹34,652.56
+- largest loss ₹-55,786.13
+- IID bootstrap 95% CI for mean weekly P&L: ₹-4,996 to ₹4,410
+- four-week block bootstrap 95% CI: ₹-4,024 to ₹4,739
+
+Phase 7A's four-trade margin-gated result is superseded by the user's latest positive-only rule.
