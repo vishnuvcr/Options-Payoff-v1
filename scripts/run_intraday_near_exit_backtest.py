@@ -26,7 +26,31 @@ def main():
     else:
         df=pd.read_parquet(input_path)
     if df.empty:
-        raise RuntimeError('No intraday selected trades found')
+        out=Path(args.out_dir); out.mkdir(parents=True,exist_ok=True)
+        empty=pd.DataFrame(columns=[
+            'entry_timestamp','entry_date','candidate_label','shift_points','strike',
+            'near_expiry','far_expiry','near_exit_timestamp','far_call_exit_timestamp',
+            'far_put_exit_timestamp','near_call_close','near_put_close','far_call_close',
+            'far_put_close','near_settlement','far_call_exit_close','far_put_exit_close',
+            'near_lot_size','far_lot_size','net_pnl_inr','gross_pnl_inr','total_costs',
+            'chart_pnl_inr','estimated_max_profit_inr','estimated_min_pnl_inr',
+            'estimated_equal_max_profit_loss_inr','estimated_all_green_flatline'
+        ])
+        empty.to_csv(out/'intraday_selected_trades.csv',index=False)
+        empty.to_parquet(out/'intraday_selected_trades.parquet',index=False)
+        pd.DataFrame().to_csv(out/'intraday_incomplete_selected_trades.csv',index=False)
+        summary={
+            'weekly_cycles':0,'selected_weekly_cycles':0,'selected_trades':0,
+            'realized_trade_rows':0,'incomplete_selected_trades':0,
+            'chart_positive_win_rate_pct':None,'realized_win_rate_pct':None,
+            'net_pnl_inr':0.0,'gross_pnl_inr':0.0,'total_costs_inr':0.0,
+            'mean_net_pnl_inr':None,'median_net_pnl_inr':None,'losing_trades':0,
+            'slippage_pct':args.slippage_pct,'brokerage_per_order_inr':args.brokerage_per_order,
+            'selection_rule':'first intraday timestamp from 09:20 onward with any positive flatline; at that timestamp choose maximum positive flatline across ATM-400..ATM+400',
+            'no_0920_skip_rule':True,'empty_horizon':True
+        }
+        (out/'summary_intraday_near_exit.json').write_text(json.dumps(summary,indent=2))
+        return
     rows=[]
     incomplete=[]
     for row in df.itertuples(index=False):
