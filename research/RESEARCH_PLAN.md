@@ -289,3 +289,16 @@ Exit criteria:
 ## Phase 7A completion rule
 
 Phase 7A is complete when the platform denominator is calibrated, historical SPAN coverage is demonstrated, all candidates capable of exceeding 2.5% are reconstructed, the ±400 rule is enforced, and an exact qualifying trade ledger is produced. This has now been achieved: 4 i1 primary trades, 3 settlement-file sensitivity trades.
+
+## Phase 7B — Weekly decision cadence and strike-scan semantics
+
+**Branch:** phase-7B-weekly-cadence
+
+User clarification now treated as the primary operational interpretation: **scan once per weekly trading cycle, evaluate all 17 common strikes from ATM-400 to ATM+400, choose the strike with the maximum estimated equal max-profit=max-loss value among candidates that satisfy the >2.5% platform percentage gate, and trade that selected strike for that week. If no strike satisfies the gate, do not trade that week.**
+
+Critical distinction:
+- scanning every week does not imply a trade every week;
+- the 2.5% gate decides whether that week's selected candidate is tradable;
+- the current Phase 7A '4 trades' figure counts qualifying historical observations under the available dataset/margin reconstruction and must not be described as the number of weekly scans performed.
+
+Before the weekly result is treated as final, the backtest must map each weekly expiry cycle to exactly one entry observation without look-ahead. The exact weekly entry day/time must not be invented; it must come from the user's documented execution convention or the dataset's actual observation schedule.
