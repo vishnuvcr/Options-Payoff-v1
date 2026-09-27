@@ -39,13 +39,13 @@ def pnl_surface(g,near,far,exit_ts,settlement,maps,model):
     sc=g.near_call*(1-s); bp=g.near_put*(1+s); bc=g.far_call*(1+s); sp=g.far_put*(1-s)
     fce=g.far_call_exit_close*(1-s); fpe=g.far_put_exit_close*(1+s)
     g['gross_pnl_inr']=(sc-bp-bc+sp+(g.strike-float(settlement))+fce-fpe)*lot
-    turnover=(sc+bp+bc+sp+fce+fpe)*lot; sell=(sc+sp+fce)*lot; buy=(bp+bc+fpe)*lot
+    turnover=(sc+bp+bc+sp+fce+fpe)*lot; entry_sell=(sc+sp)*lot; entry_buy=(bp+bc)*lot
     brokerage=6*model.brokerage_per_order_inr
     exchange=turnover*model.exchange_turnover_rate; sebi=turnover*model.sebi_turnover_rate
     stamp_entry=(bp+bc)*lot*model.stamp_duty_buy_rate; stamp_exit=fpe*lot*model.stamp_duty_buy_rate
     stt_entry_rate=np.where(g.entry_date>=dt.date(2026,4,1),model.stt_from_2026_04_01,model.stt_before_2026_04_01)
     stt_exit_rate=model.stt_from_2026_04_01 if exit_ts.date()>=dt.date(2026,4,1) else model.stt_before_2026_04_01
-    stt_entry=sell*stt_entry_rate; stt_exit=fce*lot*stt_exit_rate
+    stt_entry=entry_sell*stt_entry_rate; stt_exit=fce*lot*stt_exit_rate
     exercise=np.maximum(g.strike-float(settlement),0)*lot
     exercise_rate=model.exercise_stt_from_2026_04_01 if exit_ts.date()>=dt.date(2026,4,1) else model.exercise_stt_before_2026_04_01
     stt_ex=exercise*exercise_rate; gst=model.gst_rate*(brokerage+exchange+sebi)
