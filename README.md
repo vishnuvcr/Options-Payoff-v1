@@ -1,5 +1,17 @@
 # Options-Payoff-v1
 
+> **LIVE RESEARCH STATUS — 27-Sep-2026**
+>
+> **Phase 9A is the authoritative research phase.** The actual strategy closes all four legs at the near weekly expiry: near-expiry CE/PE settle; far-expiry CE/PE are manually squared off using their observed market prices at the near-expiry close. All earlier realized-P&L conclusions based on holding the far legs to their own expiry are superseded.
+>
+> Current corrected H1 execution: GitHub Actions run **36296334057** on `phase-9-near-expiry-exit-correction` is rebuilding the full entry grid with point-in-time far-leg exit prices. Unit tests have passed; the data-reconstruction step is active. H2/H3 remain frozen until H1 is complete.
+>
+> A second execution-cost audit also corrected entry slippage in gross P&L and exit/exercise STT date handling before accepting any H1 result. The corrected workflow models six economic transactions (four entries + two far-leg manual exits), 0.25% premium slippage, ₹20/order brokerage for the primary historical ledger, and includes broker-cost sensitivity. Current Paytm Money F&O guidance says ₹10 per executed unique F&O order, while older published Paytm Money material documents a ₹20 regime; this ambiguity is treated as a sensitivity rather than silently resolved.
+>
+> Phase 9B validation is pre-wired to run automatically after a successful Phase 9A v3 run and will produce the corrected loss audit, bootstrap/time-split statistics, slippage sensitivity, Paytm Money brokerage sensitivity, and weekly ledger.
+>
+--- 
+
 Research repository for testing a cross-expiry NIFTY index-options strategy.
 
 ## Current research status
