@@ -8,3 +8,6 @@ Corrected Rissin source reconstruction for 2024 produced H1 = 11 selected / 9 re
 
 ### Merge tooling correction — 2026-09-27
 The first pooled Rissin merge failed because an empty horizon emitted a zero-byte incomplete-trades CSV and the merger called pandas.read_csv without checking file size. The merger now treats zero-byte incomplete ledgers as zero rows. No yearly trade data were rejected.
+
+### Merge tooling correction — 2026-09-27
+The first corrected Rissin merge failed because an empty incomplete-trades CSV has no columns and pandas raised EmptyDataError. This is a merge-only defect; all three yearly artifacts were successfully reconstructed. The merger now treats an empty file as zero incomplete rows.
