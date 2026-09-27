@@ -356,3 +356,7 @@ Phase 9G completeness audit also identified a predeclared analysis gap: the fina
 ## Phase 9G correction checkpoint — 2026-09-27
 
 The sensitivity path has been hardened: realized trade ledgers now retain the raw quote-level fields required to recompute execution costs, and the workflow refuses to proceed if those fields are absent. The merger also now produces the required first-positive decision-time and selected-strike distribution summaries. **No H2/H3 conclusion is accepted yet.** Fresh corrected workflow run: 36305850007.
+
+
+### 2026-09-27 — pre-result implementation audit
+The Phase 9G selector was manually audited for chronology, 17-strike scan logic, maximum-positive selection, far-leg near-expiry marking, realized P&L sign conventions, six-order brokerage accounting, and STT/stamp/GST handling. No calculation defect was identified in this audit. The active data reconstruction remains the blocking step; no H2/H3 conclusion is accepted.
