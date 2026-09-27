@@ -21,3 +21,11 @@ def first_positive_intraday_surface(
         positive.sort(key=lambda c: (-float(c["flatline_inr"]), int(c["shift_points"])))
         return timestamp, positive[0], candidates
     return None
+
+
+def max_positive_candidate(candidates):
+    positive = [c for c in candidates if float(c['flatline_inr']) > 0.0]
+    if not positive:
+        return None
+    positive.sort(key=lambda c: (-float(c['flatline_inr']), int(c['shift_points'])))
+    return positive[0]
