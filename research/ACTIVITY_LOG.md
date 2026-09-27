@@ -132,3 +132,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Literature review extension | Added NIFTY box-spread efficiency evidence and cross-maturity volatility/calendar-spread literature; conclusion reinforced that the positive flatline is a selection metric, not proof of risk-free arbitrage. |
 
 | 2026-09-27 | 9G | H1 control baseline extracted | From authoritative run 36302077730: 169 complete realized trades; ATM selected once; decision timing median 25 minutes and P90 340.2 minutes after 09:20. Added machine-readable shift distribution and analysis document. |
+
+| 2026-09-27 | 9G | H1 control annual reference | Independently checked the archived H1 ledger: all 2021–2026 annual cohorts were historically net-positive, with materially weaker 2025 performance. Added annual control table to the Phase 9G H1 analysis document. |
