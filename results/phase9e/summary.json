@@ -1,0 +1,44 @@
+{
+  "phase": "9E",
+  "status": "complete",
+  "source_run_id": 36302077730,
+  "source_artifact": "phase-9D-final-H1-evidence",
+  "rule_frozen": true,
+  "complete_realized_trades": 169,
+  "incomplete_selected_trades": 3,
+  "incomplete_reasons": {
+    "lot_size_mismatch": 3
+  },
+  "primary_metrics": {
+    "trades": 169,
+    "net_pnl_inr": 125688.82485334152,
+    "mean_net_pnl_inr": 743.7208571203639,
+    "median_net_pnl_inr": 538.1730371995325,
+    "win_rate_pct": 63.905325443786985,
+    "profit_factor": 2.9413005123068015,
+    "max_drawdown_inr": 16200.649895328359,
+    "total_costs_inr": 37265.01577165843,
+    "largest_win_inr": 5825.602914892865,
+    "largest_loss_inr": -10052.106851599623
+  },
+  "primary_win_rate_wilson_95_ci_pct": [
+    56.42958849727131,
+    70.76296143877028
+  ],
+  "bootstrap": {
+    "iid_mean_pnl_95_ci_inr": [
+      441.8196068169417,
+      1039.5536904482976
+    ],
+    "circular_block4_mean_pnl_95_ci_inr": [
+      413.9168029152132,
+      1066.3009539075902
+    ],
+    "repetitions": 20000,
+    "seed": 20260927
+  },
+  "calendar_years_all_positive": true,
+  "anchored_holdout_years_all_positive": true,
+  "validation_state": "historically_positive_with_positive_bootstrap_lower_bound",
+  "note": "Temporal holdouts are rule-frozen historical diagnostics, not pristine future-data validation, because the same 2021-2026 sample was observed during strategy development. No parameters were tuned on holdout results."
+}
