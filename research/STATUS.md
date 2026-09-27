@@ -74,3 +74,8 @@ The loss audit explains why: a positive static payoff-chart trigger can coexist 
 ## Phase 9A corrective checkpoint
 
 All prior realized-P&L conclusions remain superseded. Correct H1 uses point-in-time far-expiry CE/PE prices at the near-expiry close, manual far-leg exits, entry and exit slippage, entry/exit-date tax timing, and six-order brokerage accounting. GitHub Actions run 36296334057 is the current authoritative H1 execution; unit tests passed and data reconstruction is active. H2/H3 remain frozen until H1 completes.
+
+
+## Current research state
+
+Phase 9A corrected the exit convention and produced the authoritative H1 ledger. Phase 9B independently reproduced that ledger and passed all statistical/loss/cost validation gates. Corrected H1 is not robust enough to be treated as a validated standalone edge under realistic execution uncertainty. Phase 9C H2/H3 is queued on Actions run 36297960485 and remains pending.
