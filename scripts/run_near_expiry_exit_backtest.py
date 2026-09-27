@@ -38,7 +38,7 @@ def six_transaction_costs(entry_date, exit_date, entry_exec, far_call_exit_exec,
     exercise_value = near_put_intrinsic * lot
     stt_exercise = exercise_value * exercise_stt_rate_for_date(exit_date, model)
     gst = model.gst_rate * (brokerage + exchange + sebi)
-    total = brokerage + exchange + sebi + stamp + stt_sales + stt_exercise + gst
+    total = brokerage + exchange + sebi + stamp_entry + stamp_exit + stt_entry_sales + stt_exit_sales + stt_exercise + gst
     return {
         'brokerage': brokerage, 'exchange_transaction': exchange, 'sebi_fee': sebi,
         'stamp_duty_entry': stamp_entry, 'stamp_duty_exit': stamp_exit,
