@@ -79,3 +79,8 @@ All prior realized-P&L conclusions remain superseded. Correct H1 uses point-in-t
 ## Current research state
 
 Phase 9A corrected the exit convention and produced the authoritative H1 ledger. Phase 9B independently reproduced that ledger and passed all statistical/loss/cost validation gates. Corrected H1 is not robust enough to be treated as a validated standalone edge under realistic execution uncertainty. Phase 9C H2/H3 is queued on Actions run 36297960485 and remains pending.
+
+
+## Phase 9C live checkpoint
+
+GitHub Actions run **36297960485** is actively building corrected H2 inputs. H1 and Phase 9B are complete and validated; H2/H3 results are not yet available and no horizon conclusion is being inferred before the workflow finishes.
