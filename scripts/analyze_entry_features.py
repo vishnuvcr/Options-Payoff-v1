@@ -171,7 +171,7 @@ def univariate_trade_stats(selected):
     selected["win"] = selected.net_pnl_inr > 0
     win = selected[selected.win]
     loss = selected[~selected.win]
-    features = [c for c in selected.columns if c.startswith(("near_","next_","iv_","abs_net_","net_","tau_","moneyness","flatline_to_"))]
+    features = [c for c in selected.columns if c.startswith(("near_","next_","iv_","abs_net_","tau_","moneyness","flatline_to_")) or c in {"net_delta","net_gamma","net_vega","net_theta_day"}]
     rows=[]
     for f in features:
         if f in {"near_expiry","next_expiry"}:
@@ -238,6 +238,43 @@ def selector_results_with_bootstrap(candidates, features):
             stat=paired_bootstrap_diff(baseline,alt)
             all_rows.append({'feature':f,'direction':direction,**stat,'alt_total_net_pnl_inr':float(alt.net_pnl_inr.sum()),'alt_mean_net_pnl_inr':float(alt.net_pnl_inr.mean()),'alt_win_rate_pct':float(100*(alt.net_pnl_inr>0).mean())})
     return pd.DataFrame(all_rows)
+
+def walk_forward_feature_selection(candidates, features, test_weeks=16):
+    weeks=sorted(candidates.weekly_cycle.unique())
+    rows=[]
+    for end_train in (31,47):
+        if end_train >= len(weeks):
+            continue
+        test_weeks_list=weeks[end_train:min(end_train+test_weeks,len(weeks))]
+        train=candidates[candidates.weekly_cycle.isin(weeks[:end_train])]
+        test=candidates[candidates.weekly_cycle.isin(test_weeks_list)]
+        train_scores=[]
+        for f in features:
+            for direction in ("max","min"):
+                tr=candidate_selector_test(train,f,direction)
+                if tr.empty:
+                    continue
+                train_scores.append({"feature":f,"direction":direction,"train_total_net_pnl_inr":float(tr.net_pnl_inr.sum())})
+        if not train_scores:
+            continue
+        best=max(train_scores,key=lambda x:x["train_total_net_pnl_inr"])
+        alt_test=candidate_selector_test(test,best["feature"],best["direction"])
+        base_test=candidate_selector_test(test,"estimated_equal_max_profit_loss_inr","max")
+        paired=paired_bootstrap_diff(base_test,alt_test)
+        rows.append({
+            "train_end_week_index":end_train,
+            "train_weeks":int(len(weeks[:end_train])),
+            "test_weeks":int(len(test_weeks_list)),
+            "selected_feature":best["feature"],
+            "selected_direction":best["direction"],
+            "train_total_net_pnl_inr":best["train_total_net_pnl_inr"],
+            "test_total_net_pnl_inr":float(alt_test.net_pnl_inr.sum()) if not alt_test.empty else np.nan,
+            "baseline_test_total_net_pnl_inr":float(base_test.net_pnl_inr.sum()) if not base_test.empty else np.nan,
+            "test_mean_difference_inr":paired["mean_difference_inr"],
+            "test_ci_low_inr":paired["ci_low_inr"],
+            "test_ci_high_inr":paired["ci_high_inr"],
+        })
+    return pd.DataFrame(rows)
 
 def candidate_within_week_correlations(candidates):
     feats=[c for c in candidates.columns if c in [
@@ -330,6 +367,9 @@ def main():
     selector_features=[f for f in selector_features if f in feat.columns]
     sel_df=selector_results_with_bootstrap(feat,selector_features)
     sel_df.to_csv(out/"candidate_feature_selection_tests.csv",index=False)
+    greek_features=[f for f in selector_features if f!="estimated_equal_max_profit_loss_inr"]
+    wf=walk_forward_feature_selection(feat,greek_features,test_weeks=16)
+    wf.to_csv(out/"walk_forward_feature_selection.csv",index=False)
 
     baseline_selector = sel_df[(sel_df.feature=="estimated_equal_max_profit_loss_inr")&(sel_df.direction=="max")] if not sel_df.empty else pd.DataFrame()
     summary={
@@ -343,7 +383,8 @@ def main():
         "positive_candidate_definition":"static one-dimensional flatline > 0 at the decision timestamp",
         "primary_rule":"first positive weekly observation; among positive candidates maximize estimated equal max-profit=max-loss flatline",
         "selector_test_note":"Each alternative feature selects one positive candidate per week by max/min. These are exploratory univariate tests and must not be treated as an optimized final strategy without out-of-sample validation.",
-        "baseline_selector_total_net_pnl_inr": float(baseline_selector.alt_total_net_pnl_inr.iloc[0]) if not baseline_selector.empty else None
+        "baseline_selector_total_net_pnl_inr": float(baseline_selector.alt_total_net_pnl_inr.iloc[0]) if not baseline_selector.empty else None,
+        "walk_forward_feature_selector_note":"Expanding-window exploratory test: at each split, choose the best Greek/IV/moneyness selector from the training weeks, then apply it once to the next 16 weeks. Baseline remains maximum positive flatline."
     }
     (out/"summary.json").write_text(json.dumps(summary,indent=2),encoding="utf-8")
     print(json.dumps(summary,indent=2))
