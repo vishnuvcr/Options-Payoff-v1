@@ -1,3 +1,5 @@
+> **SUPERSEDED:** These H1 results were generated with the wrong 09:20-only entry cadence. They are retained only as an audit record. They are not valid results for the current strategy and must not be used as a trading conclusion.
+>
 # Phase 9B — Corrected H1 statistical validation
 
 Authoritative validation run: **36297884737**.
