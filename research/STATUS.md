@@ -392,3 +392,10 @@ The earlier Phase 9G run remained in the old concurrency group. The corrected pi
 
 ### Legacy H1 superseded — 2026-09-27
 The old Phase 9D H1 control is **not accepted under the exact current rule**: 127/172 selected timestamps lacked one or more prescribed strike shifts. No conflicting quote values were found. Phase 9G run 27 is reconstructing the corrected H1/H2/H3 horizons from raw data under the exact 17-strike rule.
+
+
+### 2026-09-27 — Run 27 live checkpoint
+**Run:** 36313815542  
+**Frozen execution commit:** 63b399a9a1d631316dd5233bc684a4ee0a197b25  
+**State:** in progress.  
+The independent H1 completeness job has completed successfully. All six yearly reconstructions (2021–2026) have passed setup, dependency and data-cache stages and remain in the exact H1/H2/H3 decision-surface reconstruction step. No horizon performance result or H2/H3 conclusion has been accepted. A transient GitHub log-artifact lookup returned 404 while jobs were still running; this is recorded as tooling availability only, not a research/data result.

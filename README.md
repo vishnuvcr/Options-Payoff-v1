@@ -283,3 +283,7 @@ The Phase 9G branch has been reset to concurrency group **v2** after the stale r
 
 ### Legacy H1 control superseded — 2026-09-27
 The authoritative Phase 9D audit found the old 169-trade control did not consistently evaluate the exact 17-strike universe: only 45/172 selected timestamps had the complete prescribed set. The historical 169-trade result is therefore diagnostic only. The corrected Phase 9G reconstruction is the operative control.
+
+
+### Phase 9G live reconstruction checkpoint — 2026-09-27
+Run **36313815542** is the current corrected execution and remains **in progress** on the frozen exact-17-strike commit **63b399a9a1d631316dd5233bc684a4ee0a197b25**. The H1 completeness gate has completed successfully. All six yearly H1/H2/H3 reconstruction jobs have completed checkout, dependency installation and option-data caching and are currently in the reconstruction step. No yearly P&L, horizon comparison, sensitivity, or H2/H3 conclusion has been accepted yet.

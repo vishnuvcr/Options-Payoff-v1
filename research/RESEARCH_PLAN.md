@@ -522,8 +522,12 @@ Phase 9F is complete. The 169-trade H1 ledger was joined to point-in-time NIFTY/
 
 ## Phase 9G — H2/H3 far-expiry selection research
 
-**Status:** next planned phase; branch to be created from `phase-9F-regime-crossmarket-audit` after documentation is committed.
+**Status:** executing on branch `phase-9G-h2-h3-far-expiry-selection`. The corrected run 27 reconstruction is the operative Phase 9G execution.
 
 The H1 entry rule, first-positive timestamp logic, 17-strike ATM-400..ATM+400 grid, near-expiry manual-close exit convention, 0.25% premium slippage, broker-cost sensitivity and statutory cost model remain fixed. Phase 9G will test the research question left frozen by earlier corrections: whether the choice of the far expiry beyond the near weekly expiry changes realized economics when the far CE/PE are manually closed at near expiry.
 
 The phase must be run as a preregistered comparison of predefined H2/H3 candidate expiry horizons, with no future-data selection, separate yearly/chronological diagnostics, execution-cost sensitivity and multiple-testing correction where candidate selectors are compared. No regime insight from Phase 9F can become an entry filter inside Phase 9G.
+
+
+### Phase 9G execution checkpoint — 2026-09-27
+Run **36313815542** is frozen at commit **63b399a9a1d631316dd5233bc684a4ee0a197b25**. The execution uses the exact 17 unique shifts from -400 to +400 in 50-point increments, rejects conflicting duplicate quote groups, and scans later timestamps when an earlier timestamp is incomplete. H1 completeness passed; yearly H1/H2/H3 reconstruction is still running. Acceptance remains blocked until realized ledgers, paired horizon comparisons, cost sensitivity, multiple-comparison controls, and selection-behaviour diagnostics are all generated and audited.

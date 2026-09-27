@@ -152,3 +152,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Execution reset | Consolidated the exact-17-strike rule, empty-horizon handling, corrected H1-control logic, and legacy-H1 diagnostic treatment. Reset workflow concurrency to a new v2 group so the corrected run can execute without cancellation by the stale process. |
 
 | 2026-09-27 | 9G | Legacy H1 audit completed | Exact 17-strike surface audit of the authoritative Phase 9D H1 artifact found 45/172 selected timestamps strictly complete. The 169-trade legacy H1 result is retained only as historical reference; corrected Phase 9G reconstruction is now the control. |
+
+| 2026-09-27 | 9G | Run 27 live checkpoint | Verified workflow 36313815542 remains in progress on frozen corrected commit 63b399a9a1d631316dd5233bc684a4ee0a197b25. H1 completeness job succeeded; all six yearly jobs are still in decision-surface reconstruction after successful setup/dependency/cache stages. No H2/H3 inference accepted. |
+|
