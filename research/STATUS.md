@@ -376,3 +376,7 @@ The frozen H1 control now includes annual cohort performance for 2021–2026. Th
 
 ### Strict 17-strike completeness correction — 2026-09-27
 The selector now requires candidate_count = 17 at a qualifying timestamp. This preserves the user's no-skipping requirement and prevents missing-option data from silently changing the selection universe. The next Phase 9G run is therefore the first run using this strict completeness rule.
+
+
+### Execution governance — 2026-09-27
+Run **36307233038 (Phase 9G run 10)** is the current accepted execution candidate. It includes the strict 17-strike completeness rule and H1 completeness gate. Older run 36305850007 remains an obsolete process and its outputs will not be used.
