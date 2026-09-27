@@ -182,3 +182,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9H | Vectorized execution committed | Candidate economics are now calculated in vectorized form after the exact 17-strike validity gate; no economic formula or selection criterion changed. |
 
 | 2026-09-27 | 9H-A | Scope correction | Phase 9H was narrowed from full-sample recomputation to targeted reconstruction of the 54 realized loss cycles. This avoids spending compute on unaffected winners while preserving the exact entry and cost rules. |
+
+| 2026-09-27 | 9H | Accounting regression discovered | A direct 2021-07-20 comparison showed the targeted Phase 9H baseline differed from the frozen Phase 9G ledger because far-call exit STT had been counted twice. All pre-fix Phase 9H outputs are discarded. |
+| 2026-09-27 | 9H | Accounting correction | Fixed entry STT to use only the four entry-leg sell turnover and retained far-call STT as the separate exit transaction. Added a hard baseline-P&L regression gate before any result is accepted. |
