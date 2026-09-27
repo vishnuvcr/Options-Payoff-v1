@@ -137,3 +137,7 @@
 | 2026-09-27 | 9G | Run-27 pooled merge failure | Frozen run 36313815542 completed all six yearly reconstruction jobs, but the merge job failed because `pd.read_csv()` was called on a zero-byte `intraday_incomplete_selected_trades.csv`, raising `pandas.errors.EmptyDataError`. | Promote the already-corrected empty-ledger handling to the run-27 merge branch; rerun only the aggregation against the six frozen artifacts. Do not rerun market-data reconstruction or interpret the failed merge as a data result. |
 
 | 2026-09-27 | 9G | Final inference guard | Primary-source H2/H3 returned zero qualifying surfaces because the far-expiry partitions lacked pre-entry observations. | Classified as source coverage failure; no H2/H3 P&L inference or zero-performance claim accepted. Independent Rissin results remain source sensitivity only. |
+
+
+| 2026-09-27 | 9H | Local validation environment did not have pyarrow and outbound package installation was unavailable, so Parquet analysis could not be run locally. | No market-data result was affected; local execution was deferred to the repository's GitHub Actions environment, which installs the required analysis dependencies. |
+| 2026-09-27 | 9H | Initial Phase 9H analysis draft would have retained only losing cycles in the entry-variant ledger, which would have prevented full-sample comparison. | Caught before workflow execution; the script was corrected so all complete cycles feed variant economics, while the loss-detail file remains loss-focused. No result from the defective version was accepted. |
