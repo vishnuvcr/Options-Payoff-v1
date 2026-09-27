@@ -252,7 +252,7 @@ Workflow: [.github/workflows/phase-9F-regime-crossmarket-audit.yml](.github/work
 **Next:** H2/H3 far-expiry selection research is reopened on a separate preregistered branch; the H1 rule remains frozen while that research runs.
 
 
-## Phase 9G — H2/H3 far-expiry selection EXECUTING
+## Phase 9G — H2/H3 far-expiry selection COMPLETE — corrected primary result
 
 Phase 9G is reconstructing fixed H1/H2/H3 far-expiry horizons on the corrected intraday rule, using 1-minute observations from 09:20–15:29 and near-expiry manual closure of far CE/PE. The predeclared comparison does not allow dynamic horizon switching and retains H1 as the control.
 
@@ -307,3 +307,54 @@ The completed corrected H1 ledgers for 2021, 2024 and 2026 were independently re
 See [Phase 9G data-source decision matrix](docs/PHASE9G_DATA_SOURCE_DECISION_MATRIX.md).
 ### Phase 9G cross-source sensitivity finding — 2026-09-27
 The same frozen H1 rule produces materially different measured economics across the two tested datasets: 2024 HF-source H1 = ₹20,656.83 versus Rissin = ₹18,690.31; 2026 HF-source H1 = ₹21,014.63 versus Rissin = ₹58,226.92. This is treated as **source/measurement sensitivity**, not evidence that either vendor is superior. H2/H3 comparisons will therefore remain within-source and source provenance will be explicit. See [cross-source sensitivity](docs/PHASE9G_CROSS_SOURCE_SENSITIVITY.md).
+
+
+## Phase 9G — FINAL CORRECTED RESULT — 2026-09-27
+
+The exact-17-strike Phase 9G reconstruction is complete on the frozen primary-source run **36313815542**. All six yearly reconstruction jobs succeeded. The original pooled merge failed only because an empty incomplete CSV was passed to pandas; the aggregation was repaired without rerunning any market-data reconstruction. Corrected merge workflow **36320697995** succeeded.
+
+### Primary H1 result
+
+- **131 complete realized trades**
+- **₹71,868.76 net P&L**
+- ₹100,816.81 gross P&L
+- ₹28,948.05 modeled costs
+- **58.78% realized win rate**; Wilson 95% CI 50.22%–66.84%
+- **Profit factor 2.29**
+- **₹15,704.24 maximum drawdown**
+- Mean trade P&L ₹548.62
+- IID bootstrap 95% CI for mean ₹212.77–₹867.02
+- Four-trade block bootstrap 95% CI ₹199.66–₹872.13
+- **100% static chart-positive rate**, which is not a 100% realized win rate
+
+### Selection behaviour
+
+- Median first-positive decision delay: **210 minutes after 09:20**
+- P90 delay: **357 minutes**
+- ATM selection: **0%**
+- Median selected shift: **-250 points**
+- Mean absolute shift: **329.4 points**
+
+The result therefore confirms that the exact rule is not equivalent to an ATM-only or 09:20-only strategy.
+
+### H2/H3 status
+
+The primary Hugging Face source cannot adjudicate H2/H3 because the far-rank-2 and far-rank-3 expiry partitions lack pre-entry intraday observations. This is a source-coverage limitation, not a zero-performance result. No H2/H3 horizon is promoted.
+
+An independent Rissin source produced positive same-source paired H2-H1 and H3-H1 differences, but these are retained only as source-sensitivity evidence because of source-construction differences, partial coverage and lack of untouched holdout validation.
+
+### Execution sensitivity
+
+The primary H1 result remains positive through 0.50% modeled slippage at all tested ₹10/₹20/₹40 brokerage levels. At 1.00% slippage it remains positive at ₹10 and ₹20 brokerage, but is negative at ₹40 brokerage.
+
+### Final conclusion
+
+**The current H1 rule has positive historical net P&L after modeled costs, but it does not have a 100% realized win rate. H2/H3 remain unadjudicated on the primary source. No dynamic horizon-switching rule is adopted.**
+
+Detailed final report: [docs/PHASE9G_FINAL_RESULTS.md](docs/PHASE9G_FINAL_RESULTS.md)  
+Candidate specification: [docs/PHASE9G_CANDIDATE_STRATEGY_FINAL.md](docs/PHASE9G_CANDIDATE_STRATEGY_FINAL.md)  
+Final summary: [results/phase9g/final_summary.json](results/phase9g/final_summary.json)  
+Annual results: [results/phase9g/annual_summary.csv](results/phase9g/annual_summary.csv)  
+Execution sensitivity: [results/phase9g/execution_sensitivity.csv](results/phase9g/execution_sensitivity.csv)  
+Strike distribution: [results/phase9g/H1_strike_shift_distribution.csv](results/phase9g/H1_strike_shift_distribution.csv)  
+Merged workflow artifact: [GitHub Actions run 36320697995](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36320697995)
