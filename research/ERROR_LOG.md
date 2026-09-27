@@ -79,3 +79,5 @@
 
 | 2026-09-27 | 9E | Validation results were generated successfully, but workflow 36303040868 could not push its result commit because the branch had advanced before the push. | Statistical output was already uploaded as artifact 10926525963; no result was lost. | Removed the race-prone persist step, then reintroduced it with git fetch + git pull --rebase; authoritative workflow 36303117489 completed successfully and committed the results. |
 | 2026-09-27 | 9F | Initial cross-market audit script treated a Python `datetime.date` as a pandas timestamp when calculating the end date. | Phase 9F workflow 36303419672 failed before any context data were accepted. | Corrected the date conversion and also corrected the same-day NIFTY opening-gap alignment before rerunning. |
+
+| 2026-09-27 | 9F | The yfinance 1.7.0 downloader returned MultiIndex columns whose level order was not handled by the first normalizer. | Workflow 36303470349 failed while constructing global-context frames with `KeyError: ['close']`. | Replaced the symbol-specific MultiIndex assumption with explicit OHLC/date flattening and added a close-column invariant before accepting a frame. |
