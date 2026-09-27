@@ -59,6 +59,17 @@ jobs:
         run: |
           python scripts/analyze_s2_s1_predictability.py             --strategy-inputs data/phase3_source/strategy_inputs.parquet             --selected results/phase8_weekly/weekly_selected_first_positive.csv             --out-dir results/phase8_s2_s1
 
+      - name: Analyze S2-S1 using all prior entry timestamps for training
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/analyze_s2_s1_all_timestamps.py \
+            --strategy-inputs data/phase3_source/strategy_inputs.parquet \
+            --selected results/phase8_weekly/weekly_selected_first_positive.csv \
+            --out-dir results/phase8_s2_s1_all_ts
+          test -s results/phase8_s2_s1_all_ts/all_timestamp_model_metrics.csv
+          test -s results/phase8_s2_s1_all_ts/all_timestamp_trade_filter_results.csv
+
       - name: Validate Phase 8A outputs
         run: |
           python - <<'PY'
@@ -71,6 +82,10 @@ jobs:
           filters=pd.read_csv(out/'s2_s1_trade_filter_results.csv')
           assert len(metrics)==3
           assert len(filters)==9
+          all_ts=pd.read_csv('results/phase8_s2_s1_all_ts/all_timestamp_model_metrics.csv')
+          all_ts_filters=pd.read_csv('results/phase8_s2_s1_all_ts/all_timestamp_trade_filter_results.csv')
+          assert len(all_ts)==3
+          assert len(all_ts_filters)==9
           print(metrics.to_string(index=False))
           print(filters.to_string(index=False))
           PY
@@ -81,5 +96,6 @@ jobs:
           name: phase-8A-s2-s1-predictability
           path: |
             results/phase8_s2_s1
+            results/phase8_s2_s1_all_ts
             results/phase8_weekly
             results/phase8_metrics/summary.json
