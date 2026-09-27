@@ -112,3 +112,5 @@
 | 2026-09-27 | 9G | Methodological correction | The previous selector could qualify a timestamp using a partial inner-joined strike set. This violated the explicit all-17-strikes rule. The selector was changed so partial sets cannot qualify. |
 
 | 2026-09-27 | 9G | Execution issue | A pre-concurrency Phase 9G run (36305850007) remained active while newer corrected runs queued. Concurrency was added so future corrections supersede obsolete running attempts; no output from the stale run will be accepted. |
+
+| 2026-09-27 | 9G | Pipeline defect | The sensitivity stage passed `H*_realized_trades.csv` to a backtest script that previously called `pd.read_parquet()` unconditionally. This would have caused a false sensitivity-stage failure. The reader now detects CSV vs Parquet input. |
