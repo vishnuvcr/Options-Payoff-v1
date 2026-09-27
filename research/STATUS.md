@@ -268,3 +268,26 @@ Phase 9B is now the next required validation phase. H2/H3 remain frozen until Ph
 ## Phase 9D correction
 
 The prior Phase 9A/9B H1 realized-P&L results are superseded because they only evaluated 09:20 each trading day. The corrected strategy now scans every available 1-minute timestamp from 09:20 through 15:29 and continues across subsequent trading days within the same weekly cycle until the first positive/all-green candidate appears. There is no 2.5% threshold or 09:20 skip criterion. The new workflow is building the auditable intraday ledger.
+
+## Phase 9D — corrected intraday H1 status
+
+**Status: COMPLETE — corrected H1 baseline produced.**
+
+Authoritative run: **36302077730**.
+
+The final no-skip intraday ledger checks every available 1-minute observation from 09:20 through 15:29 and continues across subsequent trading days within each weekly cycle until the first positive/all-green candidate. It then selects the maximum positive flatline across ATM-400..ATM+400.
+
+Coverage: **172 selected weekly-cycle entries**, **448,280 checked timestamps**, **17,606 decision-surface rows**. Three selections have incompatible near/far lot sizes and are excluded only from realized-P&L arithmetic; they remain in the audit. Complete realized trades: **169**.
+
+Primary execution model: 0.25% premium slippage, ₹20/order brokerage, six executed transactions, near-expiry manual closure of far CE/PE using observed option prices.
+
+Primary result: **₹162,953.84 gross P&L, ₹37,265.02 modeled costs, ₹125,688.82 net P&L, 63.91% realized win rate, PF 2.94, max drawdown ₹16,200.65**.
+
+Execution sensitivity remains positive at 0.5% and 1.0% slippage and at ₹40/order brokerage in the tested historical sample.
+
+The static chart-positive rate is 100% by the selection rule; it must not be interpreted as a 100% realized win rate. The complete H1 result is an in-sample historical reconstruction and requires independent walk-forward/holdout validation before deployment.
+
+**Next phase:** corrected H1 validation/robustness. H2/H3 far-expiry selection research remains frozen until that validation is complete.
+
+See [docs/PHASE9D_RESULTS.md](../docs/PHASE9D_RESULTS.md).
+
