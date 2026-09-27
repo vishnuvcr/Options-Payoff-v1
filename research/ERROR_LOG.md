@@ -106,3 +106,5 @@
 
 | 2026-09-27 | 9G | Correction applied | `run_intraday_near_exit_backtest.py` now preserves the raw quote-level inputs required for alternate slippage/brokerage recalculation; the workflow adds a hard schema gate before sensitivity. |
 | 2026-09-27 | 9G | Correction applied | `merge_phase9g_results.py` now emits first-positive timestamp and selected-strike distribution summaries required by the preregistered Phase 9G comparison. |
+
+| 2026-09-27 | 9G | Data-quality watch item | Selector uses inner joins across four option quotes; therefore candidate availability can be <17 at some timestamps when historical quotes are missing. This is logged as a data-quality audit item, not treated as a strategy criterion or result. |
