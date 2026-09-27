@@ -251,3 +251,11 @@ The corrected code and regression tests are committed on `phase-9-near-expiry-ex
 - Costs: entry four-leg costs + two far-leg exit transactions + applicable exercise STT on the near long put
 - H=2/H=3 research: frozen until this H=1 corrected ledger is complete
 - Previous realized-P&L results: superseded for the actual strategy
+
+## Phase 9B completed result
+
+Phase 9B validation run 36297884737 completed successfully. Corrected H1 remains 64 trades, net ₹12,317.86, win rate 51.56%, profit factor 1.47. The trade-level Sharpe-like statistic is 1.03 and Sortino-like statistic 0.23, but both are descriptive; the IID and weekly-block 95% bootstrap intervals for mean trade P&L cross zero. Net P&L is ₹1,982.44 at 50 bp slippage and -₹18,688.40 at 100 bp. Brokerage sensitivity is positive at ₹10/₹20/₹40 per order, but the ₹40 case is only ₹3,255.46 net.
+
+Interpretation: corrected H1 is not statistically robust enough to treat as a validated standalone trading edge under realistic execution uncertainty. The static flatline selection remains a useful screening hypothesis, not proof of realized profitability.
+
+Phase 9C H2/H3 is queued on GitHub Actions run 36297960485 and must be treated as pending until it actually executes.
