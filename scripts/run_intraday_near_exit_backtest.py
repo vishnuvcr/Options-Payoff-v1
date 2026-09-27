@@ -20,7 +20,11 @@ def parse_args():
 def main():
     args=parse_args()
     model=CostModel(slippage_pct=args.slippage_pct,brokerage_per_order_inr=args.brokerage_per_order)
-    df=pd.read_parquet(args.inputs)
+    input_path=Path(args.inputs)
+    if input_path.suffix.lower()=='.csv':
+        df=pd.read_csv(input_path)
+    else:
+        df=pd.read_parquet(input_path)
     if df.empty:
         raise RuntimeError('No intraday selected trades found')
     rows=[]
