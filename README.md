@@ -142,3 +142,7 @@ The winner-versus-loser study and candidate-level tests are complete. Across 63 
 Detailed report: [docs/ENTRY_FEATURE_GREEK_ANALYSIS.md](docs/ENTRY_FEATURE_GREEK_ANALYSIS.md) (workflow run 36291838252).
 
 Compact Phase 7C outputs: [winner/loser Greek summary](results/phase7c/winner_loser_greek_summary.csv), [selector bootstrap comparison](results/phase7c/selector_bootstrap_summary.csv), and [walk-forward feature selection](results/phase7c/walk_forward_feature_selection.csv).
+
+### Phase 8A — Predicting the cross-expiry S2-S1 component
+
+The next research question is whether the future settlement difference (S_2-S_1), which dominated the economics of the current strategy, can be predicted from entry-time information. Phase 8A uses only cached internal option/surface/spot information with expanding one-week-ahead walk-forward validation. The predefined filters are predicted S2-S1 > 0 and expected trade P&L > 0 after modeled costs. External variables such as futures basis, India VIX, global markets, USD/INR, gold and FII/DII flows are reserved for Phase 8B only if the internal baseline shows predictive signal.
