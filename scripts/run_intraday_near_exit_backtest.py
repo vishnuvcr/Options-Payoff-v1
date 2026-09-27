@@ -32,12 +32,14 @@ def main():
             for field in ['near_call_close','near_put_close','far_call_close','far_put_close','near_settlement','far_call_exit_close','far_put_exit_close','near_lot_size','far_lot_size']:
                 if not hasattr(row, field) or pd.isna(getattr(row, field)):
                     missing.append(field)
+            reason='missing_realized_exit_input'
+            if not missing and int(row.near_lot_size) != int(row.far_lot_size):
+                reason='lot_size_mismatch'
             incomplete.append({
                 'entry_timestamp':row.entry_timestamp,'entry_date':row.entry_date,
                 'near_expiry':row.near_expiry,'far_expiry':row.far_expiry,
                 'strike':row.strike,'shift_points':row.shift_points,
                 'reason':reason,'missing_fields':','.join(missing),
-                'missing_fields':','.join(missing),
             })
             continue
         rows.append({
