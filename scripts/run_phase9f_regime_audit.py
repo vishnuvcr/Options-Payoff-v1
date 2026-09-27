@@ -64,27 +64,27 @@ def fetch_yf(symbol, start, end):
         x=yf.download(symbol,start=start,end=end,auto_adjust=False,progress=False,threads=False)
         if x is None or x.empty: return pd.DataFrame()
         x=x.reset_index()
-        flat=[]
+        raw_cols=[]
         for col in x.columns:
             if isinstance(col, tuple):
                 names=[str(v).strip() for v in col if str(v).strip() and str(v).strip().lower()!='nan']
-                if any(n in {'Open','High','Low','Close','Adj Close','Volume'} for n in names):
-                    flat.append(next(n for n in names if n in {'Open','High','Low','Close','Adj Close','Volume'}))
-                elif 'Date' in names or 'Datetime' in names:
-                    flat.append(next(n for n in names if n in {'Date','Datetime'}))
-                else:
-                    flat.append(names[0] if names else '')
+                raw_cols.append(names[0] if names else '')
             else:
-                flat.append(str(col))
-        x.columns=flat
-        datecol='Date' if 'Date' in x.columns else ('Datetime' if 'Datetime' in x.columns else None)
-        if datecol is None: return pd.DataFrame()
-        x['date']=pd.to_datetime(x[datecol]).dt.date
-        ren={c:c.lower().replace(' ','_') for c in x.columns}
-        out=x.rename(columns=ren)
-        keep=[c for c in ['date','open','high','low','close','volume'] if c in out.columns]
-        if 'close' not in out.columns: return pd.DataFrame()
-        return out[keep].copy()
+                raw_cols.append(str(col))
+        x.columns=raw_cols
+        date_src=next((col for col in x.columns if col in {'Date','Datetime','date'}),None)
+        open_src=next((col for col in x.columns if str(col).lower()=='open'),None)
+        high_src=next((col for col in x.columns if str(col).lower()=='high'),None)
+        low_src=next((col for col in x.columns if str(col).lower()=='low'),None)
+        close_src=next((col for col in x.columns if str(col).lower()=='close'),None)
+        volume_src=next((col for col in x.columns if str(col).lower()=='volume'),None)
+        if date_src is None or close_src is None: return pd.DataFrame()
+        out=pd.DataFrame({'date':pd.to_datetime(x[date_src],errors='coerce').dt.date,'close':pd.to_numeric(x[close_src],errors='coerce')})
+        if open_src is not None: out['open']=pd.to_numeric(x[open_src],errors='coerce')
+        if high_src is not None: out['high']=pd.to_numeric(x[high_src],errors='coerce')
+        if low_src is not None: out['low']=pd.to_numeric(x[low_src],errors='coerce')
+        if volume_src is not None: out['volume']=pd.to_numeric(x[volume_src],errors='coerce')
+        return out.dropna(subset=['date']).drop_duplicates('date',keep='last')
     except Exception:
         return pd.DataFrame()
 
