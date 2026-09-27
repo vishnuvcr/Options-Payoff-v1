@@ -29,26 +29,38 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18'
-      - name: Download Phase 3 candidate artifact
+      - name: Download Phase 2 strategy inputs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p data/phase3_source
-          gh run download '${{ inputs.source_run_id || '36262958536' }}' \
+          mkdir -p data/phase2_source
+          gh run download '36255238050' \
             --repo '${{ github.repository }}' \
-            --name phase-3-backtest-results \
-            --dir data/phase3_source
-          test -s data/phase3_source/candidate_results.parquet
+            --name phase-2-strategy-inputs \
+            --dir data/phase2_source
+          test -s data/phase2_source/strategy_inputs.parquet
+      - name: Compute all 17-strike payoff metrics with no threshold gate
+        run: |
+          python scripts/run_backtest.py \
+            --inputs data/phase2_source/strategy_inputs.parquet \
+            --out-dir results/phase7b_metrics \
+            --selection-mode max_equal_flatline \
+            --selection-score equal_max_profit_loss_inr \
+            --selection-max-shift-points 400 \
+            --selection-step-points 50 \
+            --min-chart-return-pct 0.0 \
+            --slippage-pct 0.0025
+          test -s results/phase7b_metrics/candidate_results.parquet
       - name: Weekly selection using first available 09:20 observation
         run: |
           python scripts/weekly_positive_selection.py \
-            --inputs data/phase3_source/candidate_results.parquet \
+            --inputs results/phase7b_metrics/candidate_results.parquet \
             --out-dir results/phase7b_weekly \
             --observation first
       - name: Weekly selection using last available observation sensitivity
         run: |
           python scripts/weekly_positive_selection.py \
-            --inputs data/phase3_source/candidate_results.parquet \
+            --inputs results/phase7b_metrics/candidate_results.parquet \
             --out-dir results/phase7b_weekly \
             --observation last
       - name: Validate weekly coverage and positive rule
