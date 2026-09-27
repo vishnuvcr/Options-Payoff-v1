@@ -376,3 +376,10 @@ Plan: research/RESEARCH_PLAN.md
 Status: research/STATUS.md
 Error log: research/ERROR_LOG.md
 Workflow: .github/workflows/phase-9H-loss-entry-analysis.yml
+
+
+## Phase 9H-A — targeted loss-cycle analysis — OPEN
+
+The first Phase 9H implementation was narrowed to the 54 realized losing H1 trades. For each loss, the research reconstructs exact-17 valid timestamps and all 17 candidate strikes needed to test whether changing only the entry could have produced a positive realized outcome.
+
+No exit rule, horizon, cost model, or market filter is being changed. Any rescue result is an ex-post diagnostic; it is not a trading rule until a separate prospective full-sample and untouched-holdout test supports it.
