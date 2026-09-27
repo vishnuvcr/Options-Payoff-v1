@@ -103,3 +103,7 @@ Maximum estimated INR flatline value and maximum margin-based percentage select 
 Settlement-file sensitivity produces 3 qualifying trades and ₹23,671.26 net P&L.
 
 Full Phase 7A results: [docs/PHASE7A_RESULTS.md](docs/PHASE7A_RESULTS.md).
+
+### Phase 7B — weekly cadence clarification
+
+The user's operational rule is now interpreted as **one scan per weekly cycle** across all 17 common strikes (ATM-400..ATM+400). Among candidates with platform-style Max Profit % >2.5%, the highest estimated equal max-profit=max-loss value is selected; if none exceeds 2.5%, that week is skipped. The Phase 7A count of four is the number of qualifying historical observations under the exact-margin reconstruction, not the number of weekly scans. Phase 7B will map one non-look-ahead entry observation to each weekly cycle before producing a final weekly trade count.
