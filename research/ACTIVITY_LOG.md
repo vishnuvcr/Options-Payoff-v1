@@ -63,3 +63,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9A | Regression extension | Added `tests/test_near_expiry_backtest.py`; the test verifies entry slippage plus far-leg exit slippage are both reflected in gross P&L. |
 | 2026-09-27 | 9A | Corrected rerun | Run 36296081746 was cancelled by branch concurrency after the slippage fix. Run 36296224407 (v2) is the authoritative H1 execution. |
 | 2026-09-27 | 9A | Tax-timing audit | Found that exercise/exit STT was keyed to entry date rather than the actual near-expiry exit date. Corrected before accepting H1 evidence. |
+| 2026-09-27 | 9A | Indexed data engine | Added bounded parallel expiry prefetch, Parquet time-range filtering, indexed entry-price lookups and one expiry-date far-leg exit lookup to keep the corrected reconstruction computationally tractable. |
+| 2026-09-27 | 9A | v7 corrective run | Passed checkout/setup/dependency/cache gates but failed at the dedicated regression fixture because `near_exit_timestamp` was missing. No market-data result was accepted. |
+| 2026-09-27 | 9A | v8 corrective run | Reached the market-data reconstruction step after all regression tests passed. H1 evidence remains pending until the run completes. |
