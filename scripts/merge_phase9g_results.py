@@ -67,7 +67,11 @@ def main():
             x=pd.read_csv(hfile)
             if not x.empty: parts.append(x)
             inc=hfile.parent/'intraday_incomplete_selected_trades.csv'
-            if inc.exists(): inc_total+=len(pd.read_csv(inc))
+            if inc.exists():
+                try:
+                    inc_total += len(pd.read_csv(inc)) if inc.stat().st_size else 0
+                except pd.errors.EmptyDataError:
+                    inc_total += 0
         df=pd.concat(parts,ignore_index=True) if parts else pd.DataFrame()
         if not df.empty:
             df['entry_timestamp']=pd.to_datetime(df['entry_timestamp']); df=df.sort_values('entry_timestamp').drop_duplicates('near_expiry',keep='first')
