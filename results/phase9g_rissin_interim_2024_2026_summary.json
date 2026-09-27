@@ -1,0 +1,70 @@
+{
+  "status": "interim",
+  "source": "rissin/nse-options-intraday",
+  "completed_years": [
+    2024,
+    2026
+  ],
+  "yearly": {
+    "2024": {
+      "H1": {
+        "selected": 11,
+        "realized": 9,
+        "net": 18690.30597339218,
+        "win_rate_pct": 77.77777777777779
+      },
+      "H2": {
+        "selected": 6,
+        "realized": 4,
+        "net": 5306.219649932629,
+        "win_rate_pct": 75
+      },
+      "H3": {
+        "selected": 0,
+        "realized": 0,
+        "net": 0
+      }
+    },
+    "2026": {
+      "H1": {
+        "selected": 18,
+        "realized": 18,
+        "net": 58226.91510741624,
+        "win_rate_pct": 94.44444444444444
+      },
+      "H2": {
+        "selected": 16,
+        "realized": 15,
+        "net": 78568.5109026915,
+        "win_rate_pct": 100
+      },
+      "H3": {
+        "selected": 11,
+        "realized": 11,
+        "net": 74265.40900611998,
+        "win_rate_pct": 100
+      }
+    }
+  },
+  "paired": {
+    "H2_minus_H1": {
+      "matched_cycles": 17,
+      "mean_delta_inr": 1272.7434047928596,
+      "median_delta_inr": 2584.471901567118,
+      "positive_delta_pct": 88.23529411764706,
+      "block4_bootstrap_ci_low_inr": -991.12847616,
+      "block4_bootstrap_ci_high_inr": 3132.98934145,
+      "sign_permutation_p": 0.39778011099445026
+    },
+    "H3_minus_H1": {
+      "matched_cycles": 11,
+      "mean_delta_inr": 3367.84230936594,
+      "median_delta_inr": 4820.82168579746,
+      "positive_delta_pct": 90.9090909090909,
+      "block4_bootstrap_ci_low_inr": -1009.14628317,
+      "block4_bootstrap_ci_high_inr": 6433.4227006,
+      "sign_permutation_p": 0.10354482275886205
+    }
+  },
+  "note": "Interim same-source descriptive analysis only. 2025 remains to be reconstructed; no horizon selector adopted."
+}
