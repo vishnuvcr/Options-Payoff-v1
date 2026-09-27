@@ -171,7 +171,7 @@ def main():
     expiry_exit_timestamps = defaultdict(list)
     pair_exit_ts = {}
     for entry in entry_df[['timestamp', 'trading_date']].itertuples(index=False):
-        pair = expiry_pair(entry.trading_date, expiry_dates)
+        pair = expiry_pair(entry.trading_date, expiry_dates, args.horizon_steps)
         if pair is None:
             continue
         near_expiry, far_expiry = pair
