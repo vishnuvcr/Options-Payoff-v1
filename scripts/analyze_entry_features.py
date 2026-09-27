@@ -145,7 +145,7 @@ def add_greek_features(df: pd.DataFrame, r=0.0, expiry_hour=15, expiry_minute=30
         rowd["net_theta_day"] = totals["theta_day"]
         rowd["moneyness_pct"] = 100.0*(K-S)/S
         rowd["abs_moneyness_pct"] = abs(rowd["moneyness_pct"])
-        rowd["flatline_to_spot_pct"] = 100.0*rowd["estimated_equal_max_profit_loss_inr"]/(S*float(row.lot_size))
+        rowd["flatline_to_spot_pct"] = 100.0*rowd["estimated_equal_max_profit_loss_inr"]/(S*float(row.near_lot_size))
         out.append(rowd)
     return pd.DataFrame(out)
 
