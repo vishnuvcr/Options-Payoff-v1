@@ -199,3 +199,5 @@ The primary weekly rule is fixed: first positive observation in the weekly cycle
 ## Phase 7C result
 
 63 selected weekly trades contained 36 winners and 27 losers. Greek/IV/moneyness winner-loser differences were not robust after Benjamini-Hochberg correction (best q ≈ 0.435 among tested Greek/IV features). Every full-coverage single-feature selector tested underperformed maximum positive flatline. Walk-forward training selected near-expiry call-put IV skew (maximum) in both splits, but it underperformed the baseline by ₹100.98/week and ₹66.24/week respectively in the two 16-week test blocks. Primary strike-selection rule remains unchanged.
+
+Reproducibility tables published under `results/phase7c/`; detailed methodology/results are in `docs/ENTRY_FEATURE_GREEK_ANALYSIS.md`. Phase 7C is frozen unless the primary rule or underlying data changes.
