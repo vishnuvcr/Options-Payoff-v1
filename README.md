@@ -1,5 +1,7 @@
 # Options-Payoff-v1
 
+> **CRITICAL RESEARCH STATUS — 2026-09-27:** The user's exit convention has been clarified: all four legs are closed at the **near weekly expiry**; the far-expiry CE/PE legs are manually squared off at that time. Repository audit found that the prior realized-P&L backtest instead valued the far legs at their **own far-expiry settlement**. Therefore the historical realized-P&L results in Phases 3–8 that depend on that exit convention are **superseded and must not be treated as evidence for the actual strategy**. A corrective H=1 backtest is being rebuilt on `phase-9-near-expiry-exit-correction`. The entry-time static flatline/strike-selection calculation remains a separate chart-metric hypothesis, but it is not a validated P&L result.
+
 Research repository for testing the clarified cross-expiry NIFTY options strategy.
 
 ## Current status
@@ -167,3 +169,14 @@ The current research does not validate a deployable trading edge for the final p
 **No Greek filter and no S2-S1 filter has been added.**
 
 Consolidated conclusion: [docs/FINAL_CONCLUSION.md](docs/FINAL_CONCLUSION.md).
+
+
+## Phase 9A — Correct exit semantics
+
+The corrected operational P&L for a selected strike is based on:
+
+`entry cashflow + near-expiry intrinsic payoff + far-call market sale price at near expiry - far-put market repurchase price at near expiry - all costs`
+
+The corrected backtest therefore requires point-in-time prices for the far-expiry options at the near-expiry close. Far-expiry settlement is not an acceptable substitute.
+
+The H=2/H=3 far-expiry selection experiment is paused until the corrected H=1 baseline is completed.
