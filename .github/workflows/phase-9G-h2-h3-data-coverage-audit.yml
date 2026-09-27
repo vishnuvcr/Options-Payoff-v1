@@ -1,0 +1,46 @@
+name: Phase 9G - H2 H3 Data Coverage Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_year:
+        description: First calendar year to audit
+        required: true
+        default: '2026'
+      end_year:
+        description: Last calendar year to audit
+        required: true
+        default: '2026'
+      far_ranks:
+        description: Far expiry ranks to audit
+        required: true
+        default: '2,3'
+  push:
+    branches:
+      - phase-9G-h2-h3-data-coverage-audit
+    paths:
+      - .github/workflows/phase-9G-h2-h3-data-coverage-audit.yml
+      - scripts/audit_far_horizon_data_coverage.py
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas numpy scipy pyarrow huggingface_hub
+      - name: Run far-horizon coverage audit
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python scripts/audit_far_horizon_data_coverage.py             --start "${{ github.event.inputs.start_year || '2026' }}-01-01"             --end "${{ github.event.inputs.end_year || '2026' }}-12-31"             --far-ranks "${{ github.event.inputs.far_ranks || '2,3' }}"             --out-dir results/phase9g_h2_h3_data_audit
+      - name: Upload coverage audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9g-h2-h3-data-coverage-audit
+          path: results/phase9g_h2_h3_data_audit
