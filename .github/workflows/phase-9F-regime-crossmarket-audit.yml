@@ -1,0 +1,60 @@
+name: Phase 9F - Cross-market and Regime Audit
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Authoritative Phase 9D workflow run
+        required: true
+        default: '36302077730'
+  push:
+    branches:
+      - phase-9F-regime-crossmarket-audit
+    paths:
+      - .github/workflows/phase-9F-regime-crossmarket-audit.yml
+      - scripts/run_phase9f_regime_audit.py
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install analysis dependencies
+        run: pip install pandas numpy scipy yfinance nseindiapy openpyxl tabulate requests
+      - name: Download authoritative H1 artifact
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.source_run_id || '36302077730' }}
+          name: phase-9D-final-H1-evidence
+          path: phase9d_evidence
+      - name: Run Phase 9F audit
+        run: python scripts/run_phase9f_regime_audit.py --trades phase9d_evidence/results/phase9d_primary/intraday_selected_trades.csv --out-dir results/phase9f
+      - name: Check invariants
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('results/phase9f/summary.json').read_text())
+          assert x['trades']==169
+          print(json.dumps(x,indent=2))
+          PY
+      - name: Upload Phase 9F evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9F-crossmarket-regime-evidence
+          path: results/phase9f
+      - name: Persist Phase 9F results
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin phase-9F-regime-crossmarket-audit
+          git pull --rebase origin phase-9F-regime-crossmarket-audit
+          git add results/phase9f
+          if git diff --cached --quiet; then echo 'No result changes'; exit 0; fi
+          git commit -m 'Add Phase 9F cross-market regime audit results'
+          git push origin phase-9F-regime-crossmarket-audit
