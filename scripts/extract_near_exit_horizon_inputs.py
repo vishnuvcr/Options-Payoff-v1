@@ -102,13 +102,14 @@ def build_entry_lookup(df):
         out[row.timestamp].setdefault(float(row.strike), {})[row.option_type] = float(row.close)
     return dict(out)
 
-def build_expiry_exit_lookup(df, exit_ts):
-    if exit_ts is None:
-        return {}
+def build_exit_lookups(df, exit_timestamps):
     out = {}
-    x = df[(df['trading_date'] == exit_ts.date()) & (df['timestamp'] <= exit_ts)]
-    for row in x.sort_values('timestamp').itertuples(index=False):
-        out[(float(row.strike), row.option_type)] = (float(row.close), row.timestamp)
+    for exit_ts in sorted({x for x in exit_timestamps if x is not None}):
+        day = {}
+        x = df[(df['trading_date'] == exit_ts.date()) & (df['timestamp'] <= exit_ts)]
+        for row in x.sort_values('timestamp').itertuples(index=False):
+            day[(float(row.strike), row.option_type)] = (float(row.close), row.timestamp)
+        out[exit_ts.date()] = day
     return out
 
 def common_from_lookup(near_lookup, far_lookup, entry_ts):
@@ -133,7 +134,7 @@ def last_index_bar_on_date(index_df, trading_date):
     row = x.iloc[-1]
     return row['timestamp'], float(row['close'])
 
-def expiry_horizon_pair(entry_date, expiries, horizon_steps):
+def expiry_pair(entry_date, expiries, horizon_steps=1):
     if horizon_steps < 1:
         raise ValueError('horizon_steps must be >= 1')
     xs = [x for x in expiries if x >= entry_date]
@@ -161,23 +162,27 @@ def main():
     filename_by_expiry = dict(expiry_files)
     needed_expiries = set()
     for entry in entry_df[['trading_date']].itertuples(index=False):
-        pair = expiry_horizon_pair(entry.trading_date, expiry_dates, args.horizon_steps)
+        pair = expiry_pair(entry.trading_date, expiry_dates, args.horizon_steps)
         if pair is not None:
             needed_expiries.update(pair)
     needed_expiries = sorted(needed_expiries)
 
     expiry_entry_times = defaultdict(list)
-    expiry_exit_ts = {}
+    expiry_exit_timestamps = defaultdict(list)
+    pair_exit_ts = {}
     for entry in entry_df[['timestamp', 'trading_date']].itertuples(index=False):
-        pair = expiry_horizon_pair(entry.trading_date, expiry_dates, args.horizon_steps)
+        pair = expiry_pair(entry.trading_date, expiry_dates)
         if pair is None:
             continue
         near_expiry, far_expiry = pair
+        exit_ts, _ = last_index_bar_on_date(index_df, near_expiry)
+        if exit_ts is None:
+            continue
         expiry_entry_times[near_expiry].append(entry.timestamp)
         expiry_entry_times[far_expiry].append(entry.timestamp)
-        if near_expiry not in expiry_exit_ts:
-            exit_ts, _ = last_index_bar_on_date(index_df, near_expiry)
-            expiry_exit_ts[near_expiry] = exit_ts
+        expiry_exit_timestamps[near_expiry].append(exit_ts)
+        expiry_exit_timestamps[far_expiry].append(exit_ts)
+        pair_exit_ts[(near_expiry, far_expiry)] = exit_ts
 
     option_local_paths = {}
 
@@ -201,33 +206,35 @@ def main():
         if expiry in prepared:
             return prepared[expiry]
         ts_list = expiry_entry_times.get(expiry, [])
-        exit_ts = expiry_exit_ts.get(expiry)
-        if ts_list:
-            tmin = min(ts_list)
-            tmax = max([max(ts_list), exit_ts] if exit_ts is not None else ts_list)
+        exit_list = expiry_exit_timestamps.get(expiry, [])
+        all_ts = list(ts_list) + list(exit_list)
+        if all_ts:
+            tmin = min(all_ts)
+            tmax = max(all_ts)
         else:
             tmin = tmax = None
         df = load_option_file(
             expiry, filename_by_expiry[expiry], timestamp_min=tmin, timestamp_max=tmax
         )
         entry_lookup = build_entry_lookup(df)
-        exit_lookup = build_expiry_exit_lookup(df, exit_ts)
-        prepared[expiry] = (entry_lookup, exit_lookup)
+        exit_lookups = build_exit_lookups(df, exit_list)
+        prepared[expiry] = (entry_lookup, exit_lookups)
         return prepared[expiry]
 
     rows = []
     for entry in entry_df.sort_values('timestamp').itertuples(index=False):
         entry_ts = entry.timestamp
         entry_date = entry.trading_date
-        pair = expiry_horizon_pair(entry_date, expiry_dates, args.horizon_steps)
+        pair = expiry_pair(entry_date, expiry_dates, args.horizon_steps)
         if pair is None:
             continue
         near_expiry, far_expiry = pair
-        near_lookup, near_exit_lookup = get_prepared(near_expiry)
-        far_lookup, far_exit_lookup = get_prepared(far_expiry)
+        near_lookup, near_exit_lookups = get_prepared(near_expiry)
+        far_lookup, far_exit_lookups = get_prepared(far_expiry)
         exit_ts, near_settlement = last_index_bar_on_date(index_df, near_expiry)
         if exit_ts is None:
             continue
+        far_exit_lookup = far_exit_lookups.get(near_expiry, {})
         common = common_from_lookup(near_lookup, far_lookup, entry_ts)
         if not common:
             continue
@@ -269,9 +276,6 @@ def main():
                 'net_entry_cashflow_per_unit': None if any(x is None for x in vals) else near_call - near_put - far_call + far_put,
                 'status': status
             })
-        for stale in list(cache):
-            if stale not in {near_expiry, far_expiry}:
-                del cache[stale]
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     result = pd.DataFrame(rows)
@@ -279,7 +283,7 @@ def main():
         raise RuntimeError('No strategy input rows were generated')
     result.to_parquet(out, index=False)
     meta = {
-        'dataset': DATASET, 'start': args.start, 'end': args.end, 'entry_time_ist': args.entry_time,
+        'dataset': DATASET, 'start': args.start, 'end': args.end, 'entry_time_ist': args.entry_time, 'horizon_steps': args.horizon_steps,
         'rows': len(result), 'status_counts': result['status'].value_counts(dropna=False).to_dict(),
         'grid_shifts': list(range(-400,401,50)),
         'exit_rule': 'All four legs closed at near weekly expiry; far CE/PE manually closed at last option bar on or before near-expiry index close.'
