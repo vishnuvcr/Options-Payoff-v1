@@ -291,3 +291,11 @@ The static chart-positive rate is 100% by the selection rule; it must not be int
 
 See [docs/PHASE9D_RESULTS.md](../docs/PHASE9D_RESULTS.md).
 
+
+## Phase 9E — frozen-rule H1 validation
+
+**Status: EXECUTING.**
+
+Branch `phase-9E-h1-validation` freezes the corrected Phase 9D strategy and runs chronological calendar-year cohorts, anchored holdouts, bootstrap uncertainty, and predefined execution sensitivity using the authoritative Phase 9D evidence artifact from run **36302077730**. No strategy parameter is tuned in the holdout analysis and H2/H3 remain frozen.
+
+The first validation workflow attempt (36303004660) failed on a report-writer syntax error before producing statistical output. The code has been corrected and a rerun is triggered by the fix commit.
