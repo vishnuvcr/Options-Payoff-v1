@@ -267,3 +267,7 @@ Error log: [research/ERROR_LOG.md](research/ERROR_LOG.md)
 
 ### Phase 9G correction checkpoint — 2026-09-27
 The Phase 9G pipeline has been corrected before accepting results: quote-level fields are preserved through the realized ledger, a hard sensitivity schema gate is added, and first-positive/strike-selection behaviour is now included in the merger outputs. Corrected workflow run **36305850007** is queued. No H2/H3 conclusion has been accepted.
+
+
+### H1 control behavioural baseline — 2026-09-27
+The authoritative H1 control artifact (run 36302077730) shows materially non-ATM selection: among 169 complete realized trades, ATM was selected only once; the largest groups were -400 (35), -350 (28), -300 (18), +400 (19), and +350 (15). First-positive timing also extends well beyond the opening minute: 39 decisions occurred at 09:20, while 40 occurred after 13:20. See [Phase 9G H1 control selection analysis](docs/PHASE9G_H1_CONTROL_SELECTION.md) and [machine-readable strike distribution](results/phase9g_h1_control_shift_distribution.csv).
