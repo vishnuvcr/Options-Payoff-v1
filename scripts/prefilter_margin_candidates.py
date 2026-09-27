@@ -10,15 +10,17 @@ def main() -> None:
     ap=argparse.ArgumentParser()
     ap.add_argument('--candidates',required=True)
     ap.add_argument('--out',required=True)
-    ap.add_argument('--exposure-rate-per-short',type=float,default=0.01,
+    ap.add_argument('--max-shift-points',type=int,default=400)
+    ap.add_argument('--exposure-rate-per-short',type=float,default=0.02,
                     help='Conservative lower-bound ELM rate per short NIFTY option; 1% means 2% total across the two short legs.')
     args=ap.parse_args()
     df=pd.read_parquet(args.candidates)
+    df=df[df['shift_points'].between(-args.max_shift_points,args.max_shift_points)].copy()
     need={'entry_timestamp','entry_date','shift_points','strike','spot_at_entry','lot_size','chart_pnl_inr'}
     missing=need-set(df.columns)
     if missing: raise ValueError(f'missing columns: {sorted(missing)}')
-    # For this strategy there are two short NIFTY index options. Using the
-    # calibrated/default 2% exposure rate per short option gives a 4% total
+    # For this strategy there are two short NIFTY index options. NSE's
+    # calibrated index-option ELM is 2% per short leg, giving a 4% total
     # notional exposure lower bound before any SPAN component. A trade cannot
     # exceed 2.5% max-profit/margin unless its static flatline exceeds 0.1%
     # of spot notional.
