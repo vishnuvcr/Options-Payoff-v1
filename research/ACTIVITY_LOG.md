@@ -116,3 +116,5 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9G | Initial workflow failure | Run **36304359045** failed in all yearly jobs before reconstruction because repo-root `scripts.*` imports were not on Python's module path. No statistical result accepted. |
 | 2026-09-27 | 9G | Workflow corrected | Added explicit `PYTHONPATH` handling and hardened recursive artifact discovery in the merge script before the rerun. |
+
+| 2026-09-27 | 9G | Pre-rerun hardening | Fixed duplicate workflow `env` keys and made the result merger recursively locate yearly H1/H2/H3 trade files, avoiding the brittle nested-directory assumption. |
