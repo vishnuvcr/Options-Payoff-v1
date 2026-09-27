@@ -251,3 +251,8 @@ The corrected code and regression tests are committed on `phase-9-near-expiry-ex
 - Costs: entry four-leg costs + two far-leg exit transactions + applicable exercise STT on the near long put
 - H=2/H=3 research: frozen until this H=1 corrected ledger is complete
 - Previous realized-P&L results: superseded for the actual strategy
+
+
+## Phase 9A latest correction checkpoint
+
+Before accepting any realized H1 output, three implementation audits are now resolved: (1) far legs use observed near-expiry option prices rather than far-expiry settlement; (2) entry and far-leg exit slippage is included in realized gross P&L, not only fees; (3) entry and near-expiry exit/exercise tax dates are handled separately. Phase 9A v3 run **36296334057** is executing the corrected code. Phase 9B validation is prepared on `phase-9B-near-exit-validation` and will trigger from successful v3 completion.
