@@ -275,3 +275,7 @@ The authoritative H1 control artifact (run 36302077730) shows materially non-ATM
 
 ### Phase 9G execution checkpoint — run 10
 Run **36307233038** is the accepted Phase 9G execution candidate. It includes the strict all-17-strike decision rule and the independent H1 completeness gate. Older run 36305850007 is obsolete and its output is excluded from final inference.
+
+
+### Corrected execution trigger — 2026-09-27
+The Phase 9G branch has been reset to concurrency group **v2** after the stale reconstruction process occupied the original group. This status update intentionally triggers the corrected workflow definition.
