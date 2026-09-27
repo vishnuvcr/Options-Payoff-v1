@@ -505,3 +505,12 @@ A positive historical point estimate with an uncertainty interval crossing zero 
 - no strategy rule changes made during validation.
 
 H2/H3 far-expiry selection remains frozen until Phase 9E concludes.
+
+
+## Phase 9F — Corrected H1 cross-market and regime audit
+
+**Branch:** `phase-9F-regime-crossmarket-audit`
+
+Phase 9F is a non-optimizing descriptive audit of the corrected H1 trade ledger. It will join point-in-time market context from NSE/India VIX, FII/FPI and DII, BSE/Sensex, USD/INR, gold, global equity indices and global volatility. Any subgroup association remains hypothesis-generating and cannot change the trade rule inside this phase.
+
+Exit criteria: reproducible context join for the 169 complete trades, source/coverage audit, predeclared regime summaries, dependence-aware uncertainty, explicit limitations, and no strategy-rule changes. H2/H3 remains frozen until Phase 9F completes.
