@@ -364,3 +364,7 @@ The Phase 9G selector was manually audited for chronology, 17-strike scan logic,
 
 ### Literature-review extension — 2026-09-27
 Added peer-reviewed/working literature on NIFTY box-spread efficiency, implied-volatility term structure, volatility risk premia, and calendar-spread dependence. These sources will frame the Phase 9G interpretation without changing the preregistered strategy or acceptance tests.
+
+
+### H1 control behavioural baseline — 2026-09-27
+Phase 9G now has a frozen H1 control reference for strike-selection and decision-time behaviour. H2/H3 must be compared on the same dimensions after reconstruction; these H1 values do not alter the control.
