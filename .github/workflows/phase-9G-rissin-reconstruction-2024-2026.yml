@@ -1,0 +1,85 @@
+name: Phase 9G - Rissin 2024-2026 Reconstruction
+
+on:
+  workflow_dispatch:
+    inputs:
+      start_year:
+        description: First year
+        required: true
+        default: '2024'
+      end_year:
+        description: Last year
+        required: true
+        default: '2026'
+      bootstrap_reps:
+        description: Bootstrap repetitions
+        required: true
+        default: '20000'
+  push:
+    branches:
+      - phase-9G-rissin-reconstruction-2024-2026
+    paths:
+      - .github/workflows/phase-9G-rissin-reconstruction-2024-2026.yml
+      - scripts/extract_rissin_far_horizon_strategy.py
+      - scripts/run_intraday_near_exit_backtest.py
+      - scripts/merge_phase9g_results.py
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: phase-9G-rissin-reconstruction-2024-2026
+  cancel-in-progress: true
+
+jobs:
+  yearly:
+    strategy:
+      fail-fast: false
+      matrix:
+        year: [2024,2025,2026]
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas numpy scipy pyarrow huggingface_hub tabulate
+      - name: Reconstruct Rissin H1 H2 H3
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          mkdir -p work/${{ matrix.year }}
+          for rank in 1 2 3; do
+            mkdir -p work/${{ matrix.year }}/H${rank}
+            python scripts/extract_rissin_far_horizon_strategy.py               --start "${{ matrix.year }}-01-01"               --end "${{ matrix.year }}-12-31"               --far-rank ${rank}               --out-selected "work/${{ matrix.year }}/H${rank}/intraday_selected.parquet"               --out-scan-audit "work/${{ matrix.year }}/H${rank}/intraday_scan_audit.parquet"               --out-decision-surface "work/${{ matrix.year }}/H${rank}/intraday_decision_surface.parquet"
+            python scripts/run_intraday_near_exit_backtest.py               --inputs "work/${{ matrix.year }}/H${rank}/intraday_selected.parquet"               --out-dir "work/${{ matrix.year }}/H${rank}"
+          done
+      - name: Upload yearly Rissin evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: rissin-year-${{ matrix.year }}
+          path: work/${{ matrix.year }}
+
+  merge:
+    needs: yearly
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: pip install pandas numpy scipy pyarrow tabulate
+      - name: Download yearly evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: rissin-year-*
+          merge-multiple: false
+          path: rissin_evidence
+      - name: Merge Rissin horizons
+        run: python scripts/merge_phase9g_results.py --evidence-dir rissin_evidence --out-dir results/phase9g_rissin --bootstrap-reps "${{ github.event.inputs.bootstrap_reps || '20000' }}"
+      - name: Upload merged Rissin evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9g-rissin-2024-2026-results
+          path: results/phase9g_rissin
