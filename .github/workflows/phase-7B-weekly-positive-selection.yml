@@ -29,7 +29,7 @@ jobs:
           python-version: '3.12'
       - name: Install dependencies
         run: pip install 'pandas>=2.2' 'pyarrow>=18'
-      - name: Download Phase 2 strategy inputs
+      - name: Download Phase 3 expanded strategy inputs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
