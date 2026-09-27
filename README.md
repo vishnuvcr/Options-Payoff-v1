@@ -6,7 +6,7 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 8A — S2-S1 predictability: COMPLETE; no S2-S1 filter adopted**
+**Phase 9E — frozen-rule H1 validation: COMPLETE; no new filter adopted**
 
 Current operational rule:
 - every weekly expiry cycle is scanned chronologically;
@@ -207,3 +207,26 @@ Incomplete-selection audit: [results/phase9d/incomplete_selected_trades.csv](res
 
 **Research status:** corrected H1 baseline complete; independent walk-forward/holdout validation is next. H2/H3 far-expiry selection remains frozen until that validation phase completes.
 
+
+## Phase 9E — Corrected H1 validation
+
+Phase 9E froze the corrected Phase 9D intraday strategy and validated the authoritative 2021–2026 ledger without changing the rule.
+
+- Source workflow: **36302077730**; validation workflow: **36303117489**
+- 172 selected weekly-cycle entries; 169 complete realized trades; 3 lot-size-incompatible selections retained in audit
+- Net P&L at 0.25% premium slippage and ₹20/order: **₹125,688.82**
+- Realized win rate: **63.91%**; Wilson 95% CI: **56.43%–70.76%**
+- Profit factor: **2.94**
+- Maximum drawdown: **₹16,200.65**
+- IID bootstrap 95% CI for mean trade P&L: **₹441.82–₹1,039.55**
+- Circular 4-trade block bootstrap 95% CI: **₹413.92–₹1,066.30**
+- Every 2021–2026 calendar-year cohort and every anchored 2022–2026 test cohort was positive in this historical sample.
+- Net P&L remained positive in the tested 0.00%, 0.25%, 0.50% and 1.00% slippage scenarios and at ₹10/₹20/₹40 brokerage.
+
+Important limitation: these are **rule-frozen historical diagnostics, not a pristine future holdout**, because the 2021–2026 data was already observed during development. No new entry filter is adopted from Phase 9E.
+
+Detailed report: [docs/PHASE9E_VALIDATION.md](docs/PHASE9E_VALIDATION.md)  
+Machine-readable results: [results/phase9e/summary.json](results/phase9e/summary.json)  
+Validation workflow: [.github/workflows/phase-9E-h1-validation.yml](.github/workflows/phase-9E-h1-validation.yml)
+
+**Next:** a non-optimizing point-in-time cross-market/regime audit of the corrected H1 ledger; H2/H3 remains frozen until that audit completes.
