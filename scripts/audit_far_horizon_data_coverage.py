@@ -40,6 +40,21 @@ def expiry_pair(entry_date, expiries, rank):
         return None
     return near, far
 
+def nearest_timestamp_stats(far_df, ts):
+    if far_df.empty:
+        return {"far_same_day_rows": 0, "nearest_far_timestamp": None, "nearest_far_offset_seconds": None}
+    day = far_df[far_df["trading_date"] == ts.date()]
+    if day.empty:
+        return {"far_same_day_rows": 0, "nearest_far_timestamp": None, "nearest_far_offset_seconds": None}
+    uniq = pd.Series(day["timestamp"].drop_duplicates().sort_values().tolist())
+    delta = (uniq - ts).abs()
+    j = int(delta.idxmin())
+    return {
+        "far_same_day_rows": int(len(day)),
+        "nearest_far_timestamp": str(uniq.iloc[j]),
+        "nearest_far_offset_seconds": float(delta.iloc[j].total_seconds()),
+    }
+
 def grid_stats(near_df, far_df, ts, spot):
     n = near_df[(near_df["timestamp"] == ts) & near_df["option_type"].isin(["CE","PE"])]
     f = far_df[(far_df["timestamp"] == ts) & far_df["option_type"].isin(["CE","PE"])]
@@ -128,6 +143,7 @@ def main():
                 row = x.iloc[0]
                 ts = row["timestamp"]
                 stats = grid_stats(loaded[near], loaded[far], ts, float(row["close"]))
+                nearest = nearest_timestamp_stats(loaded[far], ts)
                 sample_rows.append({
                     "far_rank": rank,
                     "entry_date": str(d),
@@ -135,6 +151,7 @@ def main():
                     "near_expiry": near,
                     "far_expiry": far,
                     "spot": float(row["close"]),
+                    **nearest,
                     **stats,
                 })
 
