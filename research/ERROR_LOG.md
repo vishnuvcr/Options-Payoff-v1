@@ -126,3 +126,6 @@
 | 2026-09-27 | 9G | Governance/data-model correction | The old Phase 9G concurrency group remained occupied by a stale reconstruction run. A v2 concurrency group is being used so the corrected exact-17-strike pipeline can execute independently; stale outputs remain excluded. |
 
 | 2026-09-27 | 9G | Legacy-control validity finding | Authoritative Phase 9D H1 audit: only 45/172 selected timestamps contained the exact prescribed 17-strike shift set; 127 did not. No conflicting quote values were found in the audited surfaces. The old 169-trade H1 result is therefore superseded for the current exact-strike research protocol. |
+
+
+| 2026-09-27 | 9G | Data-source coverage defect | The Hugging Face option files used by the corrected pipeline typically begin ~7–10 calendar days before their own expiry. For far-rank 2 and 3, sampled entry dates fall before the file's available window, yielding zero same-day far-expiry rows and no 17-strike surface. | Do not interpret H2/H3 zero opportunities as zero strategy performance. Persist the source audit, seek a source with pre-entry far-expiry coverage, and rerun only after provenance/coverage validation. |
