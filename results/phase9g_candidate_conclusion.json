@@ -1,0 +1,15 @@
+{
+  "phase": "9G",
+  "conclusion_status": "candidate_strategy_identified",
+  "candidate_horizon": "H3",
+  "alternate_candidate": "H2",
+  "production_status": "not_approved",
+  "reasons": [
+    "Both H2 and H3 pass the preregistered paired test against H1 on Rissin 2024-2026.",
+    "H3 has stronger pooled mean improvement versus H1 and beats H2 in an exploratory matched comparison.",
+    "The 2026 H3-vs-H2 comparison is positive with a dependence-aware interval above zero.",
+    "Cross-source H1 sensitivity is material, so results are source-dependent.",
+    "No untouched future-data holdout has yet validated the frozen H3 candidate."
+  ],
+  "required_next_phase": "out-of-sample future holdout with exact rule frozen"
+}
