@@ -53,3 +53,5 @@
 | 2026-09-27 | 9A | v4 workflow inserted `--download-workers 6` with a blank line after the shell continuation. | The extraction shell command would have been malformed even if the data prefetch code was correct. | Removed the blank line and promoted the workflow to v5 before relying on its result. |
 
 | 2026-09-27 | 9A | v5 remained in the expiry-data build because each historical expiry file was being processed with repeated DataFrame scans for entry and far-exit lookups. | Corrected H1 evidence could not be produced efficiently. | Replaced repeated scans with time-range-filtered Parquet reads, indexed entry lookup dictionaries, and one precomputed expiry-date exit lookup per contract. v6 is now the authoritative run. |
+
+| 2026-09-27 | 9C | H2/H3 workflow regression gate referenced `tests/test_near_exit_extractor.py`, but the test file had not yet been copied onto the separate horizon branch. | Phase 9C stopped before building H2/H3 inputs. | Added the exit-date and horizon-pair regression tests; rerun required. |
