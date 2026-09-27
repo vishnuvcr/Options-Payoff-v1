@@ -100,3 +100,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-27 | 9F | Fifth workflow failure | Run 36303608447 failed because the yfinance fallback generated duplicate Date/date columns. No statistical output accepted. |
 | 2026-09-27 | 9F | yfinance fallback corrected | Fallback now constructs explicit date/OHLC columns and drops duplicate dates before merging. Rerun triggered. |
+
+| 2026-09-27 | 9F | Sixth workflow failure | Run **36303653009** failed on repeated context-join helper columns (`date_ctx`). No statistical output accepted. |
+| 2026-09-27 | 9F | Context merge stabilized | Reworked point-in-time as-of joins to drop prior helper keys and namespace right-side context columns before each merge. Rerun triggered. |
