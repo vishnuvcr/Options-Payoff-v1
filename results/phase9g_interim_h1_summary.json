@@ -1,0 +1,44 @@
+{
+  "status": "interim",
+  "cost_model": {
+    "slippage_pct": 0.0025,
+    "brokerage_per_order_inr": 20
+  },
+  "completed_years": [
+    2021,
+    2024,
+    2026
+  ],
+  "yearly": [
+    {
+      "year": 2021,
+      "realized_trades": 14,
+      "net_pnl_inr": 9732.035833234331,
+      "realized_win_rate_pct": 64.28571428571429,
+      "losing_trades": 5,
+      "chart_positive_pct": 100
+    },
+    {
+      "year": 2024,
+      "realized_trades": 26,
+      "net_pnl_inr": 20656.83,
+      "realized_win_rate_pct": 69.23076923076923,
+      "losing_trades": 8,
+      "chart_positive_pct": 100
+    },
+    {
+      "year": 2026,
+      "realized_trades": 14,
+      "net_pnl_inr": 21014.62948496662,
+      "realized_win_rate_pct": 85.71428571428571,
+      "losing_trades": 2,
+      "chart_positive_pct": 100
+    }
+  ],
+  "combined": {
+    "realized_trades": 54,
+    "net_pnl_inr": 51403.49531820095,
+    "realized_win_rate_pct": 72.22222222222221
+  },
+  "note": "Interim corrected H1 control only. Remaining years 2022, 2023 and 2025 are still reconstructing; no pooled Phase 9G conclusion accepted."
+}
