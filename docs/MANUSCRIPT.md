@@ -583,3 +583,20 @@ Sensitivity ledger: `results/phase7a/exact_margin_selected_s.csv`
 Summary: `results/phase7a/exact_margin_summary.json`
 
 Historical SPAN coverage: `results/phase7a/span_coverage_summary.json`
+
+
+## Phase 7B — Final weekly positive-only rule
+
+The user's latest correction removes the 2.5% threshold and margin filter. The final strategy scans all 17 common strikes from ATM-400 to ATM+400 in 50-point increments. A candidate qualifies only when the payoff chart is positive/all-green. The maximum positive estimated equal max-profit=max-loss value is selected.
+
+The primary no-look-ahead weekly implementation uses the first available 09:20 observation in each weekly expiry cycle at which at least one positive candidate exists. The selected candidate is traded and the cycle ends. In the cached sample, this produced 63 trades across 63 weekly cycles with no skips.
+
+At 0.25% premium slippage and ₹20/order brokerage: net P&L ₹-9,627.90; gross P&L ₹233.25; modeled costs ₹9,861.15; win rate 57.14%; profit factor 0.98; maximum drawdown ₹-174,083.24; largest win ₹34,652.56; largest loss ₹-55,786.13.
+
+The positive static flatline component contributed ₹20,213.00, while the realized cross-expiry S2-S1 component contributed ₹-19,979.75 before costs. This demonstrates that the green static payoff representation is not sufficient to establish positive realized economics.
+
+IID bootstrap 95% CI for mean weekly P&L: ₹-4,996 to ₹4,410. Four-week block bootstrap 95% CI: ₹-4,024 to ₹4,739. Both include zero.
+
+Timing sensitivities: first fixed observation gives 38 positive weeks and ₹-32,986.60; last fixed observation gives 41 positive weeks and ₹177,070.15 but leaves many weekly cycles without a positive candidate; the ex-post best-positive-in-week oracle gives ₹3,135.05 across 63 weeks but uses future information. These are sensitivities, not the primary rule.
+
+The final research conclusion is therefore that the specified positive-only weekly rule is reproducible but did not generate positive net performance in this historical implementation after modeled costs and slippage.
