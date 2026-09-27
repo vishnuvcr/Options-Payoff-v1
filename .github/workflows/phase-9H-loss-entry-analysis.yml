@@ -125,6 +125,10 @@ jobs:
         with:
           name: phase-9H-loss-entry-analysis
           path: results/phase9h
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Persist Phase 9H results
         run: |
           git add results/phase9h
