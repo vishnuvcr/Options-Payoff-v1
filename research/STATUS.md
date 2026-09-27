@@ -326,3 +326,20 @@ Workflow **36303117489** completed successfully. The validation consumed only th
 Branch `phase-9F-regime-crossmarket-audit` is running a non-optimizing point-in-time contextual audit of the corrected H1 ledger. It covers NSE/India VIX, FII/FPI-DII, BSE/Sensex, global equity/volatility, USD/INR and gold where reproducible, with source coverage and missingness recorded. No new trading filter is permitted in this phase.
 
 The first workflow attempt (36303419672) failed on a date arithmetic bug before any result was accepted; the script has been corrected and rerun.
+
+
+## Phase 9F — corrected H1 cross-market/regime audit COMPLETE
+
+- Workflow: **36304036908**
+- Scope: **169 complete realized H1 trades**
+- NIFTY/India VIX coverage: **100%** using documented yfinance fallback
+- Sensex coverage: **160/169 (94.7%)**
+- FII/DII: **excluded from inference** because only **16** source rows were recoverable and strict point-in-time recency controls made coverage inadequate
+- India-VIX Q4: **42 trades, ₹2,925.31 net, ₹69.65 mean, PF 1.10; block-bootstrap CI crosses zero**
+- NIFTY-vs-Sensex: Sensex-outperform group **₹978.79 mean/trade** vs NIFTY-outperform **₹411.26**, but no new rule adopted
+- Global risk: risk-off **₹853.24 mean/trade**, risk-on **₹577.08**; descriptive only
+- No continuous association survived Benjamini-Hochberg correction at 5%
+
+**Conclusion:** Phase 9F is complete. It provides regime diagnostics and source-coverage limitations but does not alter the frozen H1 rule. H2/H3 far-expiry selection is now reopened under a separately preregistered phase.
+
+Results: `docs/PHASE9F_RESULTS.md`, `results/phase9f/summary.json`, `results/phase9f/regime_summary.csv`, `results/phase9f/continuous_associations.csv`, `results/phase9f/coverage.csv`.
