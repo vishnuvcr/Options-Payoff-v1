@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-27  
-**Active branch:** phase-8-s2-s1-predictor  
-**Overall status:** Phase 8A — S2-S1 predictability complete; no filter adopted
+**Active branch:** phase-9D-intraday-recheck-correction
+**Overall status:** Phase 9D — corrected no-skip intraday H1 reconstruction in progress
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -263,3 +263,8 @@ Before accepting any realized H1 output, three implementation audits are now res
 Authoritative GitHub Actions run **36297418698** completed successfully using the corrected near-expiry manual-close convention. The H1 artifact contains **252 weekly cycles**, **64 selected trades**, **₹12,317.86 net P&L**, **₹25,859.55 gross P&L**, **₹13,541.69 modeled costs**, **51.56% win rate**, and **1.47 profit factor** at 0.25% premium slippage and ₹20/order brokerage. Independent audit found 27/31 losers already negative before costs, 4 cost-only flips, no missing far-leg exits, and no far-leg exit after near expiry. See `docs/PHASE9A_RESULTS.md`.
 
 Phase 9B is now the next required validation phase. H2/H3 remain frozen until Phase 9B completes.
+
+
+## Phase 9D correction
+
+The prior Phase 9A/9B H1 realized-P&L results are superseded because they only evaluated 09:20 each trading day. The corrected strategy now scans every available 1-minute timestamp from 09:20 through 15:29 and continues across subsequent trading days within the same weekly cycle until the first positive/all-green candidate appears. There is no 2.5% threshold or 09:20 skip criterion. The new workflow is building the auditable intraday ledger.
