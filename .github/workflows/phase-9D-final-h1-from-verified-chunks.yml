@@ -1,0 +1,125 @@
+name: Phase 9D - Final H1 From Verified Intraday Chunks
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Prior run containing six verified yearly chunk artifacts
+        required: true
+        default: '36299358058'
+      slippage_pct:
+        required: true
+        default: '0.0025'
+      brokerage_per_order:
+        required: true
+        default: '20'
+  push:
+    branches:
+      - phase-9D-intraday-recheck-correction
+    paths:
+      - .github/workflows/phase-9D-final-h1-from-verified-chunks.yml
+      - scripts/run_intraday_near_exit_backtest.py
+      - scripts/merge_intraday_chunks.py
+      - scripts/run_near_expiry_exit_backtest.py
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  final-h1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-9D-intraday-recheck-correction
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install 'pandas>=2.2' 'pyarrow>=18' 'numpy>=2.0'
+      - name: Download verified yearly chunks from source run
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.inputs.source_run_id || '36299358058' }}
+          pattern: phase9d-year-*
+          path: chunks
+          merge-multiple: false
+      - name: Verify six source artifacts
+        run: |
+          test "$(find chunks -name intraday_selected_near_exit.parquet | wc -l)" -eq 6
+          test "$(find chunks -name intraday_scan_audit.parquet | wc -l)" -eq 6
+          test "$(find chunks -name intraday_decision_surface.parquet | wc -l)" -eq 6
+      - name: Merge verified chunks
+        run: |
+          mkdir -p data/derived
+          python scripts/merge_intraday_chunks.py \
+            --input-dir chunks \
+            --out-selected data/derived/intraday_selected_near_exit.parquet \
+            --out-audit data/derived/intraday_scan_audit.parquet \
+            --out-surface data/derived/intraday_decision_surface.parquet
+      - name: Audit merged ledger
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          s=pd.read_parquet('data/derived/intraday_selected_near_exit.parquet')
+          a=pd.read_parquet('data/derived/intraday_scan_audit.parquet')
+          d=pd.read_parquet('data/derived/intraday_decision_surface.parquet')
+          assert len(s)==s.near_expiry.nunique()
+          assert (s.flatline_inr>0).all()
+          print({'weekly_cycles':s.near_expiry.nunique(),'selected':len(s),'scan_rows':len(a),'decision_surface_rows':len(d)})
+          PY
+      - name: Primary corrected H1
+        env:
+          PYTHONPATH: .
+        run: |
+          python scripts/run_intraday_near_exit_backtest.py \
+            --inputs data/derived/intraday_selected_near_exit.parquet \
+            --out-dir results/phase9d_primary \
+            --slippage-pct '${{ github.event.inputs.slippage_pct || '0.0025' }}' \
+            --brokerage-per-order '${{ github.event.inputs.brokerage_per_order || '20' }}'
+      - name: Execution sensitivity
+        env:
+          PYTHONPATH: .
+        run: |
+          for slip in 0 0.0025 0.005 0.01; do
+            tag=$(python -c "print(str($slip).replace('.','p'))")
+            python scripts/run_intraday_near_exit_backtest.py --inputs data/derived/intraday_selected_near_exit.parquet --out-dir results/phase9d_slip_${tag} --slippage-pct $slip --brokerage-per-order 20
+          done
+          for broker in 10 20 40; do
+            python scripts/run_intraday_near_exit_backtest.py --inputs data/derived/intraday_selected_near_exit.parquet --out-dir results/phase9d_broker_${broker} --slippage-pct 0.0025 --brokerage-per-order $broker
+          done
+      - name: Verify selected chart positivity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('results/phase9d_primary/summary_intraday_near_exit.json').read_text())
+          assert x['chart_positive_win_rate_pct']==100.0
+          print(x)
+          PY
+      - name: Aggregate sensitivity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[]
+          for p in sorted(Path('results').glob('phase9d_*/summary_intraday_near_exit.json')):
+              x=json.loads(p.read_text()); x['scenario']=str(p.parent); rows.append(x)
+          Path('results/phase9d_summary.json').write_text(json.dumps(rows,indent=2,default=str))
+          print(json.dumps(rows,indent=2,default=str))
+          PY
+      - name: Upload final H1 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-9D-final-H1-evidence
+          path: |
+            data/derived/intraday_selected_near_exit.parquet
+            data/derived/intraday_selected_near_exit.metadata.json
+            data/derived/intraday_scan_audit.parquet
+            data/derived/intraday_decision_surface.parquet
+            results/phase9d_*/
+            results/phase9d_summary.json
