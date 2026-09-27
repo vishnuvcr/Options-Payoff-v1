@@ -294,8 +294,27 @@ See [docs/PHASE9D_RESULTS.md](../docs/PHASE9D_RESULTS.md).
 
 ## Phase 9E — frozen-rule H1 validation
 
-**Status: EXECUTING.**
+**Status: COMPLETE.**
 
 Branch `phase-9E-h1-validation` freezes the corrected Phase 9D strategy and runs chronological calendar-year cohorts, anchored holdouts, bootstrap uncertainty, and predefined execution sensitivity using the authoritative Phase 9D evidence artifact from run **36302077730**. No strategy parameter is tuned in the holdout analysis and H2/H3 remain frozen.
 
-The first validation workflow attempt (36303004660) failed on a report-writer syntax error before producing statistical output. The code has been corrected and a rerun is triggered by the fix commit.
+Workflow **36303117489** completed successfully. The validation consumed only the authoritative Phase 9D artifact from run **36302077730**.
+
+## Phase 9E — frozen-rule H1 validation COMPLETE
+
+- Authoritative H1 source: run **36302077730**
+- Validation workflow: **36303117489**
+- Complete realized trades: **169**; incomplete selections: **3** (lot_size_mismatch)
+- Net P&L: **₹125,688.82**
+- Mean trade P&L: **₹743.72**
+- Win rate: **63.91%** (Wilson 95% CI **56.43%–70.76%**)
+- Profit factor: **2.94**
+- Max drawdown: **₹16,200.65**
+- IID mean-P&L bootstrap 95% CI: **₹441.82–₹1,039.55**
+- Circular 4-trade block bootstrap 95% CI: **₹413.92–₹1,066.30**
+- All 2021–2026 annual cohorts and all anchored 2022–2026 test cohorts were positive.
+- Execution sensitivity remained positive through 1.00% premium slippage and ₹40/order brokerage in the tested scenarios.
+
+**Interpretation:** historical validation checks pass for the frozen rule, but this is not a clean future holdout. The 2021–2026 sample was already observed during strategy development. No new filter has been adopted.
+
+**Next phase:** non-optimizing point-in-time cross-market/regime audit of the corrected H1 ledger. H2/H3 remains frozen until that audit is complete.
