@@ -56,3 +56,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9A | Code audit completed | `scripts/run_backtest.py` was confirmed to value the far legs at `next_settlement`, which models holding them to far expiry rather than manual near-expiry closure. |
 | 2026-09-27 | 9A | Research validity status changed | Prior realized-P&L results are now explicitly superseded for the actual strategy; only the entry-time static flatline calculation remains as a separate hypothesis. |
 | 2026-09-27 | 9A | Corrective research protocol opened | Created `phase-9-near-expiry-exit-correction`; H=2/H=3 far-expiry selection is paused until corrected H=1 is independently rebuilt. |
+| 2026-09-27 | 9A | Corrected regression test audit | Found the near-expiry P&L regression test below the `__main__` guard, so it would not run under `unittest`. Moved it inside the test class. |
+| 2026-09-27 | 9A | Unit-test checkpoint | GitHub Actions run 36296081746 passed the options-payoff unit suite before data reconstruction began. |
+| 2026-09-27 | 9A | Reproducible execution harness | Added a default-branch Actions anchor so the phase-9 branch can execute automatically while retaining a manual `workflow_dispatch` button. Run 36296081746 is the primary corrective H1 run; run 36296102040 is a queued duplicate anchor run and is non-authoritative. |
