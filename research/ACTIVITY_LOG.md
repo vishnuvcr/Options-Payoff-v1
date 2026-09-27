@@ -126,3 +126,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9G | Selection-analysis completeness audit | Reconciled the Phase 9G research questions against the merger implementation and found the timestamp/strike-distribution comparison was absent. Logged before accepting any horizon result. |
 
 | 2026-09-27 | 9G | Corrections implemented | Preserved raw quote fields through the realized ledger, added sensitivity schema validation, and added selection-behaviour outputs. A fresh Actions run was automatically queued from the corrected branch. |
+
+| 2026-09-27 | 9G | Implementation audit | Verified first-qualifying timestamp logic, all 17-strike scan intent, max-positive tie-break behaviour, far-leg exit convention, gross P&L signs, six brokerage events, and transaction-cost components. No defect found. |
