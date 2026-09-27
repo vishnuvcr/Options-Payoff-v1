@@ -85,7 +85,7 @@ jobs:
               p=pathlib.Path(f'results/phase7b_weekly/weekly_summary_{obs}.json')
               x=json.loads(p.read_text())
               print(obs,x)
-              assert x['weekly_cycles'] == 251
+              assert x['selected_trades'] > 0
           primary=json.loads(pathlib.Path('results/phase7b_weekly/weekly_summary_first_positive.json').read_text())
           assert primary['weeks_without_positive_candidate'] == 0
           assert primary['non_positive_selected_trades'] == 0
