@@ -600,3 +600,72 @@ IID bootstrap 95% CI for mean weekly P&L: ₹-4,996 to ₹4,410. Four-week block
 Timing sensitivities: first fixed observation gives 38 positive weeks and ₹-32,986.60; last fixed observation gives 41 positive weeks and ₹177,070.15 but leaves many weekly cycles without a positive candidate; the ex-post best-positive-in-week oracle gives ₹3,135.05 across 63 weeks but uses future information. These are sensitivities, not the primary rule.
 
 The final research conclusion is therefore that the specified positive-only weekly rule is reproducible but did not generate positive net performance in this historical implementation after modeled costs and slippage.
+
+
+## Phase 8 — Predictability of the Cross-Expiry Settlement Component
+
+### 8.1 Motivation
+
+Phase 7B showed that the static positive green payoff line did not translate into positive realized weekly economics. The economically relevant decomposition is:
+
+[
+P&L = (C_1-P_1-C_2+P_2) + (S_2-S_1) - 	ext{execution/cost adjustments}.
+]
+
+The Phase 8A hypothesis was that an estimate of (S_2-S_1) constructed exclusively from information available at entry could be used as a weekly trade filter.
+
+### 8.2 Methodology
+
+Two expanding walk-forward designs were evaluated. The first used only previously selected weekly trades. The second used all historical entry timestamps from earlier weekly cycles, with equal weekly-cycle weighting so days with more observations did not dominate the fit.
+
+Candidate predictors included entry-time option IV/Greek proxies, moneyness, payoff-flatline state, cross-strike surface summaries, spot state, calendar variables and lagged completed-cycle (S_2-S_1).
+
+Models were Ridge regression, Random Forest regression and Histogram Gradient Boosting. Test observations were strictly chronologically separated from training.
+
+### 8.3 Results
+
+The all-timestamp design contained 905 historical entry timestamps across 255 weekly cycles. After the initial 31-cycle training window, 43 weekly decision cycles were strictly out of sample.
+
+| Model | MAE (points) | RMSE (points) | Sign accuracy | AUC |
+|---|---:|---:|---:|---:|
+| Ridge | 416.20 | 501.54 | 44.19% | 0.486 |
+| Random Forest | 382.08 | 477.43 | 51.16% | 0.514 |
+| Histogram Gradient Boosting | 393.34 | 489.96 | 53.49% | 0.541 |
+
+The target itself had mean +4.77 points and standard deviation 392.59 points across the 63 current weekly cycles, demonstrating very high dispersion relative to its mean.
+
+The Random Forest predicted-positive filter produced ₹91,388.05 over the 43 OOS weeks compared with ₹-10,634.75 for the same weeks without filtering. Histogram Gradient Boosting produced ₹64,981.67 and Ridge produced ₹-5,022.63.
+
+However, the apparent Random Forest improvement was not stable. Chronological block differences were +₹140,877 in the first 15 OOS weeks, -₹58,226 in the middle 14 weeks, and +₹19,372 in the final 14 weeks. Its paired weekly bootstrap mean improvement was +₹2,372.62/week with 95% interval ₹-2,740.68 to ₹7,993.14.
+
+### 8.4 Interpretation
+
+The direction-prediction accuracy and AUC values were close to random. The largest economic uplift therefore cannot be interpreted as a stable forecasting edge from the current information set. The bootstrap interval includes zero and the chronological result is unstable.
+
+This also reinforces an earlier structural observation: because (S_2-S_1) is common across strikes at a given timestamp, a forecast of (S_2-S_1) is primarily a **weekly trade/no-trade filter**, not a direct strike-selection variable.
+
+### 8.5 Phase 8A conclusion
+
+Phase 8A does not support adoption of an (S_2-S_1) entry filter.
+
+Under the predefined research stop rule, external-variable expansion is not promoted automatically. It should only be reconsidered with a materially larger independent dataset or a new predeclared information set such as point-in-time futures basis, full option OI/liquidity, India VIX term structure, global markets, USD/INR, gold, FII/DII activity and event/news regime variables.
+
+## Final Discussion Update
+
+Across the final strategy specification, the evidence is consistent:
+
+1. The static green flatline is an algebraic chart property, not a guarantee of economic flatness.
+2. The current positive-only weekly strategy is negative after modeled costs in the cached sample.
+3. Simple entry Greeks, IV structure and moneyness do not provide a robust replacement for the flatline selector.
+4. The economically dominant (S_2-S_1) term has not been predictably exploitable with the current information set.
+5. No new filter should be adopted simply because it improves one historical aggregate.
+
+## Final Conclusion Update
+
+The current evidence does not establish a robust, deployable trading edge for the final strategy specification.
+
+The key research contribution is identifying and testing the true economic source of the apparent payoff-chart advantage. Future progress requires better point-in-time information and a larger independent sample rather than further optimization of the same small historical dataset.
+
+Detailed Phase 8A report: `docs/PHASE8_S2_S1_RESULTS.md`.
+
+Current consolidated conclusion: `docs/FINAL_CONCLUSION.md`.
