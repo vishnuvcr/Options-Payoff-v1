@@ -250,9 +250,9 @@ def candidate_within_week_correlations(candidates):
     for f in feats:
         rs=[]
         for _,g in candidates.groupby("weekly_cycle"):
-            z=g[[f,"net_pnl_inr"]].dropna()
-            if len(z)>=4 and z[f].nunique()>1 and z.net_pnl_inr.nunique()>1:
-                rs.append(spearmanr(z[f],z.net_pnl_inr).statistic)
+            z=g[[f,"candidate_net_pnl_inr"]].dropna()
+            if len(z)>=4 and z[f].nunique()>1 and z.candidate_net_pnl_inr.nunique()>1:
+                rs.append(spearmanr(z[f],z.candidate_net_pnl_inr).statistic)
         if rs:
             a=np.array(rs,float)
             rows.append({"feature":f,"weeks_with_correlation":len(a),"mean_weekly_spearman":a.mean(),"median_weekly_spearman":np.median(a),"positive_corr_fraction":np.mean(a>0)})
