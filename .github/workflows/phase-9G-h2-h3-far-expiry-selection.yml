@@ -23,6 +23,7 @@ on:
       - scripts/extract_intraday_far_horizon_strategy.py
       - scripts/merge_phase9g_results.py
       - scripts/run_intraday_near_exit_backtest.py
+      - scripts/audit_h1_candidate_completeness.py
 
 permissions:
   actions: read
