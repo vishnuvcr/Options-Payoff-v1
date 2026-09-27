@@ -41,6 +41,15 @@ It will first rebuild the current H=1 strategy with the correct exit convention 
 
 Only after the corrected H=1 baseline is established will H=2/H=3 far-expiry selection be researched.
 
-## Current conclusion
 
-There is currently **no valid realized-P&L conclusion for the actual trading strategy** from the prior backtests. The correct scientific position is to treat those results as superseded and rerun the baseline with the user's actual exit convention.
+## Phase 9D — Corrected intraday H1 result
+
+The user's 09:20 observation is now treated as the **first check, not a skip gate**. The corrected extractor checks every available 1-minute observation from 09:20 through 15:29 and continues across later trading days within the same weekly cycle until the first positive/all-green candidate appears. At that timestamp it selects the maximum positive flatline across ATM-400..ATM+400.
+
+The authoritative H1 run is **36302077730**. The merged audit contains 172 selected weekly-cycle entries, 448,280 checked timestamps and 17,606 decision-surface rows. Three selected entries have incompatible near/far lot sizes and are retained as incomplete rather than assigned a synthetic exit price, leaving 169 complete realized trades.
+
+At 0.25% premium slippage and ₹20/order brokerage, the 169 complete trades produced **₹162,953.84 gross P&L, ₹37,265.02 modeled costs and ₹125,688.82 net P&L**, with a 63.91% realized win rate and profit factor 2.94. Maximum drawdown on the realized-trade sequence was ₹16,200.65. Sensitivity remained positive at 0.5% and 1.0% slippage and at ₹40/order brokerage in the tested scenarios.
+
+This is a materially different and more complete empirical result than the superseded 09:20-only studies. It supports continued validation of the corrected H1 rule, but it is **not yet sufficient to declare a deployable trading edge** because the present result is a historical in-sample reconstruction. Independent walk-forward/holdout validation, regime robustness, and execution robustness remain required.
+
+See [docs/PHASE9D_RESULTS.md](PHASE9D_RESULTS.md). H2/H3 research remains frozen until the corrected H1 validation phase is complete.
