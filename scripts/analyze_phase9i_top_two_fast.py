@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, datetime as dt, json
+import argparse, datetime as dt, json, traceback
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -92,6 +92,13 @@ def enrich(g,exit_ts,settlement,near,far,m,maps):
     return g
 
 def main():
+    try:
+        _main()
+    except Exception:
+        traceback.print_exc()
+        raise
+
+def _main():
     a=parse_args(); start=dt.date.fromisoformat(a.start); end=dt.date.fromisoformat(a.end)
     idx=load_index(); idx=idx[(idx.trading_date>=start)&(idx.trading_date<=end)].copy()
     base=pd.read_csv(a.baseline); base['entry_timestamp']=pd.to_datetime(base['entry_timestamp'],utc=True).dt.tz_convert('Asia/Kolkata')
