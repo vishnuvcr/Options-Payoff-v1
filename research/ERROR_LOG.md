@@ -160,3 +160,5 @@
 | 2026-09-28 | 9I | Initial top-two selector allowed duplicate rows for the same strike, so rank 1 and rank 2 could be identical. | The first Phase 9I run is invalid for two-lot inference. | Added an explicit distinct-strike de-duplication gate before selecting the top two candidates; prior Phase 9I results are rejected and the workflow is rerun. |
 
 | 2026-09-28 | 9I | Independent rescan reconstructed 133 cycles versus 131 accepted Phase 9G realized trades. | A direct total-P&L comparison would mix the sizing experiment with a reimplementation discrepancy. | Phase 9I is now anchored to the accepted Phase 9G entry timestamps; only within-timestamp top-two strike ranking is changed. |
+
+| 2026-09-28 | 9I | Timestamp-anchored rerun failed because the new required `--baseline` CLI argument was referenced but not declared. | All six yearly analysis jobs failed before computation. | Added the missing argument declaration; rerun required. |
