@@ -41,12 +41,6 @@ jobs:
             phase9i-fast-hf-${{ matrix.year }}-
             phase9g-hf-options-${{ matrix.year }}-
             phase9h-loss-hf-${{ matrix.year }}-
-      - name: Download accepted Phase 9G baseline
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p baseline
-          gh run download 36320697995 -n phase9g-run27-merged-results -D baseline
       - name: Run analysis
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
