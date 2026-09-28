@@ -199,3 +199,9 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-28 | 9I | Final analysis | Six yearly Phase 9I reconstructions completed successfully under the corrected implementation. Final merge-only validation workflow **36429144740** accepted the pooled result. |
 | 2026-09-28 | 9I | Final finding | 131 weekly cycles produced 198 realized positions: 131 top-1 and 67 top-2. Top-two net P&L was **₹60,418.42** versus **₹71,868.76** for top-1; rank-2 incremental contribution was **-₹11,450.33**. |
 | 2026-09-28 | 9I | Phase exit | Phase 9I is complete. No change is made to the frozen one-strike Phase 9G H1 control. A forced exact-two-lot variant is explicitly left as a separate future experiment. |
+
+| 2026-09-28 | 9I | Two-lot experiment initialized | Tested two distinct strikes per accepted Phase 9G weekly entry, with all transaction-cost and near-expiry exit assumptions unchanged. |
+| 2026-09-28 | 9I | Reproducibility correction | Initial independent rescan and duplicate-strike selector were rejected; Phase 9I was anchored to the accepted 131 Phase 9G timestamps and an explicit distinct-strike ranking. |
+| 2026-09-28 | 9I | Final literal top-two result | 262 positions across 131 accepted weeks: ₹87,362.19 net P&L, 56.11% win rate, PF 1.65, max drawdown -₹36,888.35. Rank-2 incremental contribution was ₹15,493.43. |
+| 2026-09-28 | 9I | All-green sensitivity | Only 67 weeks had a second positive flatline candidate; those 67 additional trades contributed -₹11,450.33 net. The literal two-lot result therefore partly relies on negative-static-flatline rank-2 candidates. |
+| 2026-09-28 | 9I | Decision | No change adopted to the frozen H1 control; Phase 9I remains a separate candidate for prospective/out-of-sample validation. |
