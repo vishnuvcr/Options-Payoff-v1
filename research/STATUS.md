@@ -558,3 +558,14 @@ Rank-1 reproduces the accepted Phase 9G H1 control exactly: 131/131 rows, maximu
 Detailed report: [docs/PHASE9I_TOP_TWO_STRIKES.md](../docs/PHASE9I_TOP_TWO_STRIKES.md)  
 Machine-readable results: [results/phase9i_fast/summary.json](../results/phase9i_fast/summary.json)  
 Yearly rank contribution: [results/phase9i_fast/top2_yearly_summary.csv](../results/phase9i_fast/top2_yearly_summary.csv)
+
+
+## Phase 9I — Exact two-lot variant — COMPLETE
+
+- Accepted Phase 9G decision set: 131 weekly entries.
+- Rank-1 reproduction: 131/131 exact; max P&L difference < 4e-12 INR.
+- Exact two-lot result: 262 positions, **₹87,362.19 net P&L**, 56.11% position win rate, PF 1.651, max drawdown **-₹36,888.35**.
+- Incremental second-strike contribution: **+₹15,493.43 net**, 53.44% win rate, PF 1.198.
+- Bootstrap 95% CI for mean second-strike P&L: **₹-212.70 to ₹438.82**.
+- Decision: retain Phase 9G one-strike as research control; exact two-lot is a candidate requiring untouched chronological holdout and margin-normalized risk analysis.
+- Detailed report: [docs/PHASE9I_EXACT_TWO_LOTS.md](../docs/PHASE9I_EXACT_TWO_LOTS.md).
