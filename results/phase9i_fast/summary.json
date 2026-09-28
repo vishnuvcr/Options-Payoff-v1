@@ -1,0 +1,80 @@
+{
+  "baseline_validation": {
+    "baseline_rows": 131,
+    "top1_rows": 131,
+    "merged_rows": 131,
+    "max_abs_pnl_difference_inr": 3.183231456205249e-12,
+    "all_pnl_match": true,
+    "all_shift_match": true
+  },
+  "weekly_cycles_with_signal": 131,
+  "cycles_with_two_positive_candidates": 0,
+  "cycles_with_only_one_positive_candidate": 131,
+  "top1_control": {
+    "trades": 131,
+    "net_pnl_inr": 71868.75950141653,
+    "win_rate_pct": 58.778625954198475,
+    "mean_pnl_inr": 548.6164847436376,
+    "median_pnl_inr": 352.6944938042054,
+    "profit_factor": 2.2852496366352364,
+    "max_drawdown_inr": -15704.236549774214,
+    "min_pnl_inr": -10052.106851599625,
+    "max_pnl_inr": 5825.602914892865
+  },
+  "top2_trade_level": {
+    "trades": 198,
+    "net_pnl_inr": 60418.424868897244,
+    "win_rate_pct": 56.060606060606055,
+    "mean_pnl_inr": 305.1435599439255,
+    "median_pnl_inr": 168.6089225851395,
+    "profit_factor": 1.6071994932931957,
+    "max_drawdown_inr": -31812.537747571394,
+    "min_pnl_inr": -10257.317826177185,
+    "max_pnl_inr": 5825.602914892865
+  },
+  "top2_cycle_level": {
+    "trades": 131,
+    "net_pnl_inr": 60418.42486889723,
+    "win_rate_pct": 57.25190839694656,
+    "mean_pnl_inr": 461.2093501442537,
+    "median_pnl_inr": 489.18390914497206,
+    "profit_factor": 1.6160208333242063,
+    "max_drawdown_inr": -31812.53774757139,
+    "min_pnl_inr": -20309.42467777681,
+    "max_pnl_inr": 6326.18014471872
+  },
+  "top2_exact2_cycle_level": {
+    "trades": 0,
+    "net_pnl_inr": 0.0,
+    "win_rate_pct": NaN,
+    "mean_pnl_inr": NaN,
+    "median_pnl_inr": NaN,
+    "profit_factor": Infinity,
+    "max_drawdown_inr": NaN,
+    "min_pnl_inr": NaN,
+    "max_pnl_inr": NaN
+  },
+  "second_strike_increment": {
+    "trades": 67,
+    "net_pnl_inr": -11450.334632519285,
+    "win_rate_pct": 50.74626865671642,
+    "mean_pnl_inr": -170.90051690327292,
+    "median_pnl_inr": 21.49881342331633,
+    "profit_factor": 0.7372889827657183,
+    "max_drawdown_inr": -25066.435259040838,
+    "min_pnl_inr": -10257.317826177185,
+    "max_pnl_inr": 3569.468123107272
+  },
+  "bootstrap95_mean_top2_trade": [
+    35.90074136028169,
+    562.9442425092677
+  ],
+  "bootstrap95_mean_second_strike": [
+    -621.0246020011385,
+    222.8828152556401
+  ],
+  "bootstrap95_mean_combined_cycle": [
+    -68.07933089531781,
+    942.1336395922144
+  ]
+}
