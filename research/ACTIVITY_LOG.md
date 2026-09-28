@@ -189,3 +189,13 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-27 | 9H-A | Phase completed | All 54 frozen H1 loss cycles were reconstructed. Baseline P&L matched the accepted Phase 9G ledger within 1e-6 INR. Practical bounded entry counterfactuals rescued 14/54 losses in union; no entry rule adopted. |
 
 | 2026-09-27 | 9H-A | Frozen strategy specification documented | Added docs/CURRENT_STRATEGY_SPEC.md defining the accepted Phase 9G H1 operational rule: first valid positive timestamp, complete 17-strike surface, maximum positive flatline, H1 next-week expiry pairing, near-expiry manual close, and primary execution-cost assumptions. Phase 9H-A remains diagnostic; no entry modification adopted. |
+
+
+| 2026-09-28 | 9I | Phase opened | Created branch `phase-9I-top-two-strikes` to test whether entering the top two positive flatline strikes at the first valid exact-17-strike timestamp improves the frozen Phase 9G H1 control. The primary variant does not force a second trade when only one positive candidate exists. |
+| 2026-09-28 | 9I | Reproducibility gate | Added a rank-1 regression gate requiring exact reproduction of the accepted 131-trade Phase 9G H1 ledger before rank-2 inference is accepted. |
+| 2026-09-28 | 9I | Data/compute optimization | Replaced full expiry-range scans with predicate-filtered Parquet reads against the cached Hugging Face option files. Economic equations and selection rules were unchanged. |
+| 2026-09-28 | 9I | Selector correction | Detected duplicate rows at the same strike that could occupy both rank-1 and rank-2. Added an explicit distinct-shift de-duplication gate. |
+| 2026-09-28 | 9I | Cost correction | Detected double-counting of far-call exit STT in the variant implementation. Corrected entry-sell turnover versus far-exit-sell turnover; rank-1 then matched the frozen control to numerical precision. |
+| 2026-09-28 | 9I | Final analysis | Six yearly Phase 9I reconstructions completed successfully under the corrected implementation. Final merge-only validation workflow **36429144740** accepted the pooled result. |
+| 2026-09-28 | 9I | Final finding | 131 weekly cycles produced 198 realized positions: 131 top-1 and 67 top-2. Top-two net P&L was **₹60,418.42** versus **₹71,868.76** for top-1; rank-2 incremental contribution was **-₹11,450.33**. |
+| 2026-09-28 | 9I | Phase exit | Phase 9I is complete. No change is made to the frozen one-strike Phase 9G H1 control. A forced exact-two-lot variant is explicitly left as a separate future experiment. |
