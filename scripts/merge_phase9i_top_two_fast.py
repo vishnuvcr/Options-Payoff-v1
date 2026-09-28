@@ -34,7 +34,7 @@ def main():
     cycles2=cycles2.groupby('near_expiry',as_index=False).agg(entry_timestamp=('entry_timestamp','first'),legs=('top1_pnl','size'),combined_pnl=('combined_pnl','first'))
     exact2=cycles2[cycles2.legs.ge(2)]
     s1=stats(top1.net_pnl_inr); s2=stats(trades.net_pnl_inr); sc=stats(cycles2.combined_pnl); se=stats(exact2.combined_pnl)
-    incremental=trades[trades.rank.eq(2)].net_pnl_inr.dropna()
+    incremental=trades[trades['rank'].eq(2)].net_pnl_inr.dropna()
     summary={'baseline_validation':validation,'weekly_cycles_with_signal':int(len(cycles2)),'cycles_with_two_positive_candidates':int(len(exact2)),'cycles_with_only_one_positive_candidate':int((cycles2.legs==1).sum()),'top1_control':s1,'top2_trade_level':s2,'top2_cycle_level':sc,'top2_exact2_cycle_level':se,'second_strike_increment':stats(incremental),'bootstrap95_mean_top2_trade':boot(trades.net_pnl_inr),'bootstrap95_mean_second_strike':boot(incremental),'bootstrap95_mean_combined_cycle':boot(cycles2.combined_pnl)}
     pd.DataFrame([{'metric':'net_pnl_inr','top1':s1['net_pnl_inr'],'top2':s2['net_pnl_inr'],'delta':s2['net_pnl_inr']-s1['net_pnl_inr']},
                   {'metric':'win_rate_pct','top1':s1['win_rate_pct'],'top2':s2['win_rate_pct'],'delta':s2['win_rate_pct']-s1['win_rate_pct']},
