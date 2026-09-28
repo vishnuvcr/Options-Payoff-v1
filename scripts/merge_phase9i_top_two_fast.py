@@ -50,7 +50,7 @@ def main():
       '## Reproducibility gate\n\n'
       f"Top-1 exactly reproduces the accepted Phase 9G H1 control: **{validation['all_pnl_match']}**; maximum absolute P&L difference ₹{validation['max_abs_pnl_difference_inr']:.10f}; strike selections match **{validation['all_shift_match']}**.\n\n"
       '## Key counts\n\n'
-      f"Cycles with a positive signal: **{len(cycles2)}**. Cycles with two positive candidates: **{len(exact2)}**. Cycles with only one positive candidate: **{int((cycles2.legs==1).sum())}**.\n\n"
+      f"Cycles with a positive signal: **{len(cycles2)}**. Cycles with two positive candidates: **{len(exact2)}**. Cycles with only one positive candidate: **{int((cycles2.realized_rank_count==1).sum())}**.\n\n"
       '## Metrics\n\n'+pd.DataFrame([
         {'strategy':'Top-1 control','trades':s1['trades'],'net_pnl_inr':s1['net_pnl_inr'],'win_rate_pct':s1['win_rate_pct'],'profit_factor':s1['profit_factor'],'max_drawdown_inr':s1['max_drawdown_inr']},
         {'strategy':'Top-2 trade-level','trades':s2['trades'],'net_pnl_inr':s2['net_pnl_inr'],'win_rate_pct':s2['win_rate_pct'],'profit_factor':s2['profit_factor'],'max_drawdown_inr':s2['max_drawdown_inr']},
