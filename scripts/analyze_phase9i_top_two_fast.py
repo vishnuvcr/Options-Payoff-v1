@@ -19,6 +19,7 @@ def parse_args():
     p=argparse.ArgumentParser()
     p.add_argument('--start',required=True); p.add_argument('--end',required=True)
     p.add_argument('--out-dir',required=True)
+    p.add_argument('--baseline',required=True)
     p.add_argument('--slippage-pct',type=float,default=0.0025)
     p.add_argument('--brokerage-per-order',type=float,default=20.0)
     return p.parse_args()
