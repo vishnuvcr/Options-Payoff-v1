@@ -1,12 +1,12 @@
 # Options-Payoff-v1
 
-> **CRITICAL RESEARCH STATUS — 2026-09-27:** The user's exit convention has been clarified: all four legs are closed at the **near weekly expiry**; the far-expiry CE/PE legs are manually squared off at that time. Repository audit found that the prior realized-P&L backtest instead valued the far legs at their **own far-expiry settlement**. Therefore the historical realized-P&L results in Phases 3–8 that depend on that exit convention are **superseded and must not be treated as evidence for the actual strategy**. A corrective H=1 backtest is being rebuilt on `phase-9-near-expiry-exit-correction`. The entry-time static flatline/strike-selection calculation remains a separate chart-metric hypothesis, but it is not a validated P&L result.
+> **CRITICAL RESEARCH STATUS — 2026-09-28: The user's exit convention has been clarified: all four legs are closed at the **near weekly expiry**; the far-expiry CE/PE legs are manually squared off at that time. Repository audit found that the prior realized-P&L backtest instead valued the far legs at their **own far-expiry settlement**. Therefore the historical realized-P&L results in Phases 3–8 that depend on that exit convention are **superseded and must not be treated as evidence for the actual strategy**. A corrective H=1 backtest is being rebuilt on `phase-9-near-expiry-exit-correction`. The entry-time static flatline/strike-selection calculation remains a separate chart-metric hypothesis, but it is not a validated P&L result.
 
 Research repository for testing the clarified cross-expiry NIFTY options strategy.
 
 ## Current status
 
-**Phase 9E — frozen-rule H1 validation: COMPLETE; no new filter adopted**
+**Phase 9I — top-two-positive-strike sizing analysis: COMPLETE; frozen one-strike Phase 9G H1 control retained**
 
 Current operational rule:
 - every weekly expiry cycle is scanned chronologically;
@@ -408,3 +408,33 @@ Phase 9I tested two distinct H1 positions at each accepted Phase 9G entry timest
 - **No strategy change is adopted.** The literal two-lot rule is a separate candidate requiring prospective/out-of-sample validation.
 
 Detailed report: [docs/PHASE9I_TOP_TWO_RESULTS.md](docs/PHASE9I_TOP_TWO_RESULTS.md).
+
+
+## Phase 9I — Top-two-positive-strike sizing analysis COMPLETE
+
+Phase 9I tested a sizing variant of the frozen Phase 9G H1 rule: at the **first valid exact-17-strike timestamp**, rank all positive/all-green candidates by estimated equal Max Profit = Max Loss flatline and enter the **top two distinct positive strikes** at the same timestamp. The H1 exit and cost model were unchanged.
+
+### Accepted result
+
+- Final merge-only workflow: **36429144740**
+- Final artifact: **10971858546**
+- Weekly signal cycles: **131**
+- Cycles with a second realized positive candidate: **67**
+- Cycles with only one realized candidate: **64**
+- Realized individual positions: **198** (131 rank-1 + 67 rank-2)
+- Frozen top-1 control net P&L: **₹71,868.76**
+- Top-two variant net P&L: **₹60,418.42**
+- Incremental rank-2 contribution: **-₹11,450.33**
+- Top-two trade-level win rate: **56.06%**
+- Top-two profit factor: **1.61**
+- Top-two maximum drawdown: **-₹31,812.54**
+- Rank-2 mean-P&L bootstrap 95% CI: **₹-621.02 to ₹222.88**
+
+The rank-1 component reproduced the accepted Phase 9G H1 control exactly: 131/131 rows, maximum absolute P&L difference approximately 3.2e-12 INR, and all selected strikes matched.
+
+**Decision:** the second positive strike did not improve the historical economics under the accepted cost/exit model, so the frozen one-strike H1 strategy remains unchanged. This result is a sizing experiment, not a claim about a forced-two-lot strategy.
+
+Detailed report: [docs/PHASE9I_TOP_TWO_STRIKES.md](docs/PHASE9I_TOP_TWO_STRIKES.md)  
+Machine-readable summary: [results/phase9i_fast/summary.json](results/phase9i_fast/summary.json)  
+Yearly contribution: [results/phase9i_fast/top2_yearly_summary.csv](results/phase9i_fast/top2_yearly_summary.csv)  
+Top-1 validation: [results/phase9i_fast/top2_baseline_validation.csv](results/phase9i_fast/top2_baseline_validation.csv)
