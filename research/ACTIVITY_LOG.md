@@ -205,3 +205,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-28 | 9I | Final literal top-two result | 262 positions across 131 accepted weeks: ₹87,362.19 net P&L, 56.11% win rate, PF 1.65, max drawdown -₹36,888.35. Rank-2 incremental contribution was ₹15,493.43. |
 | 2026-09-28 | 9I | All-green sensitivity | Only 67 weeks had a second positive flatline candidate; those 67 additional trades contributed -₹11,450.33 net. The literal two-lot result therefore partly relies on negative-static-flatline rank-2 candidates. |
 | 2026-09-28 | 9I | Decision | No change adopted to the frozen H1 control; Phase 9I remains a separate candidate for prospective/out-of-sample validation. |
+
+| 2026-09-28 | 9I | Exact two-lot result | Final artifact 10972304314: 262 positions across 131 accepted weeks, ₹87,362.19 net, +₹15,493.43 incremental rank-2 contribution, PF 1.651, max drawdown -₹36,888.35. Rank-1 reproduced Phase 9G exactly. |
+| 2026-09-28 | 9I | Interpretation | Exact two-lot variant improves absolute historical P&L but increases drawdown ~2.35x and lowers PF; it remains a candidate for untouched holdout rather than replacing the control. |
