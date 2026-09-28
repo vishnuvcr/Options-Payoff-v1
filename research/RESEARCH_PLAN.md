@@ -690,3 +690,21 @@ Accepted historical result for the top-two-positive variant:
 Detailed report: [docs/PHASE9I_TOP_TWO_STRIKES.md](../docs/PHASE9I_TOP_TWO_STRIKES.md)
 Machine-readable results: [results/phase9i_fast/summary.json](../results/phase9i_fast/summary.json)
 Workflow: [36429144740](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36429144740)
+
+
+## Phase 9I — Two-lot top-two-strike sizing experiment
+
+**Branch:** phase-9I-top-two-strikes
+
+Research question: If the accepted Phase 9G entry timestamp is held fixed, does entering two distinct strikes with the largest estimated equal Max Profit=Max Loss flatline values improve economic performance versus the one-strike control?
+
+Design:
+1. Freeze the accepted 131 Phase 9G entry timestamps and one-lot rank-1 selections.
+2. Evaluate all 17 distinct ATM-400..ATM+400 strikes at each accepted timestamp.
+3. Rank by estimated equal flatline value and select the top two distinct strikes.
+4. Preserve the H1 near-expiry exit, execution assumptions, taxes, slippage and brokerage.
+5. Compare literal top-two-every-week against the original one-strike control.
+6. Separately report the sensitivity that requires the second strike to remain positive/all-green.
+7. Do not adopt the two-lot rule without prospective/out-of-sample validation.
+
+Exit criteria: exact rank-1 reproduction, complete top-two ledger, incremental P&L/cost/drawdown analysis, uncertainty summary, and documented adoption decision.
