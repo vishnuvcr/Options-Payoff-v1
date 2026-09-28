@@ -396,3 +396,15 @@ It defines the exact live/research procedure:
 - close all four legs at the near weekly expiry, manually squaring the far CE/PE at observed near-expiry prices.
 
 Phase 9H-A did not adopt any entry modification. This specification is documentation of the frozen control, not a new backtest result.
+
+## Phase 9I — Two-lot / top-two-strike analysis (2026-09-28)
+
+Phase 9I tested two distinct H1 positions at each accepted Phase 9G entry timestamp, ranking all 17 strikes by estimated equal Max Profit=Max Loss flatline value. The rank-1 reproduction gate passed exactly against the 131-trade Phase 9G control.
+
+- Literal top-two-every-week: **262 positions**, **₹87,362.19 net P&L**, **56.11% win rate**, **PF 1.65**, **-₹36,888.35 max drawdown**.
+- One-lot control: **131 positions**, **₹71,868.76 net P&L**, **58.78% win rate**, **PF 2.29**, **-₹15,704.24 max drawdown**.
+- Incremental rank-2 contribution: **₹15,493.43 net**, 53.44% win rate, PF 1.20.
+- If the original positive/all-green condition is retained for the second strike, only 67 second-strike trades exist and their combined net P&L is **-₹11,450.33**.
+- **No strategy change is adopted.** The literal two-lot rule is a separate candidate requiring prospective/out-of-sample validation.
+
+Detailed report: [docs/PHASE9I_TOP_TWO_RESULTS.md](docs/PHASE9I_TOP_TWO_RESULTS.md).
