@@ -8,7 +8,7 @@ Top-1 exactly reproduces the accepted Phase 9G H1 control: **True**; maximum abs
 
 ## Key counts
 
-Cycles with a positive signal: **131**. Cycles with two positive candidates: **0**. Cycles with only one positive candidate: **131**.
+Cycles with a positive signal: **131**. Cycles with two positive candidates: **67**. Cycles with only one positive candidate: **64**.
 
 ## Metrics
 

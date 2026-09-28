@@ -8,8 +8,8 @@
     "all_shift_match": true
   },
   "weekly_cycles_with_signal": 131,
-  "cycles_with_two_positive_candidates": 0,
-  "cycles_with_only_one_positive_candidate": 131,
+  "cycles_with_two_positive_candidates": 67,
+  "cycles_with_only_one_realized_candidate": 64,
   "top1_control": {
     "trades": 131,
     "net_pnl_inr": 71868.75950141653,
@@ -44,15 +44,15 @@
     "max_pnl_inr": 6326.18014471872
   },
   "top2_exact2_cycle_level": {
-    "trades": 0,
-    "net_pnl_inr": 0.0,
-    "win_rate_pct": NaN,
-    "mean_pnl_inr": NaN,
-    "median_pnl_inr": NaN,
-    "profit_factor": Infinity,
-    "max_drawdown_inr": NaN,
-    "min_pnl_inr": NaN,
-    "max_pnl_inr": NaN
+    "trades": 67,
+    "net_pnl_inr": -10449.317537745665,
+    "win_rate_pct": 47.76119402985074,
+    "mean_pnl_inr": -155.9599632499353,
+    "median_pnl_inr": -84.47724736989488,
+    "profit_factor": 0.868017280776303,
+    "max_drawdown_inr": -44726.76642991658,
+    "min_pnl_inr": -20309.42467777681,
+    "max_pnl_inr": 6326.18014471872
   },
   "second_strike_increment": {
     "trades": 67,
