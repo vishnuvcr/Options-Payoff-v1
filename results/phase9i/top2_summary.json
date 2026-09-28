@@ -1,0 +1,27 @@
+{
+  "phase": "9I",
+  "baseline": {
+    "trades": 131,
+    "net_pnl_inr": 71868.75950141653,
+    "win_rate_pct": 58.778625954198475,
+    "profit_factor": 2.2852496366352364,
+    "max_drawdown_inr": -15704.236549774214
+  },
+  "literal_top_two": {
+    "positions": 262,
+    "net_pnl_inr": 87362.19083929546,
+    "win_rate_pct": 56.10687022900763,
+    "profit_factor": 1.6513330938406585,
+    "max_drawdown_inr": -36888.353657469146,
+    "incremental_net_pnl_inr": 15493.43133787895
+  },
+  "second_positive_only": {
+    "weeks_with_second_positive": 67,
+    "incremental_net_pnl_inr": -11450.334632519287
+  },
+  "reproducibility": {
+    "max_abs_rank1_pnl_difference_inr": 3.183231456205249e-12,
+    "strikes_match": true
+  },
+  "decision": "No strategy change adopted; Phase 9I remains a separate candidate requiring prospective/out-of-sample validation."
+}
