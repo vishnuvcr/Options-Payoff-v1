@@ -516,3 +516,16 @@ Workflow: [36325328644](https://github.com/vishnuvcr/Options-Payoff-v1/actions/r
 ## Frozen current strategy specification — 2026-09-27
 
 Added [docs/CURRENT_STRATEGY_SPEC.md](../docs/CURRENT_STRATEGY_SPEC.md) as the definitive human-readable operating specification for the accepted Phase 9G H1 control. It freezes the entry cadence, exact 17-strike completeness rule, maximum-positive-flatline selector, four-leg construction, near-expiry manual far-leg close, and cost model. No Phase 9H-A entry modification was adopted.
+
+
+## Phase 9I — Two-lot / top-two-strike analysis
+
+**Status:** COMPLETE (candidate strategy; not adopted as control)
+
+- Accepted Phase 9G decision set held fixed: 131 weekly entries.
+- Rank-1 reproduction gate passed exactly: 131/131 strikes and timestamps match; max P&L difference < 4e-12 INR.
+- Literal top-two-every-week result: 262 positions, ₹87,362.19 net, 56.11% win rate, PF 1.65, max drawdown -₹36,888.35.
+- Incremental second-strike contribution: ₹15,493.43 net; 53.44% win rate; PF 1.20.
+- Retaining the original positive/all-green requirement gives only 67 second-strike trades and -₹11,450.33 incremental net P&L.
+- No production/research-control rule change adopted. Phase 9I is a separate candidate requiring prospective/out-of-sample validation.
+- Detailed report: docs/PHASE9I_TOP_TWO_RESULTS.md.
