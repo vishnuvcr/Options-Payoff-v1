@@ -29,18 +29,20 @@ def main():
     m['abs_pnl_diff']=(m.net_pnl_inr_base-m.net_pnl_inr_top1).abs(); m['shift_match']=m.shift_points_base.eq(m.shift_points_top1)
     validation={'baseline_rows':len(base),'top1_rows':len(top1),'merged_rows':len(m),'max_abs_pnl_difference_inr':float(m.abs_pnl_diff.max()),'all_pnl_match':bool(len(m)==len(base)==len(top1) and m.abs_pnl_diff.max()<=1e-6),'all_shift_match':bool(m.shift_match.all())}
     if not validation['all_pnl_match'] or not validation['all_shift_match']: raise SystemExit('Top-1 does not reproduce frozen Phase 9G H1')
-    cycles2=cycles.copy()
-    cycles2=cycles2[cycles2['top1_pnl'].notna()].copy()
-    cycles2=cycles2.groupby('near_expiry',as_index=False).agg(entry_timestamp=('entry_timestamp','first'),legs=('top1_pnl','size'),combined_pnl=('combined_pnl','first'))
-    exact2=cycles2[cycles2.legs.ge(2)]
+    valid_cycles=cycles[cycles['top1_pnl'].notna()].copy()
+    rank_counts=trades[trades['net_pnl_inr'].notna()].groupby('near_expiry')['rank'].nunique().rename('realized_rank_count')
+    cycles2=valid_cycles.merge(rank_counts,on='near_expiry',how='left')
+    cycles2['realized_rank_count']=cycles2['realized_rank_count'].fillna(0).astype(int)
+    exact2=cycles2[cycles2['realized_rank_count'].ge(2)]
     s1=stats(top1.net_pnl_inr); s2=stats(trades.net_pnl_inr); sc=stats(cycles2.combined_pnl); se=stats(exact2.combined_pnl)
     incremental=trades[trades['rank'].eq(2)].net_pnl_inr.dropna()
-    summary={'baseline_validation':validation,'weekly_cycles_with_signal':int(len(cycles2)),'cycles_with_two_positive_candidates':int(len(exact2)),'cycles_with_only_one_positive_candidate':int((cycles2.legs==1).sum()),'top1_control':s1,'top2_trade_level':s2,'top2_cycle_level':sc,'top2_exact2_cycle_level':se,'second_strike_increment':stats(incremental),'bootstrap95_mean_top2_trade':boot(trades.net_pnl_inr),'bootstrap95_mean_second_strike':boot(incremental),'bootstrap95_mean_combined_cycle':boot(cycles2.combined_pnl)}
+    year_trade=trades.dropna(subset=['net_pnl_inr']).assign(year=pd.to_datetime(trades.dropna(subset=['net_pnl_inr'])['entry_timestamp']).dt.year).groupby(['year','rank'])['net_pnl_inr'].agg(['count','sum','mean']).reset_index()
+    summary={'baseline_validation':validation,'weekly_cycles_with_signal':int(len(cycles2)),'cycles_with_two_positive_candidates':int(len(exact2)),'cycles_with_only_one_realized_candidate':int((cycles2.realized_rank_count==1).sum()),'top1_control':s1,'top2_trade_level':s2,'top2_cycle_level':sc,'top2_exact2_cycle_level':se,'second_strike_increment':stats(incremental),'bootstrap95_mean_top2_trade':boot(trades.net_pnl_inr),'bootstrap95_mean_second_strike':boot(incremental),'bootstrap95_mean_combined_cycle':boot(cycles2.combined_pnl)}
     pd.DataFrame([{'metric':'net_pnl_inr','top1':s1['net_pnl_inr'],'top2':s2['net_pnl_inr'],'delta':s2['net_pnl_inr']-s1['net_pnl_inr']},
                   {'metric':'win_rate_pct','top1':s1['win_rate_pct'],'top2':s2['win_rate_pct'],'delta':s2['win_rate_pct']-s1['win_rate_pct']},
                   {'metric':'profit_factor','top1':s1['profit_factor'],'top2':s2['profit_factor'],'delta':s2['profit_factor']-s1['profit_factor']},
                   {'metric':'max_drawdown_inr','top1':s1['max_drawdown_inr'],'top2':s2['max_drawdown_inr'],'delta':s2['max_drawdown_inr']-s1['max_drawdown_inr']}]).to_csv(out/'top2_vs_top1_metrics.csv',index=False)
-    trades.to_csv(out/'top2_trade_rows.csv',index=False); cycles2.to_csv(out/'top2_cycle_summary.csv',index=False); m.to_csv(out/'top2_baseline_validation.csv',index=False)
+    trades.to_csv(out/'top2_trade_rows.csv',index=False); cycles2.to_csv(out/'top2_cycle_summary.csv',index=False); m.to_csv(out/'top2_baseline_validation.csv',index=False); year_trade.to_csv(out/'top2_yearly_summary.csv',index=False)
     out.joinpath('summary.json').write_text(json.dumps(summary,indent=2,default=str))
     out.joinpath('PHASE9I_TOP_TWO_RESULTS.md').write_text(
       '# Phase 9I — Top-two-strike results\n\n'
