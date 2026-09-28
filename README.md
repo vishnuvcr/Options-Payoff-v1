@@ -438,3 +438,10 @@ Detailed report: [docs/PHASE9I_TOP_TWO_STRIKES.md](docs/PHASE9I_TOP_TWO_STRIKES.
 Machine-readable summary: [results/phase9i_fast/summary.json](results/phase9i_fast/summary.json)  
 Yearly contribution: [results/phase9i_fast/top2_yearly_summary.csv](results/phase9i_fast/top2_yearly_summary.csv)  
 Top-1 validation: [results/phase9i_fast/top2_baseline_validation.csv](results/phase9i_fast/top2_baseline_validation.csv)
+
+
+### Phase 9I — Exact two-lot top-two-strike experiment (complete)
+
+The exact interpretation of “two lots each qualifying week” was tested using the fixed 131 accepted Phase 9G entry timestamps. The two highest-ranked distinct strikes were entered every week, regardless of whether rank #2 had a positive static flatline. Rank #1 reproduced the Phase 9G control exactly. The variant produced **262 positions**, **₹87,362.19 net P&L**, **53.44% weekly win rate**, **1.651 profit factor**, and **-₹36,888.35 maximum drawdown**, versus **₹71,868.76**, **58.78%**, **2.285**, and **-₹15,704.24** for the one-strike control. Incremental rank-2 contribution was **+₹15,493.43**, with bootstrap 95% CI for mean rank-2 P&L of **₹-212.70 to ₹438.82**. This does **not** replace the control; it is a candidate for untouched chronological holdout and margin-normalized risk testing.
+
+See [Phase 9I exact two-lot report](docs/PHASE9I_EXACT_TWO_LOTS.md).
