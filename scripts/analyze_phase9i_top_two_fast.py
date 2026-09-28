@@ -147,13 +147,13 @@ def _main():
         valid=[ts for ts in counts.index if counts.loc[ts]==17 and conflicts.get(ts,0)==0 and pos.get(ts,0)>0]
         if not valid: continue
         first=min(valid); h=surf[surf.timestamp.eq(first)].copy(); h=enrich(h,exit_ts,settlement,near,far,model,maps)
-        h=h[h.flatline_inr>0].copy()
+        h=h.copy()
         h=h.sort_values(['flatline_inr','shift_points'],ascending=[False,True]).drop_duplicates(['shift_points'],keep='first').reset_index(drop=True)
-        if h.empty: continue
+        if h.empty or h.iloc[0].flatline_inr<=0: continue
         take=h.head(2)
         for rank,row in enumerate(take.itertuples(index=False),1):
-            top2.append({'near_expiry':str(near),'entry_timestamp':str(first),'entry_date':str(pd.Timestamp(first).date()),'rank':rank,'shift_points':int(row.shift_points),'strike':float(row.strike),'flatline_inr':float(row.flatline_inr),'gross_pnl_inr':float(row.gross_pnl_inr) if pd.notna(row.gross_pnl_inr) else np.nan,'total_costs':float(row.total_costs) if pd.notna(row.total_costs) else np.nan,'net_pnl_inr':float(row.net_pnl_inr) if pd.notna(row.net_pnl_inr) else np.nan})
-        cycles.append({'near_expiry':str(near),'entry_timestamp':str(first),'positive_candidates':int(len(h)),'top1_shift':int(take.iloc[0].shift_points),'top2_shift':int(take.iloc[1].shift_points) if len(take)>1 else None,'top1_pnl':float(take.iloc[0].net_pnl_inr) if pd.notna(take.iloc[0].net_pnl_inr) else np.nan,'top2_pnl':float(take.iloc[1].net_pnl_inr) if len(take)>1 and pd.notna(take.iloc[1].net_pnl_inr) else np.nan,'combined_pnl':float(take.net_pnl_inr.sum(min_count=1))})
+            top2.append({'near_expiry':str(near),'entry_timestamp':str(first),'entry_date':str(pd.Timestamp(first).date()),'rank':rank,'shift_points':int(row.shift_points),'strike':float(row.strike),'flatline_inr':float(row.flatline_inr),'positive_flatline':bool(row.flatline_inr>0),'gross_pnl_inr':float(row.gross_pnl_inr) if pd.notna(row.gross_pnl_inr) else np.nan,'total_costs':float(row.total_costs) if pd.notna(row.total_costs) else np.nan,'net_pnl_inr':float(row.net_pnl_inr) if pd.notna(row.net_pnl_inr) else np.nan})
+        cycles.append({'near_expiry':str(near),'entry_timestamp':str(first),'positive_candidates':int((h.flatline_inr>0).sum()),'top1_shift':int(take.iloc[0].shift_points),'top2_shift':int(take.iloc[1].shift_points) if len(take)>1 else None,'top1_pnl':float(take.iloc[0].net_pnl_inr) if pd.notna(take.iloc[0].net_pnl_inr) else np.nan,'top2_pnl':float(take.iloc[1].net_pnl_inr) if len(take)>1 and pd.notna(take.iloc[1].net_pnl_inr) else np.nan,'combined_pnl':float(take.net_pnl_inr.sum(min_count=1))})
     out=Path(a.out_dir); out.mkdir(parents=True,exist_ok=True)
     pd.DataFrame(top2).to_csv(out/'top2_trade_rows.csv',index=False); pd.DataFrame(cycles).to_csv(out/'top2_cycle_summary.csv',index=False)
     (out/'metadata.json').write_text(json.dumps({'start':a.start,'end':a.end,'rows':len(top2),'rule':'first valid exact-17 positive timestamp; top two positive flatline strikes; predicate-filtered option reads'},indent=2))
