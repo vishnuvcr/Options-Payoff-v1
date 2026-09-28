@@ -65,9 +65,9 @@ def exit_maps(df,exit_ts):
     ce=x[x.option_type.eq('CE')].set_index('strike'); pe=x[x.option_type.eq('PE')].set_index('strike')
     return ce['close'].to_dict(),pe['close'].to_dict(),ce['timestamp'].to_dict(),pe['timestamp'].to_dict()
 
-def enrich(g,exit_ts,settlement,near,far,m):
+def enrich(g,exit_ts,settlement,near,far,m,maps):
     lot=nifty_lot_size(near); far_lot=nifty_lot_size(far); g=g.copy()
-    ce_map,pe_map,ce_ts,pe_ts=g._exitmaps
+    ce_map,pe_map,ce_ts,pe_ts=maps
     g['far_call_exit_close']=g.strike.map(ce_map); g['far_put_exit_close']=g.strike.map(pe_map)
     g['far_call_exit_timestamp']=g.strike.map(ce_ts); g['far_put_exit_timestamp']=g.strike.map(pe_ts)
     if lot!=far_lot:
@@ -137,7 +137,7 @@ def main():
         pos=surf.groupby('timestamp').flatline_inr.apply(lambda x:int((x>0).sum()))
         valid=[ts for ts in counts.index if counts.loc[ts]==17 and conflicts.get(ts,0)==0 and pos.get(ts,0)>0]
         if not valid: continue
-        first=min(valid); h=surf[surf.timestamp.eq(first)].copy(); h._exitmaps=maps; h=enrich(h,exit_ts,settlement,near,far,model)
+        first=min(valid); h=surf[surf.timestamp.eq(first)].copy(); h=enrich(h,exit_ts,settlement,near,far,model,maps)
         h=h[h.flatline_inr>0].sort_values(['flatline_inr','shift_points'],ascending=[False,True]).reset_index(drop=True)
         if h.empty: continue
         take=h.head(2)
