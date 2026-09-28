@@ -643,3 +643,50 @@ Primary findings:
 - Even the strongest ex-post later-entry/strike test left 16/54 losses unrecovered.
 
 No entry modification is adopted. Any prospective rule suggested by the loss audit must be tested on the full 131-trade population and then an untouched holdout. The research will not recursively optimize individual losses.
+
+
+## Phase 9I — Top-two-positive-strike sizing variant
+
+**Branch:** `phase-9I-top-two-strikes`
+
+### Research question
+Does adding the second-highest positive estimated equal Max Profit = Max Loss strike at the first valid exact-17-strike decision timestamp improve the historical H1 strategy relative to the frozen one-strike Phase 9G control?
+
+### Variant definition
+The variant preserves every frozen Phase 9G rule except position count:
+- scan 09:20–15:29 across later trading days within the weekly cycle;
+- require the complete 17 unique strike-shift universe ATM-400..ATM+400 in 50-point steps and no conflicting duplicates;
+- enter at the first valid timestamp with at least one positive/all-green flatline;
+- rank positive candidates by estimated equal Max Profit = Max Loss flatline;
+- select the top two **distinct positive** strikes at that same timestamp when two positive candidates exist;
+- use the unchanged four-leg H1 construction, near-expiry manual far-leg close and transaction-cost model.
+
+This is not a forced-two-position rule. A cycle with only one positive candidate remains a one-position cycle. A forced second position with a non-positive second-ranked candidate must be tested as a separate future variant.
+
+### Acceptance gates
+1. Rank-1 reconstruction must reproduce the accepted 131-trade Phase 9G H1 control exactly before rank-2 inference is accepted.
+2. Report rank-2 incremental P&L separately from combined weekly-cycle P&L.
+3. Report realized position count, weekly-cycle count, win rate, profit factor, maximum drawdown and bootstrap uncertainty.
+4. Report annual rank-2 contribution to assess temporal stability.
+5. Do not replace the frozen one-strike control solely because total absolute rupee P&L changes with additional capital deployment.
+6. No strategy adoption without a separate prospective/untouched validation design.
+
+### Phase 9I final exit record — 2026-09-28
+
+Phase 9I is complete. Final merge-only workflow **36429144740** accepted the six frozen yearly artifacts generated under the corrected Phase 9I implementation. The rank-1 component reproduced the 131-trade Phase 9G H1 control to numerical precision and exactly matched the accepted strike selections.
+
+Accepted historical result for the top-two-positive variant:
+- 131 weekly signal cycles;
+- 67 cycles with a second realized positive candidate;
+- 198 realized individual positions in total;
+- top-two net P&L **₹60,418.42** versus top-1 control **₹71,868.76**;
+- incremental second-strike contribution **-₹11,450.33** across 67 positions;
+- top-two trade-level win rate **56.06%** and PF **1.61**;
+- top-two maximum drawdown **-₹31,812.54** versus control **-₹15,704.24**;
+- bootstrap 95% CI for mean rank-2 P&L: **₹-621.02 to ₹222.88**.
+
+**Decision:** do not change the frozen Phase 9G one-strike strategy. The top-two-positive variant is retained as a completed historical sizing experiment. A forced exact-two-lot variant remains a separate, currently untested strategy definition.
+
+Detailed report: [docs/PHASE9I_TOP_TWO_STRIKES.md](../docs/PHASE9I_TOP_TWO_STRIKES.md)
+Machine-readable results: [results/phase9i_fast/summary.json](../results/phase9i_fast/summary.json)
+Workflow: [36429144740](https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36429144740)
