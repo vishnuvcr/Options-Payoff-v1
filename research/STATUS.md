@@ -1,8 +1,8 @@
 # Research status
 
-**As of:** 2026-09-27  
-**Active branch:** phase-9H-loss-entry-analysis
-**Overall status:** Phase 9G COMPLETE; Phase 9H-A COMPLETE — loss-cycle entry counterfactual audit accepted; no entry rule change adopted
+**As of:** 2026-09-28  
+**Active branch:** phase-9I-top-two-strikes
+**Overall status:** Phase 9I COMPLETE — top-two-positive-strike sizing variant tested; frozen one-strike Phase 9G H1 control retained
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -529,3 +529,32 @@ Added [docs/CURRENT_STRATEGY_SPEC.md](../docs/CURRENT_STRATEGY_SPEC.md) as the d
 - Retaining the original positive/all-green requirement gives only 67 second-strike trades and -₹11,450.33 incremental net P&L.
 - No production/research-control rule change adopted. Phase 9I is a separate candidate requiring prospective/out-of-sample validation.
 - Detailed report: docs/PHASE9I_TOP_TWO_RESULTS.md.
+
+
+## Phase 9I — Top-two-positive-strike sizing variant — COMPLETE
+
+**Final merge-only workflow:** 36429144740  
+**Final result artifact:** 10971858546  
+**Branch:** phase-9I-top-two-strikes
+
+The Phase 9I variant selected the top two **distinct positive** flatline strikes at the first valid exact-17-strike timestamp, using the same H1 exit and cost model as the Phase 9G control.
+
+### Accepted results
+- 131 weekly signal cycles.
+- 67 cycles had a second realized positive candidate; 64 had only one.
+- 198 realized individual positions: 131 rank-1 + 67 rank-2.
+- Top-1 control: **₹71,868.76 net**, 58.78% wins, PF 2.285, max drawdown **-₹15,704.24**.
+- Top-2 variant: **₹60,418.42 net**, 56.06% position win rate, PF 1.607, max drawdown **-₹31,812.54**.
+- Incremental rank-2 contribution: **-₹11,450.33**, 67 positions, mean **-₹170.90**, PF **0.737**, win rate **50.75%**.
+- Rank-2 mean-P&L bootstrap 95% CI: **₹-621.02 to ₹222.88**.
+- Combined weekly-cycle mean-P&L bootstrap 95% CI: **₹-68.08 to ₹942.13**.
+
+### Control validation
+Rank-1 reproduces the accepted Phase 9G H1 control exactly: 131/131 rows, maximum absolute P&L difference approximately 3.2e-12 INR, and all selected strikes match.
+
+### Decision
+**No strategy change.** The frozen one-strike Phase 9G H1 rule remains the research candidate. Phase 9I is retained as a completed sizing experiment. A forced exact-two-lot rule when fewer than two positive candidates exist is a separate, untested variant.
+
+Detailed report: [docs/PHASE9I_TOP_TWO_STRIKES.md](../docs/PHASE9I_TOP_TWO_STRIKES.md)  
+Machine-readable results: [results/phase9i_fast/summary.json](../results/phase9i_fast/summary.json)  
+Yearly rank contribution: [results/phase9i_fast/top2_yearly_summary.csv](../results/phase9i_fast/top2_yearly_summary.csv)
