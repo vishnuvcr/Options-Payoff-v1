@@ -24,12 +24,14 @@ def main():
     cycles=pd.concat([pd.read_csv(x) for x in sorted(Path(a.input_dir).rglob('top2_cycle_summary.csv'))],ignore_index=True)
     trades['entry_timestamp']=pd.to_datetime(trades['entry_timestamp']); cycles['entry_timestamp']=pd.to_datetime(cycles['entry_timestamp'])
     base=pd.read_csv(a.baseline); base['entry_timestamp']=pd.to_datetime(base['entry_timestamp'])
-    top1=trades[trades['rank'].eq(1)].copy()
+    top1=trades[trades['rank'].eq(1) & trades['net_pnl_inr'].notna()].copy()
     m=base[['entry_timestamp','net_pnl_inr','shift_points']].merge(top1[['entry_timestamp','net_pnl_inr','shift_points']],on='entry_timestamp',how='outer',suffixes=('_base','_top1'),validate='one_to_one')
     m['abs_pnl_diff']=(m.net_pnl_inr_base-m.net_pnl_inr_top1).abs(); m['shift_match']=m.shift_points_base.eq(m.shift_points_top1)
     validation={'baseline_rows':len(base),'top1_rows':len(top1),'merged_rows':len(m),'max_abs_pnl_difference_inr':float(m.abs_pnl_diff.max()),'all_pnl_match':bool(len(m)==len(base)==len(top1) and m.abs_pnl_diff.max()<=1e-6),'all_shift_match':bool(m.shift_match.all())}
     if not validation['all_pnl_match'] or not validation['all_shift_match']: raise SystemExit('Top-1 does not reproduce frozen Phase 9G H1')
-    cycles2=cycles.groupby('near_expiry',as_index=False).agg(entry_timestamp=('entry_timestamp','first'),legs=('top1_pnl','size'),combined_pnl=('combined_pnl','first'))
+    cycles2=cycles.copy()
+    cycles2=cycles2[cycles2['top1_pnl'].notna()].copy()
+    cycles2=cycles2.groupby('near_expiry',as_index=False).agg(entry_timestamp=('entry_timestamp','first'),legs=('top1_pnl','size'),combined_pnl=('combined_pnl','first'))
     exact2=cycles2[cycles2.legs.ge(2)]
     s1=stats(top1.net_pnl_inr); s2=stats(trades.net_pnl_inr); sc=stats(cycles2.combined_pnl); se=stats(exact2.combined_pnl)
     incremental=trades[trades.rank.eq(2)].net_pnl_inr.dropna()
