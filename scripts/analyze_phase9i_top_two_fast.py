@@ -78,12 +78,12 @@ def enrich(g,exit_ts,settlement,near,far,m,maps):
     fce=g.far_call_exit_close*(1-s); fpe=g.far_put_exit_close*(1+s)
     g['gross_pnl_inr']=(sell_call-buy_put-buy_call+sell_put+(g.strike-float(settlement))+fce-fpe)*lot
     turnover=(sell_call+buy_put+buy_call+sell_put+fce+fpe)*lot
-    sell_turnover=(sell_call+sell_put+fce)*lot; buy_turnover=(buy_put+buy_call+fpe)*lot
+    entry_sell_turnover=(sell_call+sell_put)*lot; buy_turnover=(buy_put+buy_call+fpe)*lot
     brokerage=6*m.brokerage_per_order_inr; exchange=turnover*m.exchange_turnover_rate; sebi=turnover*m.sebi_turnover_rate
     stamp_entry=(buy_put+buy_call)*lot*m.stamp_duty_buy_rate; stamp_exit=fpe*lot*m.stamp_duty_buy_rate
     stt_entry_rate=np.where(g.timestamp.dt.date>=dt.date(2026,4,1),m.stt_from_2026_04_01,m.stt_before_2026_04_01)
     stt_exit_rate=m.stt_from_2026_04_01 if exit_ts.date()>=dt.date(2026,4,1) else m.stt_before_2026_04_01
-    stt_entry=sell_turnover*stt_entry_rate; stt_exit=fce*lot*stt_exit_rate
+    stt_entry=entry_sell_turnover*stt_entry_rate; stt_exit=fce*lot*stt_exit_rate
     exercised=np.maximum(g.strike-float(settlement),0)*lot
     exercise_rate=m.exercise_stt_from_2026_04_01 if exit_ts.date()>=dt.date(2026,4,1) else m.exercise_stt_before_2026_04_01
     stt_exercise=exercised*exercise_rate; gst=m.gst_rate*(brokerage+exchange+sebi)
