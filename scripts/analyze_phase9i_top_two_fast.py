@@ -138,7 +138,8 @@ def main():
         valid=[ts for ts in counts.index if counts.loc[ts]==17 and conflicts.get(ts,0)==0 and pos.get(ts,0)>0]
         if not valid: continue
         first=min(valid); h=surf[surf.timestamp.eq(first)].copy(); h=enrich(h,exit_ts,settlement,near,far,model,maps)
-        h=h[h.flatline_inr>0].sort_values(['flatline_inr','shift_points'],ascending=[False,True]).reset_index(drop=True)
+        h=h[h.flatline_inr>0].copy()
+        h=h.sort_values(['flatline_inr','shift_points'],ascending=[False,True]).drop_duplicates(['shift_points'],keep='first').reset_index(drop=True)
         if h.empty: continue
         take=h.head(2)
         for rank,row in enumerate(take.itertuples(index=False),1):
