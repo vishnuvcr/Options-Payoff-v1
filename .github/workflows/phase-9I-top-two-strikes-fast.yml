@@ -51,7 +51,7 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          python scripts/analyze_phase9i_top_two_fast.py             --start "${{ matrix.year }}-01-01"             --end "${{ matrix.year }}-12-31"             --out-dir "work/${{ matrix.year }}"             --slippage-pct 0.0025             --brokerage-per-order 20
+          python scripts/analyze_phase9i_top_two_fast.py             --start "${{ matrix.year }}-01-01"             --end "${{ matrix.year }}-12-31"             --out-dir "work/${{ matrix.year }}"             --baseline "baseline/H1_realized_trades.csv"             --slippage-pct 0.0025             --brokerage-per-order 20
       - name: Upload yearly results
         uses: actions/upload-artifact@v4
         with:
