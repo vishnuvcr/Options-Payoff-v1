@@ -1,53 +1,53 @@
-name: Phase 9I - Top Two Strikes FAST
+name: Phase 9I Top Two Strikes Fast
 
 on:
-  workflow_dispatch:
   push:
-    branches: [phase-9I-top-two-strikes]
+    branches:
+      - phase-9I-top-two-strikes
     paths:
-      - .github/workflows/phase-9I-top-two-strikes-fast.yml
-      - scripts/analyze_phase9i_top_two_fast.py
-      - scripts/merge_phase9i_top_two_fast.py
+      - '.github/workflows/phase-9I-top-two-strikes-fast.yml'
+      - 'scripts/analyze_phase9i_top_two_fast.py'
+      - 'scripts/merge_phase9i_top_two_fast.py'
+  workflow_dispatch:
 
 permissions:
   actions: read
   contents: write
 
 concurrency:
-  group: phase9i-top-two-fast-v2
+  group: phase9i-top-two-fast-v3
   cancel-in-progress: true
 
 jobs:
   yearly:
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        year: [2021,2022,2023,2024,2025,2026]
-    runs-on: ubuntu-latest
-    env: { PYTHONPATH: ${{ github.workspace }} }
+        year: [2021, 2022, 2023, 2024, 2025, 2026]
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Install dependencies
         run: pip install pandas numpy pyarrow huggingface_hub tabulate
-      - name: Cache Phase 9G option data
+      - name: Restore option cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/huggingface/hub
-          key: phase9i-fast-hf-${{ matrix.year }}-v2
+          key: phase9i-fast-hf-${{ matrix.year }}-v3
           restore-keys: |
             phase9i-fast-hf-${{ matrix.year }}-
             phase9g-hf-options-${{ matrix.year }}-
             phase9h-loss-hf-${{ matrix.year }}-
-      - name: Download frozen H1 baseline
-        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+      - name: Run analysis
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          mkdir -p baseline
-          gh run download 36320697995 -n phase9g-run27-merged-results -D baseline
-      - name: Run predicate-filtered top-two analysis
-        env: { HF_TOKEN: ${{ secrets.HF_TOKEN }} }
-        run: |
-          python scripts/analyze_phase9i_top_two_fast.py --start ${{ matrix.year }}-01-01 --end ${{ matrix.year }}-12-31 --out-dir work/${{ matrix.year }} --slippage-pct 0.0025 --brokerage-per-order 20
-      - uses: actions/upload-artifact@v4
+          python scripts/analyze_phase9i_top_two_fast.py             --start "${{ matrix.year }}-01-01"             --end "${{ matrix.year }}-12-31"             --out-dir "work/${{ matrix.year }}"             --slippage-pct 0.0025             --brokerage-per-order 20
+      - name: Upload yearly results
+        uses: actions/upload-artifact@v4
         with:
           name: phase9i-fast-year-${{ matrix.year }}
           path: work/${{ matrix.year }}
@@ -56,32 +56,37 @@ jobs:
     needs: yearly
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install dependencies
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install merge dependencies
         run: pip install pandas numpy tabulate
-      - uses: actions/download-artifact@v4
+      - name: Download yearly results
+        uses: actions/download-artifact@v4
         with:
           pattern: phase9i-fast-year-*
           merge-multiple: false
           path: evidence
-      - name: Download frozen H1 baseline
-        env: { GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} }
+      - name: Download frozen baseline
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p baseline
           gh run download 36320697995 -n phase9g-run27-merged-results -D baseline
-      - name: Merge
-        run: python scripts/merge_phase9i_top_two_fast.py --input-dir evidence --baseline baseline/H1_realized_trades.csv --out-dir results/phase9i_fast
-      - uses: actions/upload-artifact@v4
+      - name: Merge and validate
+        run: |
+          python scripts/merge_phase9i_top_two_fast.py             --input-dir evidence             --baseline baseline/H1_realized_trades.csv             --out-dir results/phase9i_fast
+      - name: Upload merged results
+        uses: actions/upload-artifact@v4
         with:
-          name: phase-9I-top-two-fast
+          name: phase9i-top-two-final
           path: results/phase9i_fast
-      - name: Persist
+      - name: Persist results
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add results/phase9i_fast
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Add Phase 9I fast top-two results'
+          git commit -m "Add Phase 9I top-two results"
           git fetch origin phase-9I-top-two-strikes
           git rebase origin/phase-9I-top-two-strikes
           git push origin phase-9I-top-two-strikes
