@@ -19,6 +19,7 @@ def parse_args():
     p=argparse.ArgumentParser()
     p.add_argument('--start',required=True); p.add_argument('--end',required=True)
     p.add_argument('--out-dir',required=True)
+    p.add_argument('--baseline',required=True)
     p.add_argument('--slippage-pct',type=float,default=0.0025)
     p.add_argument('--brokerage-per-order',type=float,default=20.0)
     return p.parse_args()
@@ -93,8 +94,9 @@ def enrich(g,exit_ts,settlement,near,far,m,maps):
 def main():
     a=parse_args(); start=dt.date.fromisoformat(a.start); end=dt.date.fromisoformat(a.end)
     idx=load_index(); idx=idx[(idx.trading_date>=start)&(idx.trading_date<=end)].copy()
-    entries=idx[((idx.timestamp.dt.hour>9)|((idx.timestamp.dt.hour==9)&(idx.timestamp.dt.minute>=20)))&
-                ((idx.timestamp.dt.hour<15)|((idx.timestamp.dt.hour==15)&(idx.timestamp.dt.minute<=29)))][['timestamp','trading_date','close']].sort_values('timestamp')
+    base=pd.read_csv(a.baseline); base['entry_timestamp']=pd.to_datetime(base['entry_timestamp'],utc=True).dt.tz_convert('Asia/Kolkata')
+    base=base[base.entry_timestamp.dt.year==int(a.start[:4])].copy()
+    entries=idx[idx.timestamp.isin(set(base.entry_timestamp))][['timestamp','trading_date','close']].sort_values('timestamp')
     expfiles=list_nifty_expiry_files(start,end+dt.timedelta(days=35)); exps=[x[0] for x in expfiles]; fn=dict(expfiles)
     cycle_ts=defaultdict(list); need=defaultdict(list); exit_dates=defaultdict(set); cycle_exit={}
     for r in entries.itertuples(index=False):
