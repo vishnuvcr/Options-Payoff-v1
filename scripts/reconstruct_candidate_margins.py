@@ -83,12 +83,13 @@ def main() -> None:
               'exposure_inr':float(final['exposure']),
               'option_premium_reported_inr':float(final['option_premium']),
               'additional_inr':float(final['additional']),
+              'rank':int(getattr(r,'rank',0)),
               'source_spn_version':spn_name,
             })
     out=Path(args.out); out.parent.mkdir(parents=True,exist_ok=True)
     result_df=pd.DataFrame(rows)
     if result_df.empty:
-        result_df=pd.DataFrame(columns=['entry_timestamp','entry_date','candidate_label','near_expiry','next_expiry','shift_points','strike','spot_at_entry','lot_size','chart_pnl_inr','chart_return_pct','gross_pnl_inr','net_pnl_inr','total_costs_inr','premium_turnover_inr','margin_required_inr','max_profit_pct_margin','span_inr','exposure_inr','option_premium_reported_inr','additional_inr','source_spn_version'])
+        result_df=pd.DataFrame(columns=['entry_timestamp','entry_date','candidate_label','near_expiry','next_expiry','shift_points','strike','spot_at_entry','lot_size','chart_pnl_inr','chart_return_pct','gross_pnl_inr','net_pnl_inr','total_costs_inr','premium_turnover_inr','margin_required_inr','max_profit_pct_margin','span_inr','exposure_inr','option_premium_reported_inr','additional_inr','rank','source_spn_version'])
     else:
         result_df=result_df.sort_values(['entry_timestamp','shift_points'])
     result_df.to_csv(out,index=False)
