@@ -224,3 +224,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 
 | 2026-09-29 | 10B | Workflow cancelled/stalled | Phase 10B run 36556610984 remained in the extraction matrix for 2021-2023 while 2024-2026 completed, then ended cancelled without producing empirical results. | No empirical conclusion accepted. Retry failed/cancelled jobs; if recurrence persists, optimize the extraction execution path without changing the preregistered signal rule. |
 | 2026-09-29 | 10B | Workflow failure | Phase 10B failed before completion. Run: https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36561221462 | No empirical conclusion accepted from this failed run. | Inspect and correct before rerun. |
+
+| 2026-09-29 | 10B | Frozen-control schema mismatch | Merge job 109383057462 attempted to feed H1/intraday_selected_trades.csv into run_intraday_near_exit_backtest.py, but that realized-trade CSV omits the point-in-time flatline_inr field required for chart-positive auditing. | No empirical conclusion accepted. Switched the Phase 9G control merge to the authoritative H1/intraday_selected.parquet files and added a hard 131-row/schema guard. |
