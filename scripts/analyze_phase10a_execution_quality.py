@@ -80,6 +80,19 @@ def paired_permutation_pvalue(diff, reps=20000, seed=20260929):
     return float((1 + count) / (reps + 1))
 
 
+def nifty_lot_size(expiry):
+    d = pd.Timestamp(expiry).date()
+    if d < pd.Timestamp("2021-08-01").date():
+        return 75
+    if d < pd.Timestamp("2024-05-02").date():
+        return 50
+    if d < pd.Timestamp("2024-11-21").date():
+        return 25
+    if d < pd.Timestamp("2026-01-06").date():
+        return 75
+    return 65
+
+
 def estimate_point_in_time_six_order_cost(row, model):
     """Entry-observable six-order friction proxy.
 
@@ -89,7 +102,7 @@ def estimate_point_in_time_six_order_cost(row, model):
     entry/exit stamp duty and entry/exit-sale STT at the entry-date rate.
     Exercise/settlement STT is excluded because it is not entry-observable.
     """
-    lot = int(row.near_lot_size)
+    lot = nifty_lot_size(row.near_expiry)
     entry = four_leg_entry_cashflow(
         float(row.near_call), float(row.near_put),
         float(row.far_call), float(row.far_put),
@@ -199,7 +212,7 @@ def main():
     merged = primary.merge(
         surface_selected[
             ["entry_timestamp", "near_expiry", "shift_points", "near_call",
-             "near_put", "far_call", "far_put", "flatline_inr", "near_lot_size"]
+             "near_put", "far_call", "far_put", "flatline_inr"]
         ],
         on=["entry_timestamp", "near_expiry", "shift_points"],
         how="left",
@@ -222,7 +235,7 @@ def main():
     }
 
     model = CostModel(slippage_pct=args.slippage_pct, brokerage_per_order_inr=args.brokerage_per_order)
-    merged["estimated_six_order_cost_inr"] = merged.apply(
+    merged["near_lot_size"] = merged["near_expiry"].map(nifty_lot_size)\n    merged["estimated_six_order_cost_inr"] = merged.apply(
         lambda r: estimate_point_in_time_six_order_cost(r, model), axis=1
     )
     merged["cost_to_flatline"] = merged["estimated_six_order_cost_inr"] / merged["flatline_inr"]
