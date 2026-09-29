@@ -3,10 +3,10 @@
 **Status:** COMPLETE — no strategy change adopted by this phase.
 
 ## Research question
-Does closing the entire four-leg position before near expiry improve realized economics relative to the frozen near-expiry exit?
+Does closing the entire four-leg position before near expiry improve realized economics relative to the authoritative frozen Phase 9G exit convention?
 
 ## Predeclared candidates
-- baseline: near-expiry close;
+- control: frozen Phase 9G near-expiry settlement/manual far-leg exit;
 - 60, 120, 180 minutes before near-expiry close;
 - previous trading-day close.
 
@@ -26,14 +26,14 @@ Early exits close all four legs using 0.25% premium slippage and ₹20/order. No
 
 | variant   |   paired_cycles |   mean_difference_inr |   median_difference_inr |   net_difference_inr |   block_bootstrap_low_inr |   block_bootstrap_high_inr |   paired_permutation_p |     bh_q |
 |:----------|----------------:|----------------------:|------------------------:|---------------------:|--------------------------:|---------------------------:|-----------------------:|---------:|
-| 60m       |             130 |               60.8286 |                 17.3025 |              7907.71 |                 -156.482  |                    306.876 |              0.623769  | 0.623769 |
-| 120m      |             130 |              242.249  |                138.615  |             31492.4  |                  -14.7542 |                    549.825 |              0.0984451 | 0.159192 |
-| 180m      |             130 |              326.99   |                201.302  |             42508.7  |                   26.1949 |                    703.068 |              0.0433978 | 0.159192 |
-| 1d        |             127 |              301.334  |                116.952  |             38269.5  |                  -68.7605 |                    753.438 |              0.119394  | 0.159192 |
+| 60m       |             131 |              -17.2259 |                -37.2941 |             -2256.59 |                 -240.105  |                    240.968 |               0.888906 | 0.888906 |
+| 120m      |             131 |              162.773  |                 89.8869 |             21323.2  |                  -99.0367 |                    476.129 |               0.266837 | 0.355782 |
+| 180m      |             131 |              247.849  |                 70.1355 |             32468.2  |                  -56.3007 |                    633.884 |               0.129294 | 0.355782 |
+| 1d        |             128 |              225.237  |                 70.8761 |             28830.4  |                 -131.498  |                    671.223 |               0.238538 | 0.355782 |
 
 ## Decision
 
-No exit-timing candidate met the full predeclared promotion screen. The frozen near-expiry exit is retained.
+No exit-timing candidate met the full predeclared promotion screen. The frozen Phase 9G exit convention is retained.
 
 ## Limitations
 - Historical closes are execution proxies, not bid/ask fills.

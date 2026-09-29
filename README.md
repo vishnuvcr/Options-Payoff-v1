@@ -528,3 +528,7 @@ The frozen Phase 9G H1 control remains the research candidate unless Phase 10G c
 ## Phase 10D — exit timing
 
 **Complete; no strategy change adopted.** [Results](results/phase10d/PHASE10D_RESULTS.md) · [Summary](results/phase10d/exit_timing_summary.csv) · Promotion screen: **False**
+
+## Phase 10D — exit timing
+
+**Complete; no strategy change adopted.** [Results](results/phase10d/PHASE10D_RESULTS.md) · [Summary](results/phase10d/exit_timing_summary.csv) · Promotion screen: **False**

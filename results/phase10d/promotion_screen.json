@@ -3,7 +3,7 @@
   "best_variant": "180m",
   "criteria": {
     "mean_difference_gt_zero": true,
-    "bootstrap_low_gt_zero": true,
+    "bootstrap_low_gt_zero": false,
     "bh_q_lt_0_05": false
   }
 }

@@ -230,3 +230,5 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-29 | 10C | Result publication | Published full candidate scenario scores, selector backtests, paired inference and promotion screen under results/phase10c/. |
 
 | 2026-09-29 | 10D | Exit timing | Tested near-expiry, 60/120/180-minute early exits and previous-trading-day exit with all four legs closed. |
+
+| 2026-09-29 | 10D | Exit timing | Tested near-expiry, 60/120/180-minute early exits and previous-trading-day exit with all four legs closed. |

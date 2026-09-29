@@ -655,3 +655,12 @@ Control reproduction matched 131 rows with maximum absolute P&L difference ₹0.
 - [Exit timing summary](../results/phase10d/exit_timing_summary.csv)
 - [Paired comparisons](../results/phase10d/paired_exit_timing_comparisons.csv)
 - Promotion screen: False
+
+## Phase 10D — exit timing
+
+**Status:** COMPLETE — no strategy change adopted.
+
+- [Phase 10D results](../results/phase10d/PHASE10D_RESULTS.md)
+- [Exit timing summary](../results/phase10d/exit_timing_summary.csv)
+- [Paired comparisons](../results/phase10d/paired_exit_timing_comparisons.csv)
+- Promotion screen: False

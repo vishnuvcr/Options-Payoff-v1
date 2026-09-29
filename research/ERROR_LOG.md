@@ -242,3 +242,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 | 2026-09-29 | 10C | Model-based scenario limitation | Far-leg IVs are reconstructed from entry premiums with Black–Scholes r=0/q=0; they are not exchange-published executable IVs. | Treat scenario rankings as model-based research evidence and require Phase 10G holdout before any adoption. | Limitation documented in Phase 10C report. |
 
 | 2026-09-29 | 10D | Execution convention | Early-exit costs were recomputed for all four closing transactions; no exercise STT was applied. | Documented in Phase 10D results. |
+
+| 2026-09-29 | 10D | Execution convention | Early-exit costs were recomputed for all four closing transactions; no exercise STT was applied. | Documented in Phase 10D results. |
