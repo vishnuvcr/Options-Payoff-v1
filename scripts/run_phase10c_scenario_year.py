@@ -371,12 +371,14 @@ def main():
                         f"Frozen control membership mismatch for {near_expiry}: rows={len(frozen)}"
                     )
                 frozen_strike = float(frozen.iloc[0]["strike"])
-                matches = cdf[np.isclose(cdf["strike"], frozen_strike)]
-                if len(matches) != 1:
+                matches = cdf[np.isclose(cdf["strike"], frozen_strike)].copy()
+                if matches.empty:
                     raise RuntimeError(
-                        f"Frozen control strike {frozen_strike} not represented uniquely in canonical 17-strike surface for {near_expiry}"
+                        f"Frozen control strike {frozen_strike} is absent from the canonical 17-strike surface for {near_expiry}"
                     )
-                chosen = matches.iloc[0]
+                chosen = matches.sort_values(
+                    ["flatline_inr", "shift_points"], ascending=[False, True]
+                ).iloc[0]
             else:
                 chosen = cdf.sort_values(
                     [score_col, "flatline_inr", "shift_points"],
