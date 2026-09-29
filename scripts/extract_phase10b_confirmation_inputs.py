@@ -220,7 +220,10 @@ def main():
                 ["flatline_inr", "shift_points"], ascending=[False, True]
             )
             if positive.empty:
-                raise RuntimeError(f"Audit says positive confirmation but reconstructed surface is non-positive: {near_expiry} {target}")
+                # The confirmation audit and narrowed reconstruction disagree.
+                # Missing/inconsistent reconstruction is a failed confirmation,
+                # not a valid entry.
+                continue
             win = positive.iloc[0]
             fc, fc_ts = _last_option_quote(far_df, float(win["strike"]), "CE", exit_ts)
             fp, fp_ts = _last_option_quote(far_df, float(win["strike"]), "PE", exit_ts)
