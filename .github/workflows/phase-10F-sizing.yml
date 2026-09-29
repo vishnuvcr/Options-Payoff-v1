@@ -60,7 +60,7 @@ jobs:
               x["near_expiry"]=pd.to_datetime(x["near_expiry"]).dt.date
               x["far_expiry"]=pd.to_datetime(x["far_expiry"]).dt.date
               x=x[x["shift_points"].between(-400,400)]
-              x=x.sort_values(["status","flatline_inr"],ascending=[True,False]).drop_duplicates(["near_expiry","timestamp","strike","shift_points"])
+              x=x.sort_values(["flatline_inr"],ascending=[False]).drop_duplicates(["near_expiry","timestamp","strike","shift_points"])
               frames.append(x[["near_expiry","far_expiry","timestamp","strike","shift_points","spot_at_entry","near_lot_size","flatline_inr"]])
           surf=pd.concat(frames,ignore_index=True)
           m=top.merge(surf,left_on=["near_expiry","entry_timestamp","strike","shift_points"],right_on=["near_expiry","timestamp","strike","shift_points"],how="left",validate="one_to_one")
