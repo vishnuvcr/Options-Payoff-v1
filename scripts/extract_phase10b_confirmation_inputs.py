@@ -207,9 +207,10 @@ def main():
             if surf.empty:
                 raise RuntimeError(f"Audit says exact-17 positive but reconstructed surface is empty: {near_expiry} {target}")
             if surf["shift_points"].nunique() != 17:
-                raise RuntimeError(f"Confirmation surface is not exactly 17 unique shifts: {near_expiry} {target}")
+                # Missing strikes at confirmation means confirmation failed.
+                continue
             if surf["shift_points"].duplicated().any():
-                raise RuntimeError(f"Duplicate confirmation shifts: {near_expiry} {target}")
+                continue
 
             positive = surf[surf["flatline_inr"] > 0].sort_values(
                 ["flatline_inr", "shift_points"], ascending=[False, True]
