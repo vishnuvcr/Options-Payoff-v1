@@ -80,7 +80,7 @@ jobs:
               "strike":m.strike,
               "spot_at_entry":spot,
               "lot_size":lots,
-              "chart_pnl_inr":m.flatline_inr,
+              "chart_pnl_inr":m.flatline_inr_x,
               "gross_pnl_inr":m.gross_pnl_inr,
               "net_pnl_inr":m.net_pnl_inr,
               "total_costs_inr":m.total_costs,
