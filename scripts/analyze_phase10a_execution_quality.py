@@ -182,6 +182,18 @@ def main():
     surface = pd.read_parquet(args.surface)
     primary = pd.read_parquet(args.primary_trades)
     surface_selected = surface[surface["selected"].astype(bool)].copy()
+    key_cols = ["timestamp", "near_expiry", "shift_points"]
+    value_cols = ["strike", "near_call", "near_put", "far_call", "far_put", "flatline_inr"]
+    dup = surface_selected[surface_selected.duplicated(key_cols, keep=False)].copy()
+    if not dup.empty:
+        conflicts = []
+        for key, g in dup.groupby(key_cols, dropna=False):
+            for col in value_cols:
+                if g[col].nunique(dropna=False) > 1:
+                    conflicts.append({"key": key, "column": col})
+        if conflicts:
+            raise RuntimeError(f"Conflicting duplicate decision-surface rows: {conflicts[:10]}")
+        surface_selected = surface_selected.drop_duplicates(key_cols, keep="first").copy()
 
     required_surface = {
         "timestamp", "near_expiry", "shift_points", "near_call", "near_put",
