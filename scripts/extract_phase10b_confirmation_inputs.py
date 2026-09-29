@@ -55,6 +55,12 @@ def build_surface(df_near, df_far, timestamp, spot, near_expiry, far_expiry):
         & (surf["shift_points"] <= 400)
         & (surf["shift_points"] % 50 == 0)
     ].copy()
+    if surf.duplicated(["strike", "shift_points"]).any():
+        for key, g in surf.groupby(["strike", "shift_points"], dropna=False):
+            if len(g) > 1:
+                if g[["near_call", "near_put", "far_call", "far_put"]].nunique(dropna=False).max() > 1:
+                    raise RuntimeError(f"Conflicting duplicate confirmation quote rows at {timestamp}: {key}")
+        surf = surf.drop_duplicates(["strike", "shift_points"], keep="first")
     surf["near_expiry"] = near_expiry
     surf["far_expiry"] = far_expiry
     lot = nifty_lot_size(near_expiry)
@@ -72,14 +78,17 @@ def main():
     audit = pd.read_parquet(args.scan_audit)
     audit["timestamp"] = pd.to_datetime(audit["timestamp"], utc=True)
     audit["near_expiry"] = pd.to_datetime(audit["near_expiry"]).dt.date
+    required_audit = {"near_expiry", "timestamp", "positive_count"}
+    missing_audit = required_audit - set(audit.columns)
+    if missing_audit:
+        raise RuntimeError(f"Authoritative scan audit missing columns: {sorted(missing_audit)}")
 
     # Exact-17 positive observations are the only points at which a
     # confirmation window is allowed to begin. If the window fails, scanning
     # continues to the next exact-17 positive observation: no skip-at-09:20
     # behaviour is introduced.
     eligible = audit[
-        (audit["candidate_count"] == 17)
-        & (audit["positive_count"] > 0)
+        (audit["positive_count"] > 0)
         & (audit["timestamp"].dt.date >= start)
         & (audit["timestamp"].dt.date <= end)
     ].copy()
@@ -103,14 +112,7 @@ def main():
             target = row.timestamp + delay
             if target.date() != row.timestamp.date():
                 continue
-            a = audit[
-                (audit["near_expiry"] == expiry)
-                & (audit["timestamp"] == target)
-            ]
-            if a.empty:
-                continue
-            ar = a.iloc[0]
-            if int(ar["candidate_count"]) == 17 and int(ar["positive_count"]) > 0:
+            if target in set(audit.loc[audit["near_expiry"].eq(expiry), "timestamp"]):
                 candidates.append((expiry, row.timestamp, target))
 
     if not candidates:
@@ -182,16 +184,18 @@ def main():
             target = row.timestamp + delay
             if target.date() != row.timestamp.date():
                 continue
-            a = audit[
-                (audit["near_expiry"] == near_expiry)
-                & (audit["timestamp"] == target)
-            ]
-            if a.empty:
-                continue
-            ar = a.iloc[0]
-            if int(ar["candidate_count"]) != 17 or int(ar["positive_count"]) <= 0:
-                continue
             if target not in index_lookup.index:
+                continue
+
+            initial_surf = build_surface(
+                near_df, far_df, row.timestamp, index_lookup.loc[row.timestamp],
+                near_expiry, far_expiry,
+            )
+            if initial_surf.empty:
+                continue
+            if initial_surf["shift_points"].nunique() != 17:
+                continue
+            if initial_surf["flatline_inr"].max() <= 0:
                 continue
 
             surf = build_surface(
