@@ -36,6 +36,7 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument("--ledger",required=True);p.add_argument("--out-dir",required=True)
     p.add_argument("--bootstrap-reps",type=int,default=20000)
+    p.add_argument("--control",required=True)
     a=p.parse_args(); out=Path(a.out_dir);out.mkdir(parents=True,exist_ok=True)
     d=pd.read_csv(a.ledger);d["entry_timestamp"]=pd.to_datetime(d["entry_timestamp"],utc=True)
     ok=d[d.status.eq("ok")].copy()
@@ -44,10 +45,16 @@ def main():
         x=g.sort_values("entry_timestamp")["net_pnl_inr"].to_numpy(float)
         summ.append({"variant":v,"trades":len(x),"net_pnl_inr":x.sum(),"mean_pnl_inr":x.mean(),"median_pnl_inr":np.median(x),"win_rate_pct":100*(x>0).mean(),"profit_factor":pf(x),"max_drawdown_inr":dd(x),"total_costs_inr":g["total_costs"].sum(),"p10_pnl_inr":np.quantile(x,.1),"worst_trade_inr":x.min()})
     summary=pd.DataFrame(summ);summary.to_csv(out/"exit_timing_summary.csv",index=False)
-    base=ok[ok.variant.eq("baseline")][["near_expiry","net_pnl_inr"]].rename(columns={"net_pnl_inr":"baseline_pnl"})
+    control=pd.read_csv(a.control)
+    if len(control)!=131:
+        raise RuntimeError(f"Frozen Phase 9G control must contain 131 rows, found {len(control)}")
+    control["near_expiry"]=pd.to_datetime(control["near_expiry"]).dt.date
+    control["net_pnl_inr"]=pd.to_numeric(control["net_pnl_inr"],errors="raise")
+    base=control[["near_expiry","net_pnl_inr"]].rename(columns={"net_pnl_inr":"baseline_pnl"})
     rows=[]
     for v in ["60m","120m","180m","1d"]:
         alt=ok[ok.variant.eq(v)][["near_expiry","net_pnl_inr"]].rename(columns={"net_pnl_inr":"alt_pnl"})
+        alt["near_expiry"]=pd.to_datetime(alt["near_expiry"]).dt.date
         x=base.merge(alt,on="near_expiry",how="inner")
         diff=(x.alt_pnl-x.baseline_pnl).to_numpy(float)
         lo,hi=block_ci(diff,a.bootstrap_reps)
@@ -65,10 +72,10 @@ def main():
 **Status:** COMPLETE — no strategy change adopted by this phase.
 
 ## Research question
-Does closing the entire four-leg position before near expiry improve realized economics relative to the frozen near-expiry exit?
+Does closing the entire four-leg position before near expiry improve realized economics relative to the authoritative frozen Phase 9G exit convention?
 
 ## Predeclared candidates
-- baseline: near-expiry close;
+- control: frozen Phase 9G near-expiry settlement/manual far-leg exit;
 - 60, 120, 180 minutes before near-expiry close;
 - previous trading-day close.
 
@@ -84,7 +91,7 @@ Early exits close all four legs using 0.25% premium slippage and ₹20/order. No
 
 ## Decision
 
-{"A candidate passed the historical screen but remains unpromoted until Phase 10G chronological holdout." if passed else "No exit-timing candidate met the full predeclared promotion screen. The frozen near-expiry exit is retained."}
+{"A candidate passed the historical screen but remains unpromoted until Phase 10G chronological holdout." if passed else "No exit-timing candidate met the full predeclared promotion screen. The frozen Phase 9G exit convention is retained."}
 
 ## Limitations
 - Historical closes are execution proxies, not bid/ask fills.
