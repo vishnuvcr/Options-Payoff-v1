@@ -50,6 +50,7 @@ jobs:
           mkdir -p results/phase10f data/margin/span_historical
           python - <<'PY'
           import glob,pandas as pd
+          from scripts.extract_near_exit_strategy_inputs import load_index,nifty_lot_size
           top=pd.read_csv("results/phase9i_fast/top2_trade_rows.csv")
           top["entry_timestamp"]=pd.to_datetime(top["entry_timestamp"],utc=True)
           top["near_expiry"]=pd.to_datetime(top["near_expiry"]).dt.date
@@ -65,6 +66,10 @@ jobs:
           surf=pd.concat(frames,ignore_index=True)
           m=top.merge(surf,left_on=["near_expiry","entry_timestamp","strike","shift_points"],right_on=["near_expiry","timestamp","strike","shift_points"],how="left",validate="one_to_one")
           if m["far_expiry"].isna().any(): raise SystemExit("Some Phase 9I rank rows could not be matched to frozen decision-surface rows")
+          index_df=load_index().set_index("timestamp")["close"]
+          spot=[float(index_df.get(ts)) for ts in m.entry_timestamp_x]
+          lots=[int(nifty_lot_size(e)) for e in m.near_expiry]
+          if any(pd.isna(spot)): raise SystemExit("Missing index spot for a Phase 9I entry timestamp")
           out=pd.DataFrame({
               "entry_timestamp":m.entry_timestamp_x,
               "entry_date":m.entry_date,
@@ -73,8 +78,8 @@ jobs:
               "next_expiry":m.far_expiry,
               "shift_points":m.shift_points,
               "strike":m.strike,
-              "spot_at_entry":m.spot_at_entry,
-              "lot_size":m.near_lot_size,
+              "spot_at_entry":spot,
+              "lot_size":lots,
               "chart_pnl_inr":m.flatline_inr,
               "gross_pnl_inr":m.gross_pnl_inr,
               "net_pnl_inr":m.net_pnl_inr,
