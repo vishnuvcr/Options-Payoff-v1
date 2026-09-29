@@ -171,8 +171,10 @@ def main():
     selected["far_expiry"] = pd.to_datetime(selected["far_expiry"]).dt.date
     selected["shift_points"] = pd.to_numeric(selected["shift_points"]).astype(int)
 
-    if len(selected) != 131:
-        raise RuntimeError(f"Frozen Phase 9G selected ledger must contain 131 complete rows, found {len(selected)}")
+    if selected.empty:
+        raise RuntimeError("Frozen Phase 9G yearly selected ledger is empty")
+    if selected["near_expiry"].nunique() != len(selected):
+        raise RuntimeError("Frozen Phase 9G yearly selected ledger must contain exactly one selected row per weekly cycle")
 
     index_df = load_index()
     index_lookup = index_df.set_index("timestamp")["close"]
