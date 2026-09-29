@@ -19,6 +19,8 @@ def parse_args():
     p.add_argument("--results-dir", required=True)
     p.add_argument("--bootstrap-reps", type=int, default=20000)
     p.add_argument("--out-dir", required=True)
+    p.add_argument("--slippage-pct", type=float, default=0.0025)
+    p.add_argument("--brokerage-per-order", type=float, default=20.0)
     return p.parse_args()
 
 
@@ -156,7 +158,7 @@ def main():
         )
         x = control_cycles.merge(v, on="near_expiry", how="left")
         covered = int(x["variant_pnl"].notna().sum())
-        x["variant_pnl"] = x["variant_pnl"].fillna(0.0)
+        x = x[x["variant_pnl"].notna()].copy()
         diff = (x["variant_pnl"] - x["control_pnl"]).to_numpy(float)
         lo, hi = block_bootstrap_mean_ci(diff, args.bootstrap_reps)
         paired_rows.append({
@@ -187,6 +189,8 @@ def main():
     summary.to_csv(out / "scenario_selector_summary.csv", index=False)
     paired.to_csv(out / "paired_scenario_comparisons.csv", index=False)
 
+    if paired.empty:
+        raise RuntimeError("No paired scenario comparisons available")
     best = paired.sort_values("mean_difference_inr", ascending=False).iloc[0]
     promotion = bool(
         best["mean_difference_inr"] > 0
