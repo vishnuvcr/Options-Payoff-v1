@@ -21,12 +21,12 @@ def main():
     d["chart_pnl_inr"]=pd.to_numeric(d["chart_pnl_inr"],errors="raise")
     d=d.sort_values(["entry_timestamp","rank"])
     variants={}
-    rank1=d[d.rank.eq(1)].groupby("near_expiry",as_index=False).agg(net_pnl_inr=("net_pnl_inr","sum"),margin_required_inr=("margin_required_inr","sum"))
+    rank1=d[d["rank"].eq(1)].groupby("near_expiry",as_index=False).agg(net_pnl_inr=("net_pnl_inr","sum"),margin_required_inr=("margin_required_inr","sum"))
     variants["1x_rank1"]=rank1
     x=rank1.copy();x["net_pnl_inr"]*=2;x["margin_required_inr"]*=2;variants["2x_rank1"]=x
     literal=d.groupby("near_expiry",as_index=False).agg(net_pnl_inr=("net_pnl_inr","sum"),margin_required_inr=("margin_required_inr","sum"))
     variants["literal_top2"]=literal
-    pos=d[(d.rank.eq(1)) | ((d.rank.eq(2)) & (d.chart_pnl_inr>0))]
+    pos=d[(d["rank"].eq(1)) | ((d["rank"].eq(2)) & (d.chart_pnl_inr>0))]
     positive=pos.groupby("near_expiry",as_index=False).agg(net_pnl_inr=("net_pnl_inr","sum"),margin_required_inr=("margin_required_inr","sum"))
     variants["top2_positive"]=positive
     rows=[]
