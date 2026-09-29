@@ -6,7 +6,7 @@ Research repository for testing the clarified cross-expiry NIFTY options strateg
 
 ## Current status
 
-**Phase 9I — top-two-positive-strike sizing analysis: COMPLETE; frozen one-strike Phase 9G H1 control retained**
+**Phase 10A — execution-quality / cost-to-edge analysis: COMPLETE; frozen one-strike Phase 9G H1 control retained**
 
 Current operational rule:
 - every weekly expiry cycle is scanned chronologically;
@@ -469,7 +469,17 @@ The Phase 9G control remains unchanged until a candidate passes full-population 
 
 **Complete on 2026-09-29; no strategy change adopted.**
 
-Phase 10A tested predeclared trade-level execution-cost gates at the frozen Phase 9G first-positive decision timestamps. The gate uses only entry-observable premiums and lot size, avoiding future far-leg exit prices.
+Phase 10A was rerun against the accepted **Phase 9G exact-17-strike H1 control**, not the superseded Phase 9D ledger.
+
+- Frozen control: 131 complete weekly trades
+- Control net P&L: **₹71,868.76**
+- Tested gates: no gate, cost/flatline <=25%, <=50%, <=75%
+- No gate passed the full predeclared promotion screen
+- Phase 10A conclusion: **retain the frozen Phase 9G control**
+- Median estimated six-order friction / flatline: **87.10%**
+- P90 estimated friction / flatline: **740.94%**
+
+### Phase 10A evidence
 
 - [Phase 10A research plan](docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md)
 - [Phase 10A result report](results/phase10a/PHASE10A_RESULTS.md)
@@ -477,5 +487,6 @@ Phase 10A tested predeclared trade-level execution-cost gates at the frozen Phas
 - [Gate comparison](results/phase10a/gate_summary.csv)
 - [Paired inference](results/phase10a/paired_gate_comparisons.csv)
 - [Execution stress](results/phase10a/execution_stress.csv)
+- [Control reproduction](results/phase10a/reproduction_check.json)
 
-The Phase 9G H1 control remains the frozen research candidate unless a later Phase 10G chronological holdout supports a fully predeclared refinement.
+The Phase 9G H1 control remains the frozen research candidate. Phase 10B is next under the predeclared plan.
