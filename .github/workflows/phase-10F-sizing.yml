@@ -28,7 +28,7 @@ jobs:
           python-version: "3.12"
       - name: Install SPAN tooling
         run: |
-          pip install "marginism==0.1.1" "pandas>=2.2" "pyarrow>=18" "requests>=2.31"
+          pip install "marginism==0.1.1" "huggingface_hub>=0.34" "pandas>=2.2" "pyarrow>=18" "requests>=2.31"
       - name: Restore historical SPAN cache
         uses: actions/cache@v4
         with:
