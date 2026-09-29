@@ -143,7 +143,9 @@ def main():
     for near_expiry, initial_ts, target in candidates:
         far_expiry = pair_by_near[near_expiry][1]
         needed.update([near_expiry, far_expiry])
+        timestamps_by_expiry[near_expiry].add(initial_ts)
         timestamps_by_expiry[near_expiry].add(target)
+        timestamps_by_expiry[far_expiry].add(initial_ts)
         timestamps_by_expiry[far_expiry].add(target)
         if near_expiry in expiry_exit:
             timestamps_by_expiry[far_expiry].add(expiry_exit[near_expiry][0])
