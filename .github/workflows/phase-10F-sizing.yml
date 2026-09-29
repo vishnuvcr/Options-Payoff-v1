@@ -71,7 +71,7 @@ jobs:
           lots=[int(nifty_lot_size(e)) for e in m.near_expiry]
           if any(pd.isna(spot)): raise SystemExit("Missing index spot for a Phase 9I entry timestamp")
           out=pd.DataFrame({
-              "entry_timestamp":m.entry_timestamp_x,
+              "entry_timestamp":m.entry_timestamp,
               "entry_date":m.entry_date,
               "candidate_label":m["shift_points"].map(lambda x:"ATM" if int(x)==0 else ("ATM_PLUS_"+str(abs(int(x))) if int(x)>0 else "ATM_MINUS_"+str(abs(int(x))))),
               "near_expiry":m.near_expiry,
