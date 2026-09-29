@@ -217,3 +217,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 | 2026-09-29 | 10A | Workflow failure | Phase 10A GitHub Actions failed before completion. Run: https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36555174160 | No empirical conclusion is accepted from this failed run. | Inspect the failing step and log the root cause before rerun. |
 
 | 2026-09-29 | 10A | Workflow failure | Phase 10A GitHub Actions failed before completion. Run: https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36555320461 | No empirical conclusion is accepted from this failed run. | Inspect the failing step and log the root cause before rerun. |
+
+| 2026-09-29 | 10A | Point-in-time cost limitation | The cached source contains option closes rather than executable bid/ask quotes. A six-order entry-time friction proxy was therefore used; future far-leg exit prices and exercise STT were excluded from the gate to avoid look-ahead. | The gate is an execution-cost proxy, not a true executable-spread model. | Documented the limitation in the Phase 10A result and retained the frozen control pending later holdout testing. |

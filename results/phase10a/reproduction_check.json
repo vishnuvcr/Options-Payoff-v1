@@ -1,7 +1,8 @@
 {
-  "primary_rows": 169,
-  "surface_selected_rows": 172,
-  "matched_realized_rows": 169,
-  "unmatched_selected_rows": 3,
-  "net_primary_inr": 125688.8248533415
+  "rows": 131,
+  "weekly_cycles": 131,
+  "net_pnl_inr": 71868.75950141653,
+  "gross_pnl_inr": 100816.8118749999,
+  "costs_inr": 28948.05237358335,
+  "all_green_rate_pct": 100.0
 }

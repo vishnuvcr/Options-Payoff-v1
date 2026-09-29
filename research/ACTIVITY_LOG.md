@@ -215,3 +215,7 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-29 | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete Phase 9D decision-surface artifact; 169 decision timestamps and 169 candidate rows were evaluated. |
 | 2026-09-29 | 10A | Reproducibility gate | Reconstructed control matched 169 authoritative rows; maximum absolute P&L difference was ₹0.0. |
 | 2026-09-29 | 10A | Result | No Phase 10A gate is promoted automatically; any apparent historical improvement remains subject to Phase 10G chronological holdout. |
+
+| 2026-09-29 | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete frozen Phase 9G exact-17-strike H1 ledger; 131 decision timestamps and 131 candidate rows were evaluated. |
+| 2026-09-29 | 10A | Reproducibility gate | Reconstructed control matched 131 authoritative rows; maximum absolute P&L difference was ₹0.0. |
+| 2026-09-29 | 10A | Result | No Phase 10A gate is promoted automatically; any apparent historical improvement remains subject to Phase 10G chronological holdout. |

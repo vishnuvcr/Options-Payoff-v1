@@ -464,11 +464,12 @@ The Phase 9G control remains unchanged until a candidate passes full-population 
 [Phase 10 research plan](docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md) · [Research status](research/STATUS.md) · [Activity log](research/ACTIVITY_LOG.md) · [Error log](research/ERROR_LOG.md)
 
 
+
 ## Phase 10A — execution-quality / cost-to-edge
 
 **Complete on 2026-09-29; no strategy change adopted.**
 
-Phase 10A tested predeclared candidate-level execution-cost gates at the frozen Phase 9G first-positive decision timestamps. The gate uses only entry-observable premiums and lot size, avoiding future far-leg exit prices.
+Phase 10A tested predeclared trade-level execution-cost gates at the frozen Phase 9G first-positive decision timestamps. The gate uses only entry-observable premiums and lot size, avoiding future far-leg exit prices.
 
 - [Phase 10A research plan](docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md)
 - [Phase 10A result report](results/phase10a/PHASE10A_RESULTS.md)

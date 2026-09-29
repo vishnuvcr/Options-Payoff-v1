@@ -606,3 +606,21 @@ The frozen Phase 9G H1 control remains unchanged until a Phase 10 candidate pass
 - Execution stress: [execution stress](../results/phase10a/execution_stress.csv)
 
 Control reproduction matched 169 rows with maximum absolute P&L difference ₹0.0.
+
+
+## Phase 10A — execution-quality / cost-to-edge
+
+**Status:** COMPLETE — no strategy change adopted.
+
+- Decision timestamps tested: 131
+- Candidate rows tested: 131
+- Positive candidate rows: 131
+- Median point-in-time estimated six-order friction / flatline: 87.10%
+- P90 friction / flatline: 740.94%
+- Phase 10A result: see [Phase 10A results](../results/phase10a/PHASE10A_RESULTS.md)
+- Candidate ledger: [candidate cost-quality table](../results/phase10a/candidate_cost_quality.csv)
+- Gate comparison: [gate summary](../results/phase10a/gate_summary.csv)
+- Paired inference: [paired gate comparisons](../results/phase10a/paired_gate_comparisons.csv)
+- Execution stress: [execution stress](../results/phase10a/execution_stress.csv)
+
+Control reproduction matched 131 rows with maximum absolute P&L difference ₹0.0.
