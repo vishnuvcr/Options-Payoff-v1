@@ -185,7 +185,7 @@ def main():
 
     required_surface = {
         "timestamp", "near_expiry", "shift_points", "near_call", "near_put",
-        "far_call", "far_put", "flatline_inr", "near_lot_size",
+        "far_call", "far_put", "flatline_inr",
     }
     missing_surface = required_surface - set(surface_selected.columns)
     if missing_surface:
