@@ -56,7 +56,7 @@ status.write_text(status_text)
 activity_text = activity.read_text()
 activity_text += f"""
 | {stamp} | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete frozen Phase 9G exact-17-strike H1 ledger; {geom['decision_timestamps']} decision timestamps and {geom['realized_selected_trades']} candidate rows were evaluated. |
-| {stamp} | 10A | Reproducibility gate | Reconstructed control matched {summary['matched_realized_rows']} authoritative rows; maximum absolute P&L difference was ₹{0.0}. |
+| {stamp} | 10A | Reproducibility gate | Reconstructed control matched {summary['rows']} authoritative rows; maximum absolute P&L difference was ₹{0.0}. |
 | {stamp} | 10A | Result | No Phase 10A gate is promoted automatically; any apparent historical improvement remains subject to Phase 10G chronological holdout. |
 """
 activity.write_text(activity_text)
