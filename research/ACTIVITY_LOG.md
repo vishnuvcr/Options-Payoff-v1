@@ -208,3 +208,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-28 | 9I | Exact two-lot result | Final artifact 10972304314: 262 positions across 131 accepted weeks, ₹87,362.19 net, +₹15,493.43 incremental rank-2 contribution, PF 1.651, max drawdown -₹36,888.35. Rank-1 reproduced Phase 9G exactly. |
 | 2026-09-28 | 9I | Interpretation | Exact two-lot variant improves absolute historical P&L but increases drawdown ~2.35x and lowers PF; it remains a candidate for untouched holdout rather than replacing the control. |
+
+| 2026-09-29 | 10 | Strategy-refinement phase opened | Created `phase-10-strategy-refinement` and preregistered bounded tests for execution quality, entry persistence, scenario-aware strike selection, exit timing, controlled combinations, sizing and an untouched chronological holdout. No strategy rule has been changed. |
+| 2026-09-29 | 10 | Research rationale | Phase 9H-A showed bounded entry changes rescue only 14/54 losses; Phase 9I showed top-two-positive underperforms the control and literal top-two raises absolute P&L with materially higher drawdown. Phase 10 therefore targets structural execution/entry/exit mechanisms before further pattern mining. |
