@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        year: [2021,2022,2023,2024,2025,2026]
+        year: [2021, 2022, 2023, 2024, 2025, 2026]
     runs-on: ubuntu-latest
     env:
       SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36313815542' }}
@@ -40,7 +40,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
+        with:
+          python-version: "3.12"
       - name: Install dependencies
         run: |
           pip install "huggingface_hub>=0.34" "pandas>=2.2" "pyarrow>=18" "numpy>=2" "scipy>=1.11"
@@ -51,16 +52,25 @@ jobs:
           key: hf-nifty-options-intraday-${{ matrix.year }}
           restore-keys: hf-nifty-options-intraday-
       - name: Download frozen selected trades
-        env: {GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p source
           gh run download "$SOURCE_RUN_ID" -n phase9g-year-${{ matrix.year }} -D source
           test -s source/H1/intraday_selected_trades.csv
       - name: Run exit timing candidates
-        env: {HF_TOKEN: ${{ secrets.HF_TOKEN }}}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           mkdir -p out
-          python scripts/run_phase10d_exit_timing.py             --selected source/H1/intraday_selected_trades.csv             --start "${{ matrix.year }}-01-01"             --end "${{ matrix.year }}-12-31"             --download-workers 4             --slippage-pct 0.0025             --brokerage-per-order 20             --out-dir out
+          python scripts/run_phase10d_exit_timing.py \
+            --selected source/H1/intraday_selected_trades.csv \
+            --start "${{ matrix.year }}-01-01" \
+            --end "${{ matrix.year }}-12-31" \
+            --download-workers 4 \
+            --slippage-pct 0.0025 \
+            --brokerage-per-order 20 \
+            --out-dir out
       - uses: actions/upload-artifact@v4
         with:
           name: phase10d-year-${{ matrix.year }}
@@ -76,7 +86,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: {python-version: "3.12"}
+        with:
+          python-version: "3.12"
       - name: Install analysis dependencies
         run: pip install pandas numpy scipy pyarrow tabulate
       - uses: actions/download-artifact@v4
@@ -97,7 +108,10 @@ jobs:
           PY
       - name: Analyze
         run: |
-          python scripts/analyze_phase10d_results.py             --ledger results/phase10d/exit_timing_trade_ledger.csv             --out-dir results/phase10d             --bootstrap-reps "$BOOTSTRAP_REPS"
+          python scripts/analyze_phase10d_results.py \
+            --ledger results/phase10d/exit_timing_trade_ledger.csv \
+            --out-dir results/phase10d \
+            --bootstrap-reps "$BOOTSTRAP_REPS"
       - name: Upload results
         uses: actions/upload-artifact@v4
         with:
