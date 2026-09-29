@@ -708,3 +708,26 @@ Design:
 7. Do not adopt the two-lot rule without prospective/out-of-sample validation.
 
 Exit criteria: exact rank-1 reproduction, complete top-two ledger, incremental P&L/cost/drawdown analysis, uncertainty summary, and documented adoption decision.
+
+## Phase 10 — Strategy Refinement
+
+**Branch:** `phase-10-strategy-refinement`  
+**Status:** PLANNED / ACTIVE from 2026-09-29
+
+Phase 10 moves from loss-specific diagnostics and unvalidated sizing changes to a bounded refinement program focused on execution quality, entry confirmation, scenario-aware strike selection, exit timing and risk-normalized sizing.
+
+The authoritative detailed plan is [docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md](../docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md).
+
+### Research questions
+- Does an entry cost-to-edge / liquidity gate improve realized net expectancy?
+- Does predeclared signal persistence (5/10/15/30 minutes) improve full-sample outcomes?
+- Does a point-in-time stress-tested full-position selector outperform the static flatline selector?
+- Does a predeclared earlier exit reduce tail losses from far-leg revaluation?
+- Do controlled combinations survive chronological holdout without multiple-testing artifacts?
+- Does concentrating size on rank 1 outperform adding rank 2 on a margin-normalized basis?
+
+### Guardrails
+No look-ahead; exact 17-strike completeness; unchanged H1 control; observed near-expiry far-leg exits; full transaction costs and slippage; full-population tests before loss-rescue conclusions; explicit validation/holdout; no indefinite ML search.
+
+### Phase-exit rule
+Phase 10 stops after the predefined 10G untouched chronological holdout. If no refinement survives, the Phase 9G H1 control remains the research candidate.
