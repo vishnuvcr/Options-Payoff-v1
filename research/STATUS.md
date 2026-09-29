@@ -569,3 +569,22 @@ Yearly rank contribution: [results/phase9i_fast/top2_yearly_summary.csv](../resu
 - Bootstrap 95% CI for mean second-strike P&L: **₹-212.70 to ₹438.82**.
 - Decision: retain Phase 9G one-strike as research control; exact two-lot is a candidate requiring untouched chronological holdout and margin-normalized risk analysis.
 - Detailed report: [docs/PHASE9I_EXACT_TWO_LOTS.md](../docs/PHASE9I_EXACT_TWO_LOTS.md).
+
+## Phase 10 — Strategy refinement ACTIVE
+
+**Branch:** `phase-10-strategy-refinement`
+
+Status: **PLANNED / ACTIVE**.
+
+The detailed preregistered plan is [docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md](../docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md).
+
+The first research targets are:
+1. execution-quality / cost-to-edge gating;
+2. entry-signal persistence;
+3. scenario-aware strike selection;
+4. predeclared exit timing;
+5. controlled combinations;
+6. margin-normalized sizing comparison;
+7. untouched chronological holdout.
+
+The frozen Phase 9G H1 control remains unchanged until a Phase 10 candidate passes its predefined validation and holdout gates.
