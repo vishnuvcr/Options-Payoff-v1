@@ -1,0 +1,86 @@
+name: Phase 10A - Execution Quality / Cost-to-Edge
+
+on:
+  push:
+    branches:
+      - phase-10A-execution-quality
+    paths:
+      - .github/workflows/phase-10A-execution-quality.yml
+      - scripts/analyze_phase10a_execution_quality.py
+      - scripts/finalize_phase10a.py
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Authoritative Phase 9D H1 artifact workflow run
+        required: true
+        default: '36302077730'
+      bootstrap_reps:
+        description: Paired bootstrap/permutation repetitions
+        required: true
+        default: '20000'
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: phase10a-execution-quality
+  cancel-in-progress: true
+
+jobs:
+  phase10a:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36302077730' }}
+      BOOTSTRAP_REPS: ${{ github.event.inputs.bootstrap_reps || '20000' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install analysis dependencies
+        run: pip install pandas numpy scipy pyarrow tabulate
+      - name: Download authoritative Phase 9D H1 evidence
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          rm -rf phase10a_source
+          mkdir -p phase10a_source
+          gh run download "$SOURCE_RUN_ID" -n phase-9D-final-H1-evidence -D phase10a_source
+      - name: Verify cached authoritative inputs
+        run: |
+          test -f phase10a_source/data/derived/intraday_decision_surface.parquet
+          test -f phase10a_source/results/phase9d_primary/intraday_selected_trades.parquet
+          sha256sum phase10a_source/data/derived/intraday_decision_surface.parquet
+          sha256sum phase10a_source/results/phase9d_primary/intraday_selected_trades.parquet
+      - name: Run Phase 10A
+        run: |
+          rm -rf results/phase10a
+          python scripts/analyze_phase10a_execution_quality.py             --surface phase10a_source/data/derived/intraday_decision_surface.parquet             --primary-trades phase10a_source/results/phase9d_primary/intraday_selected_trades.parquet             --out-dir results/phase10a             --slippage-pct 0.0025             --brokerage-per-order 20             --bootstrap-reps "$BOOTSTRAP_REPS"
+      - name: Upload Phase 10A evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase10a-execution-quality
+          path: results/phase10a
+      - name: Finalize repository status, logs and README
+        run: |
+          python scripts/finalize_phase10a.py
+          git add results/phase10a research/STATUS.md research/ACTIVITY_LOG.md research/ERROR_LOG.md README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --quiet; then
+            echo "No repository changes to persist."
+            exit 0
+          fi
+          git commit -m "Phase 10A: publish execution-quality results and status"
+          git push origin HEAD:phase-10A-execution-quality
+      - name: Log workflow failure
+        if: failure()
+        run: |
+          {
+            echo ""
+            echo "| $(date -u +%F) | 10A | Workflow failure | Phase 10A GitHub Actions failed before completion. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | No empirical conclusion is accepted from this failed run. | Inspect the failing step and log the root cause before rerun. |"
+          } >> research/ERROR_LOG.md
+          git add research/ERROR_LOG.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+actions-bot@users.noreply.github.com"
+          git commit -m "Phase 10A: log failed workflow run" || true
+          git push origin HEAD:phase-10A-execution-quality || true
