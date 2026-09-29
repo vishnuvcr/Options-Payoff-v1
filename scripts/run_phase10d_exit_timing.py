@@ -21,6 +21,7 @@ from scripts.extract_near_exit_strategy_inputs import (
 from scripts.run_near_expiry_exit_backtest import (
     CostModel,
     executed_premium,
+    stt_rate_for_date,
     four_leg_entry_cashflow,
     static_flatline_value,
     estimated_equal_max_profit_loss,
@@ -106,8 +107,8 @@ def early_costs(entry_date, exit_date, entry_exec, exit_near_call, exit_near_put
     sebi = turnover * model.sebi_turnover_rate
     stamp_entry = entry_buy * lot * model.stamp_duty_buy_rate
     stamp_exit = exit_buy * lot * model.stamp_duty_buy_rate
-    stt_entry_sales = entry_sell * lot * model.stt_rate_for_date(entry_date)
-    stt_exit_sales = exit_sell * lot * model.stt_rate_for_date(exit_date)
+    stt_entry_sales = entry_sell * lot * stt_rate_for_date(entry_date, model)
+    stt_exit_sales = exit_sell * lot * stt_rate_for_date(exit_date, model)
     gst = model.gst_rate * (brokerage + exchange + sebi)
     total = (
         brokerage + exchange + sebi + stamp_entry + stamp_exit
