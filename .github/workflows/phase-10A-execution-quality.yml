@@ -11,9 +11,9 @@ on:
   workflow_dispatch:
     inputs:
       source_run_id:
-        description: Authoritative Phase 9D H1 artifact workflow run
+        description: Authoritative Phase 9G H1 reconstruction workflow run
         required: true
-        default: '36302077730'
+        default: '36313815542'
       bootstrap_reps:
         description: Paired bootstrap/permutation repetitions
         required: true
@@ -32,34 +32,49 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
-      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36302077730' }}
+      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36313815542' }}
       BOOTSTRAP_REPS: ${{ github.event.inputs.bootstrap_reps || '20000' }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Install analysis dependencies
-        run: pip install pandas numpy scipy pyarrow tabulate
-      - name: Download authoritative Phase 9D H1 evidence
+        run: pip install pandas numpy scipy tabulate
+
+      - name: Download authoritative Phase 9G H1 yearly artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           rm -rf phase10a_source
           mkdir -p phase10a_source
-          gh run download "$SOURCE_RUN_ID" -n phase-9D-final-H1-evidence -D phase10a_source
-      - name: Verify cached authoritative inputs
+          gh run download "$SOURCE_RUN_ID" -D phase10a_source
+
+      - name: Build frozen exact-17-strike H1 ledger
         run: |
-          test -f phase10a_source/data/derived/intraday_decision_surface.parquet
-          test -f phase10a_source/results/phase9d_primary/intraday_selected_trades.parquet
-          sha256sum phase10a_source/data/derived/intraday_decision_surface.parquet
-          sha256sum phase10a_source/results/phase9d_primary/intraday_selected_trades.parquet
+          rm -f phase10a_source/phase9g_h1_all.csv
+          first=1
+          while IFS= read -r f; do
+            if [ "$first" -eq 1 ]; then
+              cat "$f" > phase10a_source/phase9g_h1_all.csv
+              first=0
+            else
+              tail -n +2 "$f" >> phase10a_source/phase9g_h1_all.csv
+            fi
+          done < <(find phase10a_source -path '*/H1/intraday_selected_trades.csv' -type f | sort)
+          test -s phase10a_source/phase9g_h1_all.csv
+          wc -l phase10a_source/phase9g_h1_all.csv
+          sha256sum phase10a_source/phase9g_h1_all.csv
+
       - name: Run Phase 10A
         run: |
           rm -rf results/phase10a
-          python scripts/analyze_phase10a_execution_quality.py             --surface phase10a_source/data/derived/intraday_decision_surface.parquet             --primary-trades phase10a_source/results/phase9d_primary/intraday_selected_trades.parquet             --out-dir results/phase10a             --slippage-pct 0.0025             --brokerage-per-order 20             --bootstrap-reps "$BOOTSTRAP_REPS"
+          python scripts/analyze_phase10a_execution_quality.py             --primary-trades phase10a_source/phase9g_h1_all.csv             --out-dir results/phase10a             --slippage-pct 0.0025             --brokerage-per-order 20             --bootstrap-reps "$BOOTSTRAP_REPS"
+
       - name: Upload Phase 10A evidence
         uses: actions/upload-artifact@v4
         with:
           name: phase10a-execution-quality
           path: results/phase10a
+
       - name: Finalize repository status, logs and README
         run: |
           python scripts/finalize_phase10a.py
@@ -72,6 +87,7 @@ jobs:
           fi
           git commit -m "Phase 10A: publish execution-quality results and status"
           git push origin HEAD:phase-10A-execution-quality
+
       - name: Log workflow failure
         if: failure()
         run: |
