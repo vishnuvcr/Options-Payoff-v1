@@ -8,6 +8,7 @@ on:
     paths:
       - .github/workflows/phase-10B-signal-persistence.yml
       - scripts/extract_phase10b_confirmation_inputs.py
+      - scripts/extract_phase10b_confirmation_year.py
       - scripts/analyze_phase10b_results.py
       - scripts/finalize_phase10b.py
   workflow_dispatch:
@@ -35,7 +36,6 @@ jobs:
       fail-fast: false
       matrix:
         year: [2021, 2022, 2023, 2024, 2025, 2026]
-        delay: [5, 10, 15, 30]
     runs-on: ubuntu-latest
     env:
       PYTHONPATH: .
@@ -63,17 +63,24 @@ jobs:
           gh run download "$SOURCE_RUN_ID" -n phase9g-year-${{ matrix.year }} -D source
           test -f source/H1/intraday_scan_audit.parquet
           test -s source/H1/intraday_selected_trades.csv
-      - name: Extract confirmation entry
+      - name: Extract all confirmation horizons
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           PYTHONPATH: .
         run: |
           mkdir -p out
-          python scripts/extract_phase10b_confirmation_inputs.py             --scan-audit source/H1/intraday_scan_audit.parquet             --start "${{ matrix.year }}-01-01"             --end "${{ matrix.year }}-12-31"             --delay-minutes "${{ matrix.delay }}"             --download-workers 4             --out "out/phase10b_${{ matrix.delay }}m.csv"
+          mkdir -p out
+          python scripts/extract_phase10b_confirmation_year.py \
+            --scan-audit source/H1/intraday_scan_audit.parquet \
+            --start "${{ matrix.year }}-01-01" \
+            --end "${{ matrix.year }}-12-31" \
+            --delay-minutes 5 10 15 30 \
+            --download-workers 4 \
+            --out-dir out
       - name: Upload confirmation input
         uses: actions/upload-artifact@v4
         with:
-          name: phase10b-year-${{ matrix.year }}-${{ matrix.delay }}m
+          name: phase10b-year-${{ matrix.year }}
           path: out/
 
   merge:
