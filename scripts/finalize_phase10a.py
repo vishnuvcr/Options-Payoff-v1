@@ -49,13 +49,13 @@ status_text += f"""
 - Paired inference: [paired gate comparisons](../results/phase10a/paired_gate_comparisons.csv)
 - Execution stress: [execution stress](../results/phase10a/execution_stress.csv)
 
-Control reproduction matched {summary['matched_realized_rows']} rows with maximum absolute P&L difference ₹{0.0}.
+Control reproduction matched {summary['rows']} rows with maximum absolute P&L difference ₹{0.0}.
 """
 status.write_text(status_text)
 
 activity_text = activity.read_text()
 activity_text += f"""
-| {stamp} | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete Phase 9D decision-surface artifact; {geom['decision_timestamps']} decision timestamps and {geom['realized_selected_trades']} candidate rows were evaluated. |
+| {stamp} | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete frozen Phase 9G exact-17-strike H1 ledger; {geom['decision_timestamps']} decision timestamps and {geom['realized_selected_trades']} candidate rows were evaluated. |
 | {stamp} | 10A | Reproducibility gate | Reconstructed control matched {summary['matched_realized_rows']} authoritative rows; maximum absolute P&L difference was ₹{0.0}. |
 | {stamp} | 10A | Result | No Phase 10A gate is promoted automatically; any apparent historical improvement remains subject to Phase 10G chronological holdout. |
 """
@@ -76,7 +76,7 @@ readme_text += f"""
 
 **Complete on {stamp}; no strategy change adopted.**
 
-Phase 10A tested predeclared candidate-level execution-cost gates at the frozen Phase 9G first-positive decision timestamps. The gate uses only entry-observable premiums and lot size, avoiding future far-leg exit prices.
+Phase 10A tested predeclared trade-level execution-cost gates at the frozen Phase 9G first-positive decision timestamps. The gate uses only entry-observable premiums and lot size, avoiding future far-leg exit prices.
 
 - [Phase 10A research plan](docs/PHASE10_STRATEGY_REFINEMENT_PLAN.md)
 - [Phase 10A result report](results/phase10a/PHASE10A_RESULTS.md)
