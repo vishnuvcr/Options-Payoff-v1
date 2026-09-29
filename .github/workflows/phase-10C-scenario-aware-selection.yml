@@ -1,0 +1,177 @@
+name: Phase 10C - Scenario Aware Selection
+
+on:
+  push:
+    branches:
+      - phase-10C-scenario-aware-selection
+    paths:
+      - .github/workflows/phase-10C-scenario-aware-selection.yml
+      - scripts/run_phase10c_scenario_year.py
+      - scripts/analyze_phase10c_results.py
+      - scripts/finalize_phase10c.py
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Frozen Phase 9G H1 yearly-artifact workflow
+        required: true
+        default: "36313815542"
+      bootstrap_reps:
+        description: Paired bootstrap/permutation repetitions
+        required: true
+        default: "20000"
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: phase10c-scenario-aware-selection
+  cancel-in-progress: true
+
+jobs:
+  extract:
+    strategy:
+      fail-fast: false
+      matrix:
+        year: [2021, 2022, 2023, 2024, 2025, 2026]
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36313815542' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "huggingface_hub>=0.34" "pandas>=2.2" "pyarrow>=18" "scipy>=1.11"
+      - name: Restore cached Hugging Face source files
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-nifty-options-intraday-${{ matrix.year }}
+          restore-keys: hf-nifty-options-intraday-
+      - name: Download frozen Phase 9G yearly H1 artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p source
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-${{ matrix.year }} -D source
+          test -f source/H1/intraday_decision_surface.parquet
+          test -s source/H1/intraday_selected_trades.csv
+      - name: Run fixed scenario grid for all four selectors
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          mkdir -p out
+          python scripts/run_phase10c_scenario_year.py \
+            --decision-surface source/H1/intraday_decision_surface.parquet \
+            --selected source/H1/intraday_selected_trades.csv \
+            --start "${{ matrix.year }}-01-01" \
+            --end "${{ matrix.year }}-12-31" \
+            --download-workers 4 \
+            --slippage-pct 0.0025 \
+            --brokerage-per-order 20 \
+            --out-dir out
+      - name: Upload yearly scenario evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase10c-year-${{ matrix.year }}
+          path: out/
+
+  merge:
+    needs: extract
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: .
+      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '36313815542' }}
+      BOOTSTRAP_REPS: ${{ github.event.inputs.bootstrap_reps || '20000' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install analysis dependencies
+        run: |
+          pip install pandas numpy scipy pyarrow tabulate
+      - name: Download yearly scenario evidence
+        uses: actions/download-artifact@v4
+        with:
+          pattern: phase10c-year-*
+          path: scenario
+          merge-multiple: false
+      - name: Download frozen Phase 9G yearly H1 artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p phase9g
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2021 -D phase9g/year2021
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2022 -D phase9g/year2022
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2023 -D phase9g/year2023
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2024 -D phase9g/year2024
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2025 -D phase9g/year2025
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2026 -D phase9g/year2026
+      - name: Build selector inputs
+        run: |
+          rm -rf inputs results/phase10c
+          mkdir -p inputs results/phase10c
+          python - <<'PY'
+          import glob
+          import pandas as pd
+          for selector in ("control", "median", "p10", "worst"):
+              files = sorted(glob.glob(f"scenario/*/selector_{selector}.csv"))
+              if len(files) != 6:
+                  raise SystemExit(f"Expected six yearly {selector} files, found {len(files)}")
+              frames = [pd.read_csv(f) for f in files]
+              out = pd.concat(frames, ignore_index=True)
+              out.to_csv(f"inputs/{selector}.csv", index=False)
+              print(selector, len(out))
+          scen_files = sorted(glob.glob("scenario/*/candidate_scenario_scores.csv"))
+          scenario_frames = [pd.read_csv(f) for f in scen_files]
+          pd.concat(scenario_frames, ignore_index=True).to_csv(
+              "results/phase10c/candidate_scenario_scores.csv", index=False
+          )
+          control_files = sorted(glob.glob("phase9g/year*/H1/intraday_selected_trades.csv"))
+          control = pd.concat([pd.read_csv(f) for f in control_files], ignore_index=True)
+          if len(control) != 131:
+              raise SystemExit(f"Frozen Phase 9G control membership must be 131 rows, found {len(control)}")
+          control.to_csv("inputs/control_membership.csv", index=False)
+          PY
+      - name: Run realized near-expiry backtests
+        run: |
+          python scripts/run_intraday_near_exit_backtest.py --inputs inputs/control.csv --out-dir results/phase10c/control --slippage-pct 0.0025 --brokerage-per-order 20
+          python scripts/run_intraday_near_exit_backtest.py --inputs inputs/median.csv --out-dir results/phase10c/median --slippage-pct 0.0025 --brokerage-per-order 20
+          python scripts/run_intraday_near_exit_backtest.py --inputs inputs/p10.csv --out-dir results/phase10c/p10 --slippage-pct 0.0025 --brokerage-per-order 20
+          python scripts/run_intraday_near_exit_backtest.py --inputs inputs/worst.csv --out-dir results/phase10c/worst --slippage-pct 0.0025 --brokerage-per-order 20
+      - name: Analyze selectors
+        run: |
+          python scripts/analyze_phase10c_results.py \
+            --control inputs/control.csv \
+            --results-dir results/phase10c \
+            --bootstrap-reps "$BOOTSTRAP_REPS" \
+            --out-dir results/phase10c
+      - name: Upload Phase 10C evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase10c-scenario-aware-selection
+          path: results/phase10c
+      - name: Finalize repository status and logs
+        run: |
+          python scripts/finalize_phase10c.py
+          git add results/phase10c research/STATUS.md research/ACTIVITY_LOG.md research/ERROR_LOG.md README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Phase 10C: publish scenario-aware selector results"
+          git push origin HEAD:phase-10C-scenario-aware-selection
+      - name: Log workflow failure
+        if: failure()
+        run: |
+          echo "| $(date -u +%F) | 10C | Workflow failure | Phase 10C failed before completion. Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID | No empirical conclusion accepted from this failed run. | Inspect and correct before rerun. |" >> research/ERROR_LOG.md
+          git add research/ERROR_LOG.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Phase 10C: log failed workflow" || true
+          git push origin HEAD:phase-10C-scenario-aware-selection || true
