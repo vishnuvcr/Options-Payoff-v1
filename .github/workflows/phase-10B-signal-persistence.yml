@@ -141,8 +141,12 @@ jobs:
           raw = pd.concat([pd.read_parquet(f) for f in parquet_files], ignore_index=True)
           key = ["entry_timestamp", "strike", "shift_points", "near_expiry", "far_expiry"]
           raw_small = raw[key + ["flatline_inr", "flatline_per_unit"]].drop_duplicates(key)
-          control["entry_timestamp"] = pd.to_datetime(control["entry_timestamp"], utc=True)
-          raw_small["entry_timestamp"] = pd.to_datetime(raw_small["entry_timestamp"], utc=True)
+          for frame in (control, raw_small):
+              frame["entry_timestamp"] = pd.to_datetime(frame["entry_timestamp"], utc=True)
+              frame["near_expiry"] = pd.to_datetime(frame["near_expiry"]).dt.date.astype(str)
+              frame["far_expiry"] = pd.to_datetime(frame["far_expiry"]).dt.date.astype(str)
+              frame["strike"] = pd.to_numeric(frame["strike"], errors="raise").astype(float)
+              frame["shift_points"] = pd.to_numeric(frame["shift_points"], errors="raise").astype(int)
           control = control.merge(raw_small, on=key, how="left", validate="one_to_one")
           if len(control) != 131:
               raise SystemExit(f"Frozen Phase 9G realized control must contain 131 rows, found {len(control)}")
