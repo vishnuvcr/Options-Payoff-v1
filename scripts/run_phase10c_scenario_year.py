@@ -111,8 +111,7 @@ def build_exit_lookup(df, exit_timestamps):
     return out
 
 
-def scenario_net(row, spot_scenario, far_iv_ce, far_iv_pe, t_far, exit_date, model):
-    lot = int(row.near_lot_size)
+def scenario_net(row, spot_scenario, far_iv_ce, far_iv_pe, t_far, entry_date, exit_date, lot, model):
     K = float(row.strike)
     entry = four_leg_entry_cashflow(
         float(row.near_call),
@@ -138,7 +137,7 @@ def scenario_net(row, spot_scenario, far_iv_ce, far_iv_pe, t_far, exit_date, mod
 
     near_put_intrinsic = max(K - spot_scenario, 0.0)
     costs = six_transaction_costs(
-        pd.Timestamp(row.entry_timestamp).date(),
+        entry_date,
         exit_date,
         entry,
         far_call_exit,
@@ -288,7 +287,9 @@ def main():
                         sigma_ce,
                         sigma_pe,
                         T_far_at_exit,
+                        entry_ts.date(),
                         exit_ts.date(),
+                        nifty_lot_size(near_expiry),
                         model,
                     )
                     nets.append((spot_shock, iv_shock, pnl))
@@ -402,9 +403,16 @@ def main():
 
     out_control = out_dir / "control.csv"
     selected.to_csv(out_control, index=False)
+    selector_columns = [
+        "entry_timestamp","entry_date","near_expiry","far_expiry","near_exit_timestamp",
+        "far_call_exit_timestamp","far_put_exit_timestamp","candidate_label","shift_points","strike",
+        "near_call_close","near_put_close","far_call_close","far_put_close","near_settlement",
+        "far_call_exit_close","far_put_exit_close","near_lot_size","far_lot_size","flatline_inr",
+        "scenario_median_inr","scenario_p10_inr","scenario_worst_inr","scenario_mean_inr","scenario_sd_inr","status"
+    ]
     for name, rows in selector_rows.items():
         out = out_dir / f"selector_{name}.csv"
-        pd.DataFrame(rows).to_csv(out, index=False)
+        pd.DataFrame(rows, columns=selector_columns).to_csv(out, index=False)
 
     scen = pd.DataFrame(scenario_rows)
     scen.to_csv(out_dir / "candidate_scenario_scores.csv", index=False)
