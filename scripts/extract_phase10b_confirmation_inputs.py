@@ -205,7 +205,11 @@ def main():
                 near_expiry, far_expiry,
             )
             if surf.empty:
-                raise RuntimeError(f"Audit says exact-17 positive but reconstructed surface is empty: {near_expiry} {target}")
+                # The scan audit can be positive from the source's availability
+                # logic even when the narrowed reconstruction cannot reproduce
+                # every quote at the exact minute. Treat this as failed
+                # confirmation, never as evidence for a trade.
+                continue
             if surf["shift_points"].nunique() != 17:
                 # Missing strikes at confirmation means confirmation failed.
                 continue
