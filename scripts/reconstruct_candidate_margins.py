@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 
 import pandas as pd
@@ -17,6 +16,8 @@ def main() -> None:
     ap.add_argument('--span-version',default='i1')
     ap.add_argument('--skip-missing',action='store_true')
     ap.add_argument('--max-shift-points',type=int,default=400)
+    ap.add_argument('--symbols',default='NIFTY',
+                    help='Comma-separated SPAN portfolio symbols to parse; default NIFTY only.')
     args=ap.parse_args()
     df=pd.read_csv(args.candidates)
     df=df[df['shift_points'].between(-args.max_shift_points,args.max_shift_points)].copy()
@@ -24,6 +25,7 @@ def main() -> None:
     missing=required-set(df.columns)
     if missing: raise ValueError(f'missing columns: {sorted(missing)}')
     span_dir=Path(args.span_dir)
+    symbols=[s.strip() for s in args.symbols.split(',') if s.strip()]
     rows=[]
     cache={}
     for entry_date, g in df.groupby(args.date_col, sort=True):
@@ -43,7 +45,7 @@ def main() -> None:
                     continue
                 raise FileNotFoundError(f'No SPN file for {date_key} variant={args.span_version}')
             spn=sorted(preferred)[0]
-            engine=RiskEngine.from_file(str(spn))
+            engine=RiskEngine.from_file(str(spn), symbols=symbols)
             spn_name=spn.name
             cache[date_key]=(engine,spn_name)
         for r in g.itertuples(index=False):
@@ -84,8 +86,13 @@ def main() -> None:
               'source_spn_version':spn_name,
             })
     out=Path(args.out); out.parent.mkdir(parents=True,exist_ok=True)
-    pd.DataFrame(rows).sort_values(['entry_timestamp','shift_points']).to_csv(out,index=False)
-    print(f'rows={len(rows)} timestamps={pd.DataFrame(rows).entry_timestamp.nunique() if rows else 0}')
+    result_df=pd.DataFrame(rows)
+    if result_df.empty:
+        result_df=pd.DataFrame(columns=['entry_timestamp','entry_date','candidate_label','near_expiry','next_expiry','shift_points','strike','spot_at_entry','lot_size','chart_pnl_inr','chart_return_pct','gross_pnl_inr','net_pnl_inr','total_costs_inr','premium_turnover_inr','margin_required_inr','max_profit_pct_margin','span_inr','exposure_inr','option_premium_reported_inr','additional_inr','source_spn_version'])
+    else:
+        result_df=result_df.sort_values(['entry_timestamp','shift_points'])
+    result_df.to_csv(out,index=False)
+    print(f'rows={len(result_df)} timestamps={result_df.entry_timestamp.nunique() if not result_df.empty else 0}')
 
 if __name__=='__main__':
     main()
