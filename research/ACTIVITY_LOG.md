@@ -219,3 +219,6 @@ This is the observable research/repository activity log. It records completed ac
 | 2026-09-29 | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete frozen Phase 9G exact-17-strike H1 ledger; 131 decision timestamps and 131 candidate rows were evaluated. |
 | 2026-09-29 | 10A | Reproducibility gate | Reconstructed control matched 131 authoritative rows; maximum absolute P&L difference was ₹0.0. |
 | 2026-09-29 | 10A | Result | No Phase 10A gate is promoted automatically; any apparent historical improvement remains subject to Phase 10G chronological holdout. |
+
+| 2026-09-29 | 10A | Control-source correction | An initial successful computation was invalidated because it used the superseded Phase 9D 169-trade ledger. Phase 10A was re-anchored to the frozen Phase 9G exact-17-strike yearly H1 artifacts. |
+| 2026-09-29 | 10A | Accepted execution-quality result | Workflow 36555450407 reproduced the frozen 131-trade Phase 9G control exactly and completed the predeclared <=25%, <=50% and <=75% cost-to-flatline gates plus execution stress. No gate was promoted. |
