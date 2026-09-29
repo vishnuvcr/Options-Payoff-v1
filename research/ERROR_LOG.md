@@ -246,3 +246,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 | 2026-09-29 | 10D | Execution convention | Early-exit costs were recomputed for all four closing transactions; no exercise STT was applied. | Documented in Phase 10D results. |
 
 | 2026-09-29 | 10F | Repeated candidate-assembly schema mismatch | Phase 10F initially referenced absent decision-surface columns and retained one stale post-merge timestamp suffix; no SPAN result was accepted. | Corrected to derive spot/lot from repository sources and use the canonical merged timestamp. |
+
+| 2026-09-29 | 10F | SPAN reconstruction bottleneck | Run 36572330899 spent the full reconstruction interval parsing the full NSE SPAN universe for each entry date and was cancelled before producing a margin ledger. No sizing result was accepted. | Updated `reconstruct_candidate_margins.py` to pass `symbols=['NIFTY']` to `RiskEngine.from_file`, added the script to workflow triggers, and rerun with the same preregistered 198-candidate margin calculation. |
