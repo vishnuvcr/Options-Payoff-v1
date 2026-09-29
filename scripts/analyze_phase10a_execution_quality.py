@@ -246,6 +246,8 @@ def main():
         "net_primary_inr": float(primary["net_pnl_inr"].sum()),
     }
 
+    (out / "reproduction_check.json").write_text(json.dumps(reproduction, indent=2))
+
     model = CostModel(slippage_pct=args.slippage_pct, brokerage_per_order_inr=args.brokerage_per_order)
     merged["near_lot_size"] = merged["near_expiry"].map(nifty_lot_size)
     merged["estimated_six_order_cost_inr"] = merged.apply(
