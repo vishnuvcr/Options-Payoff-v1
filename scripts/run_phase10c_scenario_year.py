@@ -361,21 +361,27 @@ def main():
             ("p10", "scenario_p10_inr"),
             ("worst", "scenario_worst_inr"),
         ):
-            chosen = cdf.sort_values(
-                [score_col, "flatline_inr", "shift_points"],
-                ascending=[False, False, True],
-            ).iloc[0]
             if name == "control":
-                frozen_shift = int(selected.loc[
+                frozen = selected[
                     (selected["near_expiry"] == near_expiry)
-                    & (selected["entry_timestamp"] == entry_ts),
-                    "shift_points"
-                ].iloc[0])
-                if int(chosen["shift_points"]) != frozen_shift:
+                    & (selected["entry_timestamp"] == entry_ts)
+                ]
+                if len(frozen) != 1:
                     raise RuntimeError(
-                        f"Control selector mismatch for {near_expiry}: "
-                        f"decision surface selected {chosen['shift_points']} but frozen control has {frozen_shift}"
+                        f"Frozen control membership mismatch for {near_expiry}: rows={len(frozen)}"
                     )
+                frozen_strike = float(frozen.iloc[0]["strike"])
+                matches = cdf[np.isclose(cdf["strike"], frozen_strike)]
+                if len(matches) != 1:
+                    raise RuntimeError(
+                        f"Frozen control strike {frozen_strike} not represented uniquely in canonical 17-strike surface for {near_expiry}"
+                    )
+                chosen = matches.iloc[0]
+            else:
+                chosen = cdf.sort_values(
+                    [score_col, "flatline_inr", "shift_points"],
+                    ascending=[False, False, True],
+                ).iloc[0]
 
             fc = far_exit_map.get((float(chosen["strike"]), "CE"))
             fp = far_exit_map.get((float(chosen["strike"]), "PE"))
