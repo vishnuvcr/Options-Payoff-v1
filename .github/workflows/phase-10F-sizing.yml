@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - phase-10F-sizing
+      - phase-10F-sizing-retry
     paths:
       - .github/workflows/phase-10F-sizing.yml
       - scripts/analyze_phase10f_sizing.py
