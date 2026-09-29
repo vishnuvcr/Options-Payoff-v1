@@ -524,3 +524,7 @@ Phase 10C tested fixed point-in-time scenario ranking across the 17-strike grid:
 - Best historical variant: **worst**
 
 The frozen Phase 9G H1 control remains the research candidate unless Phase 10G chronological holdout supports a predeclared refinement.
+
+## Phase 10D — exit timing
+
+**Complete; no strategy change adopted.** [Results](results/phase10d/PHASE10D_RESULTS.md) · [Summary](results/phase10d/exit_timing_summary.csv) · Promotion screen: **False**

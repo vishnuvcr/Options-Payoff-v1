@@ -228,3 +228,5 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-29 | 10C | Scenario-aware selector | Evaluated the predeclared 15-state (-2/-1/0/+1/+2% spot × -5/0/+5 vol-point far-IV) grid across positive/all-green 17-strike candidates; no future realized P&L was used in selection. |
 | 2026-09-29 | 10C | Result publication | Published full candidate scenario scores, selector backtests, paired inference and promotion screen under results/phase10c/. |
+
+| 2026-09-29 | 10D | Exit timing | Tested near-expiry, 60/120/180-minute early exits and previous-trading-day exit with all four legs closed. |
