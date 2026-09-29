@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/phase-10F-sizing.yml
       - scripts/analyze_phase10f_sizing.py
+      - scripts/reconstruct_candidate_margins.py
   workflow_dispatch:
     inputs:
       source_run_id:
@@ -117,7 +118,7 @@ jobs:
           PY
       - name: Reconstruct historical SPAN margin
         run: |
-          python scripts/reconstruct_candidate_margins.py             --candidates results/phase10f/margin_candidates.csv             --span-dir data/margin/span_historical             --span-version i1             --max-shift-points 400             --out results/phase10f/margin_ledger.csv
+          python scripts/reconstruct_candidate_margins.py             --candidates results/phase10f/margin_candidates.csv             --span-dir data/margin/span_historical             --span-version i1             --symbols NIFTY             --max-shift-points 400             --out results/phase10f/margin_ledger.csv
           python - <<'PY'
           import pandas as pd
           d=pd.read_csv("results/phase10f/margin_ledger.csv")
