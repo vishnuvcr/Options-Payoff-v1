@@ -67,7 +67,7 @@ jobs:
           m=top.merge(surf,left_on=["near_expiry","entry_timestamp","strike","shift_points"],right_on=["near_expiry","timestamp","strike","shift_points"],how="left",validate="one_to_one")
           if m["far_expiry"].isna().any(): raise SystemExit("Some Phase 9I rank rows could not be matched to frozen decision-surface rows")
           index_df=load_index().set_index("timestamp")["close"]
-          spot=[float(index_df.get(ts)) for ts in m.entry_timestamp_x]
+          spot=[float(index_df.get(ts)) for ts in m.entry_timestamp]
           lots=[int(nifty_lot_size(e)) for e in m.near_expiry]
           if any(pd.isna(spot)): raise SystemExit("Missing index spot for a Phase 9I entry timestamp")
           out=pd.DataFrame({
