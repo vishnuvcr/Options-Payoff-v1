@@ -118,18 +118,24 @@ jobs:
         run: |
           rm -rf inputs
           mkdir -p inputs
-          for delay in 5 10 15 30; do
-            first=1
-            rm -f "inputs/phase10b_${delay}m.csv"
-            while IFS= read -r f; do
-              if [ "$first" -eq 1 ]; then
-                cat "$f" > "inputs/phase10b_${delay}m.csv"
-                first=0
-              else
-                tail -n +2 "$f" >> "inputs/phase10b_${delay}m.csv"
-              fi
-            done < <(find confirmation -name "phase10b_${delay}m.csv" -type f | sort)
-          done
+          python - <<'PY'
+          import glob
+          import pandas as pd
+          required = ["entry_timestamp","entry_date","initial_signal_timestamp","confirmation_delay_minutes","spot_at_entry","near_expiry","far_expiry","near_exit_timestamp","far_call_exit_timestamp","far_put_exit_timestamp","candidate_label","shift_points","strike","near_call_close","near_put_close","far_call_close","far_put_close","near_settlement","far_call_exit_close","far_put_exit_close","execution_fidelity","near_lot_size","far_lot_size","flatline_per_unit","flatline_inr"]
+          for delay in (5, 10, 15, 30):
+              files = sorted(glob.glob(f"confirmation/*/phase10b_{delay}m.csv"))
+              if len(files) != 6:
+                  raise SystemExit(f"Expected six yearly confirmation files for {delay}m, found {len(files)}")
+              frames = []
+              for f in files:
+                  df = pd.read_csv(f)
+                  missing = set(required) - set(df.columns)
+                  if missing:
+                      raise SystemExit(f"{f} missing confirmation columns: {sorted(missing)}")
+                  frames.append(df)
+              merged = pd.concat(frames, ignore_index=True)
+              merged.to_csv(f"inputs/phase10b_{delay}m.csv", index=False)
+          PY
           python - <<'PY'
           import glob
           import pandas as pd
