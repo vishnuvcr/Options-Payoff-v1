@@ -133,19 +133,27 @@ jobs:
           python - <<'PY'
           import glob
           import pandas as pd
-          files = sorted(glob.glob("phase9g/year*/H1/intraday_selected.parquet"))
-          if len(files) != 6:
-              raise SystemExit(f"Expected 6 frozen Phase 9G H1 parquet files, found {len(files)}")
-          frames = [pd.read_parquet(f) for f in files]
-          control = pd.concat(frames, ignore_index=True)
-          control.to_csv("inputs/phase9g_control.csv", index=False)
+          csv_files = sorted(glob.glob("phase9g/year*/H1/intraday_selected_trades.csv"))
+          parquet_files = sorted(glob.glob("phase9g/year*/H1/intraday_selected.parquet"))
+          if len(csv_files) != 6 or len(parquet_files) != 6:
+              raise SystemExit(f"Expected six CSV and six parquet H1 files; got {len(csv_files)} CSV and {len(parquet_files)} parquet")
+          control = pd.concat([pd.read_csv(f) for f in csv_files], ignore_index=True)
+          raw = pd.concat([pd.read_parquet(f) for f in parquet_files], ignore_index=True)
+          key = ["entry_timestamp", "strike", "shift_points", "near_expiry", "far_expiry"]
+          raw_small = raw[key + ["flatline_inr", "flatline_per_unit"]].drop_duplicates(key)
+          control["entry_timestamp"] = pd.to_datetime(control["entry_timestamp"], utc=True)
+          raw_small["entry_timestamp"] = pd.to_datetime(raw_small["entry_timestamp"], utc=True)
+          control = control.merge(raw_small, on=key, how="left", validate="one_to_one")
           if len(control) != 131:
-              raise SystemExit(f"Frozen Phase 9G control must contain 131 rows, found {len(control)}")
-          required = {"flatline_inr","near_call_close","near_put_close","far_call_close","far_put_close","near_settlement","far_call_exit_close","far_put_exit_close"}
+              raise SystemExit(f"Frozen Phase 9G realized control must contain 131 rows, found {len(control)}")
+          if control["flatline_inr"].isna().any():
+              raise SystemExit("Frozen Phase 9G realized control has rows without matching raw flatline data")
+          required = {"near_call_close","near_put_close","far_call_close","far_put_close","near_settlement","far_call_exit_close","far_put_exit_close","flatline_inr"}
           missing = required - set(control.columns)
           if missing:
-              raise SystemExit(f"Frozen Phase 9G parquet missing required fields: {sorted(missing)}")
-          print(f"validated frozen control rows={len(control)}")
+              raise SystemExit(f"Frozen Phase 9G realized control missing required fields: {sorted(missing)}")
+          control.to_csv("inputs/phase9g_control.csv", index=False)
+          print(f"validated frozen realized control rows={len(control)}")
           PY
           wc -l inputs/phase9g_control.csv inputs/phase10b_*.csv
       - name: Run realized-P&L backtests
