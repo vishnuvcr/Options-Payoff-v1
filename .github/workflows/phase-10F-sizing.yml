@@ -1,0 +1,140 @@
+name: Phase 10F - Margin Normalized Sizing
+
+on:
+  push:
+    branches:
+      - phase-10F-sizing
+    paths:
+      - .github/workflows/phase-10F-sizing.yml
+      - scripts/analyze_phase10f_sizing.py
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Frozen Phase 9G H1 yearly-artifact workflow
+        required: true
+        default: "36313815542"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  sizing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install SPAN tooling
+        run: |
+          pip install "marginism==0.1.1" "pandas>=2.2" "pyarrow>=18" "requests>=2.31"
+      - name: Restore historical SPAN cache
+        uses: actions/cache@v4
+        with:
+          path: data/margin/span_historical
+          key: nifty-span-i1-2021-2026-v1
+      - name: Download frozen Phase 9G yearly decision surfaces
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p phase9g
+          gh run download "${{ github.event.inputs.source_run_id || '36313815542' }}" -n phase9g-year-2021 -D phase9g/year2021
+          gh run download "${{ github.event.inputs.source_run_id || '36313815542' }}" -n phase9g-year-2022 -D phase9g/year2022
+          gh run download "${{ github.event.inputs.source_run_id || '36313815542' }}" -n phase9g-year-2023 -D phase9g/year2023
+          gh run download "${{ github.event.inputs.source_run_id || '36313815542' }}" -n phase9g-year-2024 -D phase9g/year2024
+          gh run download "${{ github.event.inputs.source_run_id || '36313815542' }}" -n phase9g-year-2025 -D phase9g/year2025
+          gh run download "${{ github.event.inputs.source_run_id || '36313815542' }}" -n phase9g-year-2026 -D phase9g/year2026
+      - name: Build rank-1/rank-2 margin candidates
+        run: |
+          mkdir -p results/phase10f data/margin/span_historical
+          python - <<'PY'
+          import glob,pandas as pd
+          top=pd.read_csv("results/phase9i_fast/top2_trade_rows.csv")
+          top["entry_timestamp"]=pd.to_datetime(top["entry_timestamp"],utc=True)
+          top["near_expiry"]=pd.to_datetime(top["near_expiry"]).dt.date
+          frames=[]
+          for f in sorted(glob.glob("phase9g/year*/H1/intraday_decision_surface.parquet")):
+              x=pd.read_parquet(f)
+              x["timestamp"]=pd.to_datetime(x["timestamp"],utc=True)
+              x["near_expiry"]=pd.to_datetime(x["near_expiry"]).dt.date
+              x["far_expiry"]=pd.to_datetime(x["far_expiry"]).dt.date
+              x=x[x["shift_points"].between(-400,400)]
+              x=x.sort_values(["status","flatline_inr"],ascending=[True,False]).drop_duplicates(["near_expiry","timestamp","strike","shift_points"])
+              frames.append(x[["near_expiry","far_expiry","timestamp","strike","shift_points","spot_at_entry","near_lot_size","flatline_inr"]])
+          surf=pd.concat(frames,ignore_index=True)
+          m=top.merge(surf,left_on=["near_expiry","entry_timestamp","strike","shift_points"],right_on=["near_expiry","timestamp","strike","shift_points"],how="left",validate="one_to_one")
+          if m["far_expiry"].isna().any(): raise SystemExit("Some Phase 9I rank rows could not be matched to frozen decision-surface rows")
+          out=pd.DataFrame({
+              "entry_timestamp":m.entry_timestamp_x,
+              "entry_date":m.entry_date,
+              "candidate_label":m["shift_points"].map(lambda x:"ATM" if int(x)==0 else ("ATM_PLUS_"+str(abs(int(x))) if int(x)>0 else "ATM_MINUS_"+str(abs(int(x))))),
+              "near_expiry":m.near_expiry,
+              "next_expiry":m.far_expiry,
+              "shift_points":m.shift_points,
+              "strike":m.strike,
+              "spot_at_entry":m.spot_at_entry,
+              "lot_size":m.near_lot_size,
+              "chart_pnl_inr":m.flatline_inr,
+              "gross_pnl_inr":m.gross_pnl_inr,
+              "net_pnl_inr":m.net_pnl_inr,
+              "total_costs_inr":m.total_costs,
+              "rank":m["rank"]
+          })
+          out.to_csv("results/phase10f/margin_candidates.csv",index=False)
+          print("candidate rows",len(out),"unique dates",out.entry_date.nunique())
+          PY
+      - name: Cache or download historical NSE SPAN i1 files
+        run: |
+          python - <<'PY'
+          import concurrent.futures,io,zipfile
+          from pathlib import Path
+          import pandas as pd,requests
+          out=Path("data/margin/span_historical");out.mkdir(parents=True,exist_ok=True)
+          dates=sorted(pd.to_datetime(pd.read_csv("results/phase10f/margin_candidates.csv")["entry_date"]).dt.strftime("%Y%m%d").unique())
+          headers={"User-Agent":"Mozilla/5.0","Accept":"application/octet-stream,*/*;q=0.8","Referer":"https://www.nseindia.com/"}
+          def one(d):
+              dest=out/f"nsccl.{d}.i1.spn"
+              if dest.exists() and dest.stat().st_size>0:return d,"cached"
+              url=f"https://nsearchives.nseindia.com/archives/nsccl/span/nsccl.{d}.i1.zip"
+              try:
+                  r=requests.get(url,headers=headers,timeout=60);r.raise_for_status()
+                  with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+                      names=[n for n in z.namelist() if n.lower().endswith(".spn")]
+                      if not names: return d,"no_spn"
+                      dest.write_bytes(z.read(names[0]));return d,"downloaded"
+              except Exception as e:return d,"error:"+str(e)
+          with concurrent.futures.ThreadPoolExecutor(max_workers=12) as ex:
+              res=list(ex.map(one,dates))
+          print(pd.Series([x[1] for x in res]).value_counts().to_string())
+          bad=[x for x in res if x[1].startswith("error") or x[1]=="no_spn"]
+          if bad: raise SystemExit(f"SPAN download failures: {bad[:10]}")
+          PY
+      - name: Reconstruct historical SPAN margin
+        run: |
+          python scripts/reconstruct_candidate_margins.py             --candidates results/phase10f/margin_candidates.csv             --span-dir data/margin/span_historical             --span-version i1             --max-shift-points 400             --out results/phase10f/margin_ledger.csv
+          python - <<'PY'
+          import pandas as pd
+          d=pd.read_csv("results/phase10f/margin_ledger.csv")
+          if len(d)!=198: raise SystemExit(f"Expected 198 margin rows, found {len(d)}")
+          if d.margin_required_inr.isna().any(): raise SystemExit("Missing SPAN margin rows")
+          print(d.head().to_string(index=False))
+          PY
+      - name: Analyze sizing
+        run: |
+          python scripts/analyze_phase10f_sizing.py             --margin-ledger results/phase10f/margin_ledger.csv             --out-dir results/phase10f
+      - name: Publish
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path(".")
+          (root/"research"/"STATUS.md").write_text(root.joinpath("research/STATUS.md").read_text()+"\n## Phase 10F — margin-normalized sizing\n\n**Status:** COMPLETE — no sizing change adopted automatically.**\n\n- [Phase 10F results](../results/phase10f/PHASE10F_RESULTS.md)\n- [Sizing summary](../results/phase10f/sizing_margin_summary.csv)\n")
+          (root/"research"/"ACTIVITY_LOG.md").write_text(root.joinpath("research/ACTIVITY_LOG.md").read_text()+"\n| 2026-09-29 | 10F | Margin-normalized sizing | Reconstructed historical NSE/NSCCL SPAN i1 margin for 198 Phase 9I rank positions and compared 1x, 2x, literal top-two and top-two-positive sizing. |\n")
+          (root/"research"/"ERROR_LOG.md").write_text(root.joinpath("research/ERROR_LOG.md").read_text()+"\n| 2026-09-29 | 10F | Margin normalization | Position-level historical SPAN i1 is used for required margin; two-lot doubles the same-position margin and top-two variants sum position-level requirements. | Method documented in Phase 10F results. |\n")
+          (root/"README.md").write_text(root.joinpath("README.md").read_text()+"\n## Phase 10F — margin-normalized sizing\n\n**Complete.** [Results](results/phase10f/PHASE10F_RESULTS.md) · [Sizing summary](results/phase10f/sizing_margin_summary.csv)\n")
+          PY
+          git add results/phase10f research/STATUS.md research/ACTIVITY_LOG.md research/ERROR_LOG.md README.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Phase 10F: publish margin normalized sizing results" || true
+          git push origin HEAD:phase-10F-sizing
