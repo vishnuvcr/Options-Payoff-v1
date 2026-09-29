@@ -1,0 +1,10 @@
+{
+  "decision_timestamps": 169,
+  "realized_selected_trades": 169,
+  "median_cost_to_flatline_pct": 125.42690160376593,
+  "p75_cost_to_flatline_pct": 365.3725611064698,
+  "p90_cost_to_flatline_pct": 1559.3465601194523,
+  "pct_trades_under_25_pct_gate": 9.467455621301776,
+  "pct_trades_under_50_pct_gate": 23.076923076923077,
+  "pct_trades_under_75_pct_gate": 35.50295857988166
+}

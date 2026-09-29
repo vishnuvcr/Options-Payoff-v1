@@ -1,8 +1,8 @@
 # Research status
 
-**As of:** 2026-09-28  
-**Active branch:** phase-9I-top-two-strikes
-**Overall status:** Phase 9I COMPLETE — top-two-positive-strike sizing variant tested; frozen one-strike Phase 9G H1 control retained
+**As of:** 2026-09-29  
+**Active branch:** phase-10A-execution-quality
+**Overall status:** Phase 10A COMPLETE — execution-quality / cost-to-edge gate tested; frozen one-strike Phase 9G H1 control retained
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -588,3 +588,21 @@ The first research targets are:
 7. untouched chronological holdout.
 
 The frozen Phase 9G H1 control remains unchanged until a Phase 10 candidate passes its predefined validation and holdout gates.
+
+
+## Phase 10A — execution-quality / cost-to-edge
+
+**Status:** COMPLETE — no strategy change adopted.
+
+- Decision timestamps tested: 169
+- Candidate rows tested: 169
+- Positive candidate rows: 169
+- Median point-in-time estimated six-order friction / flatline: 125.43%
+- P90 friction / flatline: 1559.35%
+- Phase 10A result: see [Phase 10A results](../results/phase10a/PHASE10A_RESULTS.md)
+- Candidate ledger: [candidate cost-quality table](../results/phase10a/candidate_cost_quality.csv)
+- Gate comparison: [gate summary](../results/phase10a/gate_summary.csv)
+- Paired inference: [paired gate comparisons](../results/phase10a/paired_gate_comparisons.csv)
+- Execution stress: [execution stress](../results/phase10a/execution_stress.csv)
+
+Control reproduction matched 169 rows with maximum absolute P&L difference ₹0.0.

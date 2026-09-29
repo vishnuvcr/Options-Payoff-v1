@@ -211,3 +211,7 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-29 | 10 | Strategy-refinement phase opened | Created `phase-10-strategy-refinement` and preregistered bounded tests for execution quality, entry persistence, scenario-aware strike selection, exit timing, controlled combinations, sizing and an untouched chronological holdout. No strategy rule has been changed. |
 | 2026-09-29 | 10 | Research rationale | Phase 9H-A showed bounded entry changes rescue only 14/54 losses; Phase 9I showed top-two-positive underperforms the control and literal top-two raises absolute P&L with materially higher drawdown. Phase 10 therefore targets structural execution/entry/exit mechanisms before further pattern mining. |
+
+| 2026-09-29 | 10A | Execution-quality analysis | Tested the predeclared no-gate, <=25%, <=50% and <=75% point-in-time cost-to-flatline gates on the complete Phase 9D decision-surface artifact; 169 decision timestamps and 169 candidate rows were evaluated. |
+| 2026-09-29 | 10A | Reproducibility gate | Reconstructed control matched 169 authoritative rows; maximum absolute P&L difference was ₹0.0. |
+| 2026-09-29 | 10A | Result | No Phase 10A gate is promoted automatically; any apparent historical improvement remains subject to Phase 10G chronological holdout. |
