@@ -276,13 +276,35 @@ def main():
             )
             iv_ce = implied_vol(float(r.far_call), float(spot), K, T_entry_far, "C")
             iv_pe = implied_vol(float(r.far_put), float(spot), K, T_entry_far, "P")
-            if not (np.isfinite(iv_ce) and np.isfinite(iv_pe)):
-                continue
-
             T_far_at_exit = (
                 far_expiry_ts - exit_ts
             ).total_seconds() / (365.0 * 24 * 3600)
-            if T_far_at_exit <= 0:
+
+            if not (np.isfinite(iv_ce) and np.isfinite(iv_pe)) or T_far_at_exit <= 0:
+                candidate_records.append({
+                    "near_expiry": near_expiry,
+                    "far_expiry": far_expiry,
+                    "entry_timestamp": entry_ts,
+                    "spot_at_entry": float(spot),
+                    "strike": K,
+                    "shift_points": int(r.shift_points),
+                    "candidate_label": "ATM" if int(r.shift_points) == 0 else (
+                        f"ATM_PLUS_{abs(int(r.shift_points))}" if int(r.shift_points) > 0 else f"ATM_MINUS_{abs(int(r.shift_points))}"
+                    ),
+                    "near_call_close": float(r.near_call),
+                    "near_put_close": float(r.near_put),
+                    "far_call_close": float(r.far_call),
+                    "far_put_close": float(r.far_put),
+                    "flatline_inr": flatline,
+                    "flatline_per_unit": float(r.flatline_per_unit),
+                    "far_call_iv": np.nan,
+                    "far_put_iv": np.nan,
+                    "scenario_median_inr": np.nan,
+                    "scenario_p10_inr": np.nan,
+                    "scenario_worst_inr": np.nan,
+                    "scenario_mean_inr": np.nan,
+                    "scenario_sd_inr": np.nan,
+                })
                 continue
 
             nets = []
@@ -380,7 +402,10 @@ def main():
                     ["flatline_inr", "shift_points"], ascending=[False, True]
                 ).iloc[0]
             else:
-                chosen = cdf.sort_values(
+                eligible = cdf[np.isfinite(cdf[score_col])].copy()
+                if eligible.empty:
+                    continue
+                chosen = eligible.sort_values(
                     [score_col, "flatline_inr", "shift_points"],
                     ascending=[False, False, True],
                 ).iloc[0]
