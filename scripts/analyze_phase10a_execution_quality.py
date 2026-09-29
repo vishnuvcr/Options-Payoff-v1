@@ -403,9 +403,7 @@ def main():
         "",
         "This phase tests whether the static chart edge is large enough relative to entry-time friction. It does not establish that a lower cost-to-flatline ratio predicts favorable far-expiry revaluation, and it does not change the frozen strike/timing rule unless a later chronological holdout supports the refinement.",
     ]
-    (out / "PHASE10A_RESULTS.md").write_text("
-".join(lines) + "
-", encoding="utf-8")
+    (out / "PHASE10A_RESULTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(json.dumps({
         "status": "complete",
