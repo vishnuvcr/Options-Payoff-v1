@@ -253,3 +253,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 
 | 2026-09-29 | 10F | Margin-ledger rank omission | The corrected 198-row SPAN ledger omitted the candidate `rank` field, so the analyzer could not separate rank-1 from rank-2 positions. No sizing conclusion was accepted. | Preserve `rank` in `reconstruct_candidate_margins.py`; rerun the same SPAN calculation and analysis. |
 | 2026-09-29 | 10F | Old-commit SPAN retry stalled | Rerun attempt 36572330899 attempt 2 remained in `Reconstruct historical SPAN margin` for an extended interval; its head commit predates the NIFTY-only and parallel reconstruction patches, so it is not evidence for the optimized path. | Preserve as execution-only failure; do not accept sizing results. Optimized NIFTY-only parallel reconstruction is committed for the next non-duplicate retry. |
+
+| 2026-09-29 | 10F | Analyzer rank attribute collision | The analyzer used `d.rank`, which pandas resolves as the DataFrame method rather than the `rank` column; no sizing result was produced. | Replaced attribute access with explicit `d["rank"]`; rerun required. |
