@@ -62,7 +62,7 @@ jobs:
               x["far_expiry"]=pd.to_datetime(x["far_expiry"]).dt.date
               x=x[x["shift_points"].between(-400,400)]
               x=x.sort_values(["flatline_inr"],ascending=[False]).drop_duplicates(["near_expiry","timestamp","strike","shift_points"])
-              frames.append(x[["near_expiry","far_expiry","timestamp","strike","shift_points","spot_at_entry","near_lot_size","flatline_inr"]])
+              frames.append(x[["near_expiry","far_expiry","timestamp","strike","shift_points","flatline_inr"]])
           surf=pd.concat(frames,ignore_index=True)
           m=top.merge(surf,left_on=["near_expiry","entry_timestamp","strike","shift_points"],right_on=["near_expiry","timestamp","strike","shift_points"],how="left",validate="one_to_one")
           if m["far_expiry"].isna().any(): raise SystemExit("Some Phase 9I rank rows could not be matched to frozen decision-surface rows")
