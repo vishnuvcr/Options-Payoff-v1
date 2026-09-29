@@ -1,4 +1,5 @@
 name: Phase 10B - Signal Persistence Confirmation
+# Recovery trigger: rerun optimized year x delay extraction after cancelled run 36556610984
 
 on:
   push:
