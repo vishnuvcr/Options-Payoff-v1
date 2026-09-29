@@ -39,8 +39,8 @@ status_text += f"""
 **Status:** COMPLETE — no strategy change adopted.
 
 - Decision timestamps tested: {geom['decision_timestamps']}
-- Candidate rows tested: {geom['candidate_rows']}
-- Positive candidate rows: {geom['positive_candidate_rows']}
+- Candidate rows tested: {geom['realized_selected_trades']}
+- Positive candidate rows: {geom['realized_selected_trades']}
 - Median point-in-time estimated six-order friction / flatline: {geom['median_cost_to_flatline_pct']:.2f}%
 - P90 friction / flatline: {geom['p90_cost_to_flatline_pct']:.2f}%
 - Phase 10A result: see [Phase 10A results](../results/phase10a/PHASE10A_RESULTS.md)
