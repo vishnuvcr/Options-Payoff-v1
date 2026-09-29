@@ -151,6 +151,8 @@ jobs:
             --control inputs/control.csv \
             --results-dir results/phase10c \
             --bootstrap-reps "$BOOTSTRAP_REPS" \
+            --slippage-pct 0.0025 \
+            --brokerage-per-order 20 \
             --out-dir results/phase10c
       - name: Upload Phase 10C evidence
         uses: actions/upload-artifact@v4
