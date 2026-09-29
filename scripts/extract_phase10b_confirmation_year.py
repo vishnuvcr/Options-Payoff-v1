@@ -94,6 +94,15 @@ def surface(near_q, far_q, timestamp, spot, near_expiry):
     return pd.DataFrame(rows)
 
 
+
+OUTPUT_COLUMNS = [
+    "entry_timestamp","entry_date","initial_signal_timestamp","confirmation_delay_minutes",
+    "spot_at_entry","near_expiry","far_expiry","near_exit_timestamp",
+    "far_call_exit_timestamp","far_put_exit_timestamp","candidate_label","shift_points",
+    "strike","near_call_close","near_put_close","far_call_close","far_put_close",
+    "near_settlement","far_call_exit_close","far_put_exit_close","execution_fidelity",
+    "near_lot_size","far_lot_size","flatline_per_unit","flatline_inr",
+]
 def main():
     args = parse_args()
     delays = sorted(set(args.delay_minutes))
@@ -243,7 +252,7 @@ def main():
 
     for delay in delays:
         out = out_dir / ("phase10b_%dm.csv" % delay)
-        df = pd.DataFrame(results[delay]).sort_values("entry_timestamp") if results[delay] else pd.DataFrame()
+        df = (pd.DataFrame(results[delay], columns=OUTPUT_COLUMNS).sort_values("entry_timestamp") if results[delay] else pd.DataFrame(columns=OUTPUT_COLUMNS))
         df.to_csv(out, index=False)
         meta = {
             "delay_minutes": delay,
