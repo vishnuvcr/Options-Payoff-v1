@@ -106,10 +106,29 @@ jobs:
           d.to_csv("results/phase10d/exit_timing_trade_ledger.csv",index=False)
           print(d.groupby(["variant","status"]).size())
           PY
+      - name: Download frozen Phase 9G control
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p phase9g
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2021 -D phase9g/year2021
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2022 -D phase9g/year2022
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2023 -D phase9g/year2023
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2024 -D phase9g/year2024
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2025 -D phase9g/year2025
+          gh run download "$SOURCE_RUN_ID" -n phase9g-year-2026 -D phase9g/year2026
+          python - <<'PY'
+          import glob,pandas as pd
+          files=sorted(glob.glob("phase9g/year*/H1/intraday_selected_trades.csv"))
+          control=pd.concat([pd.read_csv(f) for f in files],ignore_index=True)
+          if len(control)!=131: raise SystemExit(f"Frozen control must contain 131 rows, found {len(control)}")
+          control.to_csv("results/phase10d/frozen_control.csv",index=False)
+          PY
       - name: Analyze
         run: |
           python scripts/analyze_phase10d_results.py \
             --ledger results/phase10d/exit_timing_trade_ledger.csv \
+            --control results/phase10d/frozen_control.csv \
             --out-dir results/phase10d \
             --bootstrap-reps "$BOOTSTRAP_REPS"
       - name: Upload results
