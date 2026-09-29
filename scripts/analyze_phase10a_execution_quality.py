@@ -9,15 +9,19 @@ import numpy as np
 import pandas as pd
 
 from src.costs import CostModel, executed_premium, four_leg_entry_cashflow, stt_rate_for_date
+from scripts.run_near_expiry_exit_backtest import candidate_metrics
 
 GATES = [None, 0.25, 0.50, 0.75]
 SLIPPAGE_SENS = [0.0, 0.0025, 0.005, 0.01]
 BROKERAGE_SENS = [10.0, 20.0, 40.0]
+EXPECTED_PHASE9G_ROWS = 131
+EXPECTED_PHASE9G_NET = 71868.76
+EXPECTED_PHASE9G_GROSS = 100816.81
+EXPECTED_PHASE9G_COSTS = 28948.05
 
 
 def parse_args():
     p = argparse.ArgumentParser()
-    p.add_argument("--surface", required=True)
     p.add_argument("--primary-trades", required=True)
     p.add_argument("--out-dir", required=True)
     p.add_argument("--slippage-pct", type=float, default=0.0025)
@@ -80,36 +84,24 @@ def paired_permutation_pvalue(diff, reps=20000, seed=20260929):
     return float((1 + count) / (reps + 1))
 
 
-def nifty_lot_size(expiry):
-    d = pd.Timestamp(expiry).date()
-    if d < pd.Timestamp("2021-08-01").date():
-        return 75
-    if d < pd.Timestamp("2024-05-02").date():
-        return 50
-    if d < pd.Timestamp("2024-11-21").date():
-        return 25
-    if d < pd.Timestamp("2026-01-06").date():
-        return 75
-    return 65
-
-
 def estimate_point_in_time_six_order_cost(row, model):
     """Entry-observable six-order friction proxy.
 
-    Future far-leg exit prices are unknown at entry, so the two future exit
-    premiums are proxied by their corresponding entry premiums. The proxy
-    includes six-order brokerage, turnover-based exchange/SEBI charges,
-    entry/exit stamp duty and entry/exit-sale STT at the entry-date rate.
-    Exercise/settlement STT is excluded because it is not entry-observable.
+    The four entry premiums are observed. Future far-leg exit premiums are
+    unknown at entry, so the proxy assumes those two exits occur at their
+    corresponding entry premiums with the same slippage. It includes
+    six-order brokerage, turnover-based exchange/SEBI charges, entry/exit
+    stamp duty and entry/exit-sale STT at the entry-date rate. Exercise STT
+    is excluded because it is not entry-observable.
     """
-    lot = nifty_lot_size(row.near_expiry)
+    lot = int(row.near_lot_size)
     entry = four_leg_entry_cashflow(
-        float(row.near_call), float(row.near_put),
-        float(row.far_call), float(row.far_put),
+        float(row.near_call_close), float(row.near_put_close),
+        float(row.far_call_close), float(row.far_put_close),
         slippage_pct=model.slippage_pct,
     )
-    far_ce_exit = executed_premium(float(row.far_call), -1, model.slippage_pct)
-    far_pe_exit = executed_premium(float(row.far_put), +1, model.slippage_pct)
+    far_ce_exit = executed_premium(float(row.far_call_close), -1, model.slippage_pct)
+    far_pe_exit = executed_premium(float(row.far_put_close), +1, model.slippage_pct)
     turnover = (entry["premium_turnover"] + far_ce_exit + far_pe_exit) * lot
     sell_turnover = (entry["sell_premium_turnover"] + far_ce_exit) * lot
     buy_turnover = (entry["buy_premium_turnover"] + far_pe_exit) * lot
@@ -154,119 +146,68 @@ def select_gate(primary, gate):
     return g.sort_values("entry_timestamp").reset_index(drop=True)
 
 
-def load_sensitivity_ledgers(primary_path):
-    root = Path(primary_path).parent.parent
-    out = {}
-    for slip in SLIPPAGE_SENS:
-        slip_label = {
-            0.0: "phase9d_slip_0",
-            0.0025: "phase9d_primary",
-            0.005: "phase9d_slip_0p005",
-            0.01: "phase9d_slip_0p01",
-        }[slip]
-        p = root / slip_label / "intraday_selected_trades.csv"
-        if p.exists():
-            out[("slippage", slip)] = pd.read_csv(p)
-    for brokerage in BROKERAGE_SENS:
-        p = root / f"phase9d_broker_{int(brokerage)}" / "intraday_selected_trades.csv"
-        if p.exists():
-            out[("brokerage", brokerage)] = pd.read_csv(p)
-    return out
-
-
 def main():
     args = parse_args()
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    surface = pd.read_parquet(args.surface)
-    primary = pd.read_parquet(args.primary_trades)
-    surface_selected = surface[surface["selected"].astype(bool)].copy()
-    key_cols = ["timestamp", "near_expiry", "shift_points"]
-    value_cols = ["strike", "near_call", "near_put", "far_call", "far_put", "flatline_inr"]
-    dup = surface_selected[surface_selected.duplicated(key_cols, keep=False)].copy()
-    if not dup.empty:
-        conflicts = []
-        for key, g in dup.groupby(key_cols, dropna=False):
-            for col in value_cols:
-                if g[col].nunique(dropna=False) > 1:
-                    conflicts.append({"key": key, "column": col})
-        if conflicts:
-            raise RuntimeError(f"Conflicting duplicate decision-surface rows: {conflicts[:10]}")
-        surface_selected = surface_selected.drop_duplicates(key_cols, keep="first").copy()
-
-    required_surface = {
-        "timestamp", "near_expiry", "shift_points", "near_call", "near_put",
-        "far_call", "far_put", "flatline_inr",
+    primary = pd.read_csv(args.primary_trades)
+    required = {
+        "entry_timestamp", "near_expiry", "shift_points", "near_lot_size",
+        "near_call_close", "near_put_close", "far_call_close", "far_put_close",
+        "estimated_all_green_flatline", "estimated_equal_max_profit_loss_inr",
+        "chart_pnl_inr", "gross_pnl_inr", "net_pnl_inr", "total_costs",
     }
-    missing_surface = required_surface - set(surface_selected.columns)
-    if missing_surface:
-        raise RuntimeError(f"Decision surface missing required columns: {sorted(missing_surface)}")
+    missing = required - set(primary.columns)
+    if missing:
+        raise RuntimeError(f"Phase 9G H1 ledger missing required columns: {sorted(missing)}")
 
-    required_primary = {
-        "entry_timestamp", "near_expiry", "net_pnl_inr", "total_costs",
-    }
-    missing_primary = required_primary - set(primary.columns)
-    if missing_primary:
-        raise RuntimeError(f"Primary ledger missing required columns: {sorted(missing_primary)}")
-
-    primary = primary.copy()
     primary["entry_timestamp"] = pd.to_datetime(primary["entry_timestamp"], utc=True)
-    surface_selected["timestamp"] = pd.to_datetime(surface_selected["timestamp"], utc=True)
+    primary["flatline_inr"] = primary["chart_pnl_inr"].astype(float)
+    primary["cost_to_flatline"] = np.nan
 
-    # Join the authoritative realized ledger to the selected decision-surface
-    # row. The surface supplies entry-observable premiums/lot size; the ledger
-    # supplies realized outcome. This is intentionally not a future-data join
-    # for the gate itself.
-    join_cols_left = ["entry_timestamp", "near_expiry", "shift_points"]
-    join_cols_right = ["timestamp", "near_expiry", "shift_points"]
-    surface_selected = surface_selected.rename(columns={"timestamp": "entry_timestamp"})
-    merged = primary.merge(
-        surface_selected[
-            ["entry_timestamp", "near_expiry", "shift_points", "near_call",
-             "near_put", "far_call", "far_put", "flatline_inr"]
-        ],
-        on=["entry_timestamp", "near_expiry", "shift_points"],
-        how="left",
-        validate="one_to_one",
-    )
-    if merged[["near_call", "near_put", "far_call", "far_put"]].isna().any().any():
-        raise RuntimeError("Some authoritative realized trades could not be matched to a selected decision-surface row")
-
-    pkeys = set(zip(primary["entry_timestamp"].astype(str), primary["near_expiry"].astype(str), primary["shift_points"]))
-    skeys = set(zip(surface_selected["entry_timestamp"].astype(str), surface_selected["near_expiry"].astype(str), surface_selected["shift_points"]))
-    if not pkeys.issubset(skeys):
-        raise RuntimeError("Authoritative realized trades are not a subset of selected decision-surface rows")
-
-    reproduction = {
-        "primary_rows": int(len(primary)),
-        "surface_selected_rows": int(len(surface_selected)),
-        "matched_realized_rows": int(len(merged)),
-        "unmatched_selected_rows": int(len(surface_selected) - len(merged)),
-        "net_primary_inr": float(primary["net_pnl_inr"].sum()),
+    # Frozen Phase 9G reproduction guard. These values come from the accepted
+    # Phase 9G exact-17-strike H1 result, not from the superseded Phase 9D ledger.
+    actual = {
+        "rows": int(len(primary)),
+        "weekly_cycles": int(primary["near_expiry"].nunique()),
+        "net_pnl_inr": float(primary["net_pnl_inr"].sum()),
+        "gross_pnl_inr": float(primary["gross_pnl_inr"].sum()),
+        "costs_inr": float(primary["total_costs"].sum()),
+        "all_green_rate_pct": float(100 * primary["estimated_all_green_flatline"].mean()),
     }
-
-    (out / "reproduction_check.json").write_text(json.dumps(reproduction, indent=2))
+    if actual["rows"] != EXPECTED_PHASE9G_ROWS:
+        raise RuntimeError(f"Frozen Phase 9G row-count reproduction failed: {actual['rows']} != {EXPECTED_PHASE9G_ROWS}")
+    if abs(actual["net_pnl_inr"] - EXPECTED_PHASE9G_NET) > 0.01:
+        raise RuntimeError(f"Frozen Phase 9G net-P&L reproduction failed: {actual['net_pnl_inr']} != {EXPECTED_PHASE9G_NET}")
+    if abs(actual["gross_pnl_inr"] - EXPECTED_PHASE9G_GROSS) > 0.01:
+        raise RuntimeError(f"Frozen Phase 9G gross-P&L reproduction failed: {actual['gross_pnl_inr']} != {EXPECTED_PHASE9G_GROSS}")
+    if abs(actual["costs_inr"] - EXPECTED_PHASE9G_COSTS) > 0.01:
+        raise RuntimeError(f"Frozen Phase 9G cost reproduction failed: {actual['costs_inr']} != {EXPECTED_PHASE9G_COSTS}")
+    if actual["weekly_cycles"] != EXPECTED_PHASE9G_ROWS:
+        raise RuntimeError("Phase 9G H1 control is not one complete realized trade per weekly cycle")
+    if actual["all_green_rate_pct"] != 100.0:
+        raise RuntimeError("Phase 9G H1 control contains a non-positive selected static flatline")
 
     model = CostModel(slippage_pct=args.slippage_pct, brokerage_per_order_inr=args.brokerage_per_order)
-    merged["near_lot_size"] = merged["near_expiry"].map(nifty_lot_size)
-    merged["estimated_six_order_cost_inr"] = merged.apply(
+    primary["estimated_six_order_cost_inr"] = primary.apply(
         lambda r: estimate_point_in_time_six_order_cost(r, model), axis=1
     )
-    merged["cost_to_flatline"] = merged["estimated_six_order_cost_inr"] / merged["flatline_inr"]
-    merged["estimated_gate_uses_future_exit_prices"] = False
-    merged.to_csv(out / "candidate_cost_quality.csv", index=False)
+    primary["cost_to_flatline"] = primary["estimated_six_order_cost_inr"] / primary["flatline_inr"]
+    primary["estimated_gate_uses_future_exit_prices"] = False
+    primary.to_csv(out / "candidate_cost_quality.csv", index=False)
+    (out / "reproduction_check.json").write_text(json.dumps(actual, indent=2))
 
     variants = {}
     gate_rows = []
     for gate in GATES:
         label = "control" if gate is None else f"cost_le_{int(gate * 100)}pct"
-        trades = select_gate(merged, gate)
+        trades = select_gate(primary, gate)
         variants[label] = trades
         s = summarize(trades)
         s["variant"] = label
         s["gate_ratio"] = np.nan if gate is None else gate
-        s["skipped_cycles"] = int(len(merged) - len(trades))
+        s["skipped_cycles"] = int(len(primary) - len(trades))
         gate_rows.append(s)
         trades.to_csv(out / f"{label}_trades.csv", index=False)
 
@@ -312,10 +253,10 @@ def main():
         paired["bh_q"] = q
     paired.to_csv(out / "paired_gate_comparisons.csv", index=False)
 
-    positive = merged[merged["flatline_inr"] > 0]
+    positive = primary[primary["flatline_inr"] > 0]
     geom = {
-        "decision_timestamps": int(merged["entry_timestamp"].nunique()),
-        "realized_selected_trades": int(len(merged)),
+        "decision_timestamps": int(primary["entry_timestamp"].nunique()),
+        "realized_selected_trades": int(len(primary)),
         "median_cost_to_flatline_pct": float(100 * positive["cost_to_flatline"].median()),
         "p75_cost_to_flatline_pct": float(100 * positive["cost_to_flatline"].quantile(.75)),
         "p90_cost_to_flatline_pct": float(100 * positive["cost_to_flatline"].quantile(.90)),
@@ -325,38 +266,26 @@ def main():
     }
     (out / "geometry_summary.json").write_text(json.dumps(geom, indent=2))
 
-    # Use already-cached Phase 9D sensitivity ledgers and apply the exact same
-    # entry-time gate membership. This avoids re-running market-data extraction.
-    sensitivity = load_sensitivity_ledgers(args.primary_trades)
     stress_rows = []
     for label, selected in variants.items():
-        keys = set(zip(selected["entry_timestamp"].astype(str), selected["near_expiry"].astype(str), selected["shift_points"]))
         for slip in SLIPPAGE_SENS:
-            ledger = sensitivity.get(("slippage", slip))
-            if ledger is None:
-                continue
-            ledger["entry_timestamp"] = pd.to_datetime(ledger["entry_timestamp"], utc=True)
-            lk = set(zip(ledger["entry_timestamp"].astype(str), ledger["near_expiry"].astype(str), ledger["shift_points"]))
-            keep = ledger[[k in keys for k in zip(ledger["entry_timestamp"].astype(str), ledger["near_expiry"].astype(str), ledger["shift_points"])]]
-            stress_rows.append({
-                "variant": label, "slippage_pct": slip, "brokerage_per_order_inr": 20.0,
-                "trade_count": len(keep), "net_pnl_inr": float(keep["net_pnl_inr"].sum()),
-                "mean_pnl_inr": float(keep["net_pnl_inr"].mean()) if len(keep) else np.nan,
-            })
-        for brokerage in BROKERAGE_SENS:
-            ledger = sensitivity.get(("brokerage", brokerage))
-            if ledger is None:
-                continue
-            ledger["entry_timestamp"] = pd.to_datetime(ledger["entry_timestamp"], utc=True)
-            keep = ledger[[k in keys for k in zip(ledger["entry_timestamp"].astype(str), ledger["near_expiry"].astype(str), ledger["shift_points"])]]
-            stress_rows.append({
-                "variant": label, "slippage_pct": 0.0025, "brokerage_per_order_inr": brokerage,
-                "trade_count": len(keep), "net_pnl_inr": float(keep["net_pnl_inr"].sum()),
-                "mean_pnl_inr": float(keep["net_pnl_inr"].mean()) if len(keep) else np.nan,
-            })
+            for brokerage in [20.0] if slip != 0.0025 else BROKERAGE_SENS:
+                mdl = CostModel(slippage_pct=slip, brokerage_per_order_inr=brokerage)
+                pnl = []
+                for row in selected.itertuples(index=False):
+                    m = candidate_metrics(row, mdl)
+                    if m is not None:
+                        pnl.append(m["net_pnl_inr"])
+                stress_rows.append({
+                    "variant": label,
+                    "slippage_pct": slip,
+                    "brokerage_per_order_inr": brokerage,
+                    "trade_count": len(pnl),
+                    "net_pnl_inr": float(np.sum(pnl)) if pnl else 0.0,
+                    "mean_pnl_inr": float(np.mean(pnl)) if pnl else np.nan,
+                })
     pd.DataFrame(stress_rows).to_csv(out / "execution_stress.csv", index=False)
 
-    best = None
     promotion_screen = False
     if not paired.empty:
         best = paired.sort_values("mean_difference_inr", ascending=False).iloc[0]
@@ -375,20 +304,25 @@ def main():
         "",
         "Does a predeclared execution-quality gate remove trades whose static chart edge is too small relative to realistic six-order friction?",
         "",
+        "## Frozen-control source",
+        "",
+        "This phase uses the accepted Phase 9G exact-17-strike H1 ledger: 131 complete realized trades, one per weekly cycle. The superseded 169-trade Phase 9D ledger is explicitly not used.",
+        "",
         "## Gate definition",
         "",
-        "At the frozen Phase 9G H1 selected entry, reject the trade when the point-in-time estimated six-order friction divided by the positive static flatline exceeds the gate. The test does not choose another strike and does not search a later timestamp.",
+        "At the frozen Phase 9G selected entry, reject the trade when the point-in-time estimated six-order friction divided by the positive static flatline exceeds the gate. The test does not choose another strike and does not search a later timestamp.",
         "",
         "The proxy uses only entry-observable premiums and lot size. Future far-leg exit premiums are proxied by their entry premiums with the same 0.25% slippage. It includes six-order brokerage, turnover-based exchange/SEBI charges, entry/exit stamp duty and entry/exit-sale STT at the entry-date rate. Exercise/settlement STT is excluded because it is not entry-observable.",
         "",
         "Predeclared gates: no gate, <=25%, <=50%, <=75%.",
         "",
         "## Control reproduction",
-        f"- Authoritative realized rows: {reproduction['primary_rows']}",
-        f"- Selected decision-surface rows: {reproduction['surface_selected_rows']}",
-        f"- Matched realized rows: {reproduction['matched_realized_rows']}",
-        f"- Selected rows without complete realized ledger: {reproduction['unmatched_selected_rows']}",
-        f"- Authoritative control net P&L: ₹{reproduction['net_primary_inr']:,.2f}",
+        f"- Complete realized trades: {actual['rows']}",
+        f"- Weekly cycles: {actual['weekly_cycles']}",
+        f"- Gross P&L: ₹{actual['gross_pnl_inr']:,.2f}",
+        f"- Modeled costs: ₹{actual['costs_inr']:,.2f}",
+        f"- Net P&L: ₹{actual['net_pnl_inr']:,.2f}",
+        f"- Static chart-positive rate: {actual['all_green_rate_pct']:.1f}%",
         "",
         "## Gate results",
         "",
@@ -410,20 +344,19 @@ def main():
         "## Limitations",
         "",
         "- The cached source contains option closes rather than point-in-time bid/ask quotes, so this is an execution-friction proxy rather than a true executable-spread model.",
-        "- The exit-price proxy is intentionally conservative/explicit and is used only to construct an entry-time cost ratio; it is not treated as a forecast of realized exit prices.",
-        "- Three of the 172 selected Phase 9D cycles were incomplete for realized P&L because of lot-size incompatibility; they remain in the selection surface but are excluded from realized control metrics, matching the authoritative H1 convention.",
+        "- The exit-price proxy is intentionally explicit and is used only to construct an entry-time cost ratio; it is not treated as a forecast of realized exit prices.",
+        "- The gate is a trade/no-trade filter at the frozen selected entry; it does not test alternate-strike substitution or later same-day re-entry.",
         "",
         "## Interpretation",
         "",
-        "This phase tests whether the static chart edge is large enough relative to entry-time friction. It does not establish that a lower cost-to-flatline ratio predicts favorable far-expiry revaluation, and it does not change the frozen strike/timing rule unless a later chronological holdout supports the refinement.",
+        "This phase tests whether the static chart edge is large enough relative to entry-time friction. It does not establish that a lower cost-to-flatline ratio predicts favorable far-expiry revaluation.",
     ]
     (out / "PHASE10A_RESULTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     print(json.dumps({
         "status": "complete",
-        "realized_selected_trades": len(merged),
+        "frozen_control": actual,
         "promotion_screen_passed": promotion_screen,
-        "reproduction": reproduction,
         "gate_summary": gate_rows,
     }, indent=2, default=str))
 
