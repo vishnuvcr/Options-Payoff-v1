@@ -194,6 +194,14 @@ def main():
         ].copy()
         group = group[group["shift_points"].between(-400, 400)]
         group = group[(group["shift_points"] % 50) == 0]
+        if "status" in group.columns:
+            group["_status_ok"] = (group["status"] == "ok").astype(int)
+        else:
+            group["_status_ok"] = 1
+        group = group.sort_values(
+            ["shift_points", "_status_ok", "flatline_inr"],
+            ascending=[True, False, False],
+        ).drop_duplicates("shift_points", keep="first").drop(columns=["_status_ok"])
         if len(group) != 17 or group["shift_points"].nunique() != 17:
             raise RuntimeError(
                 f"Exact-17 decision surface missing for cycle {near_expiry} at {entry_ts}: "
