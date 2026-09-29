@@ -170,3 +170,18 @@
 | 2026-09-28 | 9I | Merge-column bug | The merge script used `trades.rank`, which resolves to the pandas DataFrame method rather than the `rank` column. | Replaced it with explicit `trades['rank']` column access. |
 | 2026-09-28 | 9I | Reporting-count bug | The first cycle-level summary counted rows in the cycle summary rather than realized rank-2 positions, so the second-candidate count was initially misreported. | Recomputed realized rank counts directly from the top-two trade ledger and added an annual rank-contribution table. |
 | 2026-09-28 | 9I | Redundant workflow execution | Push-triggered full-analysis workflows repeatedly competed with the merge-only acceptance path and were cancelled or failed while the completed yearly artifacts already existed. | Used the dedicated merge-only workflow against the frozen six yearly artifacts for final acceptance; redundant runs are not used as evidence. |
+
+## Phase 10 initiation — 2026-09-29
+
+No Phase 10 implementation error has been accepted yet.
+
+Pre-start prevention gates carried forward:
+- exact 17 unique strikes;
+- no conflicting duplicates;
+- no look-ahead;
+- near-expiry manual far-leg close;
+- six-transaction cost model;
+- full-population validation before adoption;
+- no loss-specific optimization as a production rule.
+
+Any Phase 10 error will be appended with its invalidated output, correction, and verification evidence.
