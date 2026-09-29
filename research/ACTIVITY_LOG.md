@@ -222,3 +222,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-29 | 10A | Control-source correction | An initial successful computation was invalidated because it used the superseded Phase 9D 169-trade ledger. Phase 10A was re-anchored to the frozen Phase 9G exact-17-strike yearly H1 artifacts. |
 | 2026-09-29 | 10A | Accepted execution-quality result | Workflow 36555450407 reproduced the frozen 131-trade Phase 9G control exactly and completed the predeclared <=25%, <=50% and <=75% cost-to-flatline gates plus execution stress. No gate was promoted. |
+
+| 2026-09-29 | 10B | Signal-persistence confirmation | Tested 5, 10, 15 and 30 minute exact-17 positive-surface confirmation windows using the frozen Phase 9G source structure; no confirmation rule was promoted automatically. |
+| 2026-09-29 | 10B | Result publication | Published the confirmation summary, paired inference and promotion screen under results/phase10b/. |

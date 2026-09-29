@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-29  
-**Active branch:** phase-10A-execution-quality
-**Overall status:** Phase 10A COMPLETE — execution-quality / cost-to-edge gate tested; frozen one-strike Phase 9G H1 control retained
+**Active branch:** phase-10B-signal-persistence
+**Overall status:** Phase 10B COMPLETE — signal-persistence confirmation tested; frozen one-strike Phase 9G H1 control retained
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -624,3 +624,13 @@ Control reproduction matched 169 rows with maximum absolute P&L difference ₹0.
 - Execution stress: [execution stress](../results/phase10a/execution_stress.csv)
 
 Control reproduction matched 131 rows with maximum absolute P&L difference ₹0.0.
+
+## Phase 10B — signal persistence
+
+**Status:** COMPLETE — no strategy change adopted.
+
+- [Phase 10B result report](../results/phase10b/PHASE10B_RESULTS.md)
+- [Confirmation summary](../results/phase10b/confirmation_summary.csv)
+- [Paired confirmation comparisons](../results/phase10b/paired_confirmation_comparisons.csv)
+- Promotion screen passed: False
+- Best historical variant considered: 15m

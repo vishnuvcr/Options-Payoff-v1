@@ -1,0 +1,19 @@
+{
+  "weekly_cycles": 38,
+  "selected_weekly_cycles": 39,
+  "selected_trades": 39,
+  "realized_trade_rows": 38,
+  "incomplete_selected_trades": 1,
+  "chart_positive_win_rate_pct": 100.0,
+  "realized_win_rate_pct": 50.0,
+  "net_pnl_inr": -646.709545470891,
+  "gross_pnl_inr": 7731.714374999663,
+  "total_costs_inr": 8378.423920470554,
+  "mean_net_pnl_inr": -17.018672249233976,
+  "median_net_pnl_inr": -50.084322834113564,
+  "losing_trades": 19,
+  "slippage_pct": 0.0025,
+  "brokerage_per_order_inr": 20.0,
+  "selection_rule": "first intraday timestamp from 09:20 onward with any positive flatline; at that timestamp choose maximum positive flatline across ATM-400..ATM+400",
+  "no_0920_skip_rule": true
+}

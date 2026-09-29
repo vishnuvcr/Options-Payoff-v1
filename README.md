@@ -490,3 +490,17 @@ Phase 10A was rerun against the accepted **Phase 9G exact-17-strike H1 control**
 - [Control reproduction](results/phase10a/reproduction_check.json)
 
 The Phase 9G H1 control remains the frozen research candidate. Phase 10B is next under the predeclared plan.
+
+## Phase 10B — signal persistence
+
+**Complete on 2026-09-29; no strategy change adopted.**
+
+Phase 10B tested whether a positive exact-17-strike surface must persist for 5, 10, 15 or 30 minutes before entry.
+
+- [Phase 10B result report](results/phase10b/PHASE10B_RESULTS.md)
+- [Confirmation summary](results/phase10b/confirmation_summary.csv)
+- [Paired inference](results/phase10b/paired_confirmation_comparisons.csv)
+- Promotion screen: **False**
+- Best historical variant: **15m**
+
+The frozen Phase 9G H1 control remains the research candidate unless Phase 10G chronological holdout supports a predeclared refinement.

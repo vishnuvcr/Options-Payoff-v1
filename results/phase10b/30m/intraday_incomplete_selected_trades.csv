@@ -1,0 +1,2 @@
+entry_timestamp,entry_date,near_expiry,far_expiry,strike,shift_points,reason,missing_fields
+2024-04-25 09:05:00+00:00,2024-04-25,2024-04-25,2024-05-02,22750.0,150,lot_size_mismatch,
