@@ -70,3 +70,28 @@ The literature does not justify treating a positive static cross-expiry payoff c
 8. **Hu, Li & Zhuo, “The Term Structure of Index Option Returns” (working paper; revised August 2026).** The study directly examines the maturity structure of index-option realized returns and finds that the term structure of option returns contains risk-premium components that differ by maturity. This is a particularly relevant conceptual reference for fixed H1/H2/H3 horizon comparison. Source: https://papers.ssrn.com/sol3/Delivery.cfm/5944594.pdf?abstractid=5944594&mirid=1
 
 9. **Kumar, Sarva & Kumaresan (2025), “Behavioral Dynamics in Testing Markets: A Methodological Analogy to Trader and Investor Efficiency.”** Using Nifty50 spot/futures/options data from April 2018 to March 2024, the paper reports that transaction costs materially reduce the subset of apparent put-call parity violations that are exploitable. This supports explicit friction sensitivity in the present research. Source: https://doi.org/10.5281/zenodo.17567987
+
+## Phase 10 literature / evidence additions — 2026-09-29
+
+24. Vipul (2008), “Cross-market efficiency in the Indian derivatives market: A test of put-call parity,” *Journal of Futures Markets* 28(9), 889–910. Time-stamped NIFTY transactions data and reported short-lived parity violations motivate explicit intraday timing and execution-friction tests.
+Source: https://doi.org/10.1002/fut.20325
+
+25. Mutum, Das, Singh & Singha (2018), “Testing the Efficiency of Indian Index Options Market by Employing the Box-Spread Strategy: Empirical Evidence from S&P CNX Nifty Index,” *Indian Journal of Finance* 12(10), 21–33. Reported apparent box-spread mispricing was concentrated around illiquid levels/maturity segments and often was not exploitable after liquidity considerations.
+Source: https://www.indianjournaloffinance.co.in/index.php/IJF/article/view/132492
+
+26. Aggarwal & Gupta (2009), “Empirical Evidence on the Efficiency of Index Options Market in India,” *Asia Pacific Business Review*. Transaction costs materially affected the exploitability of apparent parity violations in Indian index options.
+Source: https://doi.org/10.1177/097324700900500311
+
+27. Kaeck, van Kervel & Seeger (2022), “Price impact versus bid–ask spreads in the index option market,” *Journal of Financial Markets* 59, 100675. The study documents large option bid-ask spreads relative to option value and examines their relation to price impact, motivating executable-spread sensitivity rather than relying only on close-price fills.
+Source: https://doi.org/10.1016/j.finmar.2021.100675
+
+28. Christoffersen et al. (2016), “Analyzing volatility risk and risk premium in option contracts: A new theory,” *Journal of Financial Economics* 120(1), 1–20. Maturity- and strike-specific volatility risk premia motivate scenario-aware cross-expiry analysis.
+Source: https://doi.org/10.1016/j.jfineco.2016.01.004
+
+29. Guo (2023), “Term spreads of implied volatility smirk and variance risk premium,” *Journal of Futures Markets*. Reports predictive content in implied-volatility term-spread factors for variance-asset returns, motivating a predeclared term-structure scenario test rather than ad-hoc Greek selection.
+Source: https://doi.org/10.1002/fut.22409
+
+30. Culp et al. (2021), “Option-Implied Spreads and Option Risk Premia,” NBER Working Paper 28941. Provides a framework for interpreting option-implied spreads as risk premia rather than pure arbitrage.
+Source: https://www.nber.org/papers/w28941
+
+These sources motivate the Phase 10 hypotheses. They do not establish that any Phase 10 refinement is profitable for this specific NIFTY strategy.
