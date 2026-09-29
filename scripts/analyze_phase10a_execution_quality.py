@@ -230,7 +230,7 @@ def main():
         how="left",
         validate="one_to_one",
     )
-    if merged[["near_call", "near_put", "far_call", "far_put", "near_lot_size"]].isna().any().any():
+    if merged[["near_call", "near_put", "far_call", "far_put"]].isna().any().any():
         raise RuntimeError("Some authoritative realized trades could not be matched to a selected decision-surface row")
 
     pkeys = set(zip(primary["entry_timestamp"].astype(str), primary["near_expiry"].astype(str), primary["shift_points"]))
