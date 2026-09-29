@@ -1,8 +1,8 @@
 # Research status
 
 **As of:** 2026-09-29  
-**Active branch:** phase-10B-signal-persistence
-**Overall status:** Phase 10B COMPLETE — signal-persistence confirmation tested; frozen one-strike Phase 9G H1 control retained
+**Active branch:** phase-10C-scenario-aware-selection
+**Overall status:** Phase 10C COMPLETE — scenario-aware strike selection tested; frozen one-strike Phase 9G H1 control retained
 
 | Phase | Status | Corrected evidence |
 |---|---|---|
@@ -634,3 +634,15 @@ Control reproduction matched 131 rows with maximum absolute P&L difference ₹0.
 - [Paired confirmation comparisons](../results/phase10b/paired_confirmation_comparisons.csv)
 - Promotion screen passed: False
 - Best historical variant considered: 15m
+
+
+## Phase 10C — scenario-aware strike selection
+
+**Status:** COMPLETE — no strategy change adopted.
+
+- [Phase 10C result report](../results/phase10c/PHASE10C_RESULTS.md)
+- [Scenario selector summary](../results/phase10c/scenario_selector_summary.csv)
+- [Paired comparisons](../results/phase10c/paired_scenario_comparisons.csv)
+- [Candidate scenario scores](../results/phase10c/candidate_scenario_scores.csv)
+- Promotion screen passed: False
+- Best historical variant: worst

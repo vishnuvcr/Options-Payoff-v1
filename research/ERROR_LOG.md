@@ -238,3 +238,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 
 | 2026-09-29 | 10C | Frozen-control tie-break mismatch | Canonicalizing duplicate surface rows with a new shift tie-break produced a different 2022 control strike from the frozen Phase 9G selector. | No empirical conclusion accepted. Control selection is now anchored to the exact frozen selected strike; only alternative scenario selectors are independently ranked. |
 | 2026-09-29 | 10C | Workflow failure | Phase 10C failed before completion. Run: https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36567160798 | No empirical conclusion accepted from this failed run. | Inspect and correct before rerun. |
+
+| 2026-09-29 | 10C | Model-based scenario limitation | Far-leg IVs are reconstructed from entry premiums with Black–Scholes r=0/q=0; they are not exchange-published executable IVs. | Treat scenario rankings as model-based research evidence and require Phase 10G holdout before any adoption. | Limitation documented in Phase 10C report. |

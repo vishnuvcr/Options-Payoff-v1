@@ -504,3 +504,23 @@ Phase 10B tested whether a positive exact-17-strike surface must persist for 5, 
 - Best historical variant: **15m**
 
 The frozen Phase 9G H1 control remains the research candidate unless Phase 10G chronological holdout supports a predeclared refinement.
+
+## Phase 10C — scenario-aware strike selection
+
+**Complete on 2026-09-29; no strategy change adopted.**
+
+Phase 10C tested fixed point-in-time scenario ranking across the 17-strike grid:
+
+- spot shocks: -2%, -1%, 0%, +1%, +2%;
+- far-leg IV shocks: -5, 0, +5 volatility points;
+- 15 scenarios per eligible strike;
+- candidate eligibility remains positive/all-green static flatline.
+
+- [Phase 10C result report](results/phase10c/PHASE10C_RESULTS.md)
+- [Scenario selector summary](results/phase10c/scenario_selector_summary.csv)
+- [Paired inference](results/phase10c/paired_scenario_comparisons.csv)
+- [Candidate scenario scores](results/phase10c/candidate_scenario_scores.csv)
+- Promotion screen: **False**
+- Best historical variant: **worst**
+
+The frozen Phase 9G H1 control remains the research candidate unless Phase 10G chronological holdout supports a predeclared refinement.

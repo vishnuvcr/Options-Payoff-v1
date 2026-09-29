@@ -1,0 +1,9 @@
+{
+  "passed": false,
+  "best_variant": "worst",
+  "criteria": {
+    "mean_difference_gt_zero": false,
+    "bootstrap_low_gt_zero": false,
+    "bh_q_lt_0_05": true
+  }
+}

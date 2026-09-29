@@ -225,3 +225,6 @@ This is the observable research/repository activity log. It records completed ac
 
 | 2026-09-29 | 10B | Signal-persistence confirmation | Tested 5, 10, 15 and 30 minute exact-17 positive-surface confirmation windows using the frozen Phase 9G source structure; no confirmation rule was promoted automatically. |
 | 2026-09-29 | 10B | Result publication | Published the confirmation summary, paired inference and promotion screen under results/phase10b/. |
+
+| 2026-09-29 | 10C | Scenario-aware selector | Evaluated the predeclared 15-state (-2/-1/0/+1/+2% spot × -5/0/+5 vol-point far-IV) grid across positive/all-green 17-strike candidates; no future realized P&L was used in selection. |
+| 2026-09-29 | 10C | Result publication | Published full candidate scenario scores, selector backtests, paired inference and promotion screen under results/phase10c/. |
