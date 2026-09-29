@@ -231,3 +231,5 @@ Any Phase 10 error will be appended with its invalidated output, correction, and
 | 2026-09-29 | 10B | Workflow failure | Phase 10B failed before completion. Run: https://github.com/vishnuvcr/Options-Payoff-v1/actions/runs/36562518688 | No empirical conclusion accepted from this failed run. | Inspect and correct before rerun. |
 
 | 2026-09-29 | 10B | Execution-data limitation | Confirmation analysis uses historical 1-minute close observations and exact-minute confirmation timestamps; it does not claim executable bid/ask fills. | Treat confirmation results as historical research evidence only and require Phase 10G holdout before promotion. | Limitation documented in the Phase 10B report. |
+
+| 2026-09-29 | 10C | Yearly-control cardinality assertion | Phase 10C extractor incorrectly required 131 frozen selected rows inside each yearly artifact; year 2024 correctly contains only its 26 selected weekly cycles. | No empirical result accepted. Changed the extractor to require nonempty yearly data and exactly one selected row per weekly cycle; the six-year global merge remains the 131-row control gate. |
