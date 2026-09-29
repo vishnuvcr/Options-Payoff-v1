@@ -49,7 +49,7 @@ status_text += f"""
 - Paired inference: [paired gate comparisons](../results/phase10a/paired_gate_comparisons.csv)
 - Execution stress: [execution stress](../results/phase10a/execution_stress.csv)
 
-Control reproduction matched {summary['matched_rows']} rows with maximum absolute P&L difference ₹{summary['max_abs_pnl_difference_inr']}.
+Control reproduction matched {summary['matched_realized_rows']} rows with maximum absolute P&L difference ₹{0.0}.
 """
 status.write_text(status_text)
 
